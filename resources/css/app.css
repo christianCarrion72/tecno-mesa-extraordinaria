@@ -1,0 +1,153 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import './themes.css';
+
+/* ====================================================================
+   ESTILOS GLOBALES CON VARIABLES CSS DINÁMICAS
+   ==================================================================== */
+
+/* Body y fondo */
+body {
+    background-color: var(--color-base);
+    color: var(--color-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Selects dinámicos */
+select {
+    border-color: var(--color-border);
+    background-color: var(--color-base);
+    color: var(--color-text);
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+}
+
+/* Inputs dinámicos */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="search"],
+textarea {
+    border-color: var(--color-border);
+    background-color: var(--color-base);
+    color: var(--color-text);
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+}
+
+/* Links dinámicos */
+a {
+    color: var(--color-primary);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--color-secondary);
+}
+
+/* Estilos personalizados para el taller */
+.bg-taller-gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    transition: background 0.3s ease;
+}
+
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hover-lift {
+    transition: transform 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+/* ====================================================================
+   OVERRIDES PARA TAILWIND CON VARIABLES CSS
+   ==================================================================== */
+
+/* Buttons con clases Tailwind que cambian al tema */
+.bg-blue-600 {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-blue-600:hover {
+    filter: brightness(0.9);
+}
+
+.bg-green-600 {
+    background-color: var(--color-success) !important;
+}
+
+.bg-green-600:hover {
+    filter: brightness(0.9);
+}
+
+.bg-red-600 {
+    background-color: var(--color-error) !important;
+}
+
+.bg-red-600:hover {
+    filter: brightness(0.9);
+}
+
+.bg-purple-600 {
+    background-color: var(--color-secondary) !important;
+}
+
+.bg-purple-600:hover {
+    filter: brightness(0.9);
+}
+
+.bg-yellow-600 {
+    background-color: var(--color-warning) !important;
+}
+
+.bg-yellow-600:hover {
+    filter: brightness(0.9);
+}
+
+/* Text colors */
+.text-blue-600 {
+    color: var(--color-primary) !important;
+}
+
+.text-green-600 {
+    color: var(--color-success) !important;
+}
+
+.text-red-600 {
+    color: var(--color-error) !important;
+}
+
+.text-purple-600 {
+    color: var(--color-secondary) !important;
+}
+
+/* Border colors */
+.border-blue-600 {
+    border-color: var(--color-primary) !important;
+}
+
+.border-green-600 {
+    border-color: var(--color-success) !important;
+}
+
+.border-red-600 {
+    border-color: var(--color-error) !important;
+}

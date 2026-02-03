@@ -1,0 +1,29 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "refresh": "rm -rf node_modules package-lock.json && npm install"
+    },
+    "devDependencies": {
+        "@inertiajs/vue3": "^1.0.0",
+        "@tailwindcss/forms": "^0.5.7",
+        "@tailwindcss/typography": "^0.5.10",
+        "@vitejs/plugin-vue": "^5.0.5",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.7.0",
+        "laravel-vite-plugin": "^1.0.0",
+        "postcss": "^8.4.41",
+        "tailwindcss": "^3.4.7",
+        "vite": "^5.0.0",
+        "vue": "^3.4.0"
+    },
+    "dependencies": {
+        "@heroicons/vue": "^2.2.0",
+        "chart.js": "^4.5.1",
+        "lodash": "^4.17.21",
+        "vue-chartjs": "^5.3.3"
+    }
+}
