@@ -13,6 +13,10 @@ use App\Models\OrdenTrabajo;
 use App\Models\Pago;
 use App\Models\Servicio;
 use App\Models\Diagnostico;
+use App\Models\Marca;
+use App\Models\Modelo;
+use App\Models\Motor;
+use App\Models\Parte;
 
 class DashboardController extends Controller
 {
@@ -28,6 +32,10 @@ class DashboardController extends Controller
     private function getAdminStats()
     {
         return [
+            'total_marcas' => Marca::count(),
+            'total_modelos' => Modelo::count(),
+            'total_motores' => Motor::count(),
+            'total_partes' => Parte::count(),
             // // Estadísticas generales
             // 'total_clientes' => User::clientes()->activos()->count(),
             // 'total_mecanicos' => User::mecanicos()->activos()->count(),

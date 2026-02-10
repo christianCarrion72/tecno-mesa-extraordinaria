@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Diagnostico;
 use App\Models\OrdenTrabajo;
+use App\Models\Marca;
+use App\Models\Modelo;
+use App\Models\Motor;
+use App\Models\Parte;
 
 class DashboardController extends Controller
 {
@@ -26,6 +30,10 @@ class DashboardController extends Controller
                 ->where('estado', 'completada')
                 ->whereMonth('created_at', now()->month)
                 ->count(),
+            'total_marcas' => Marca::count(),
+            'total_modelos' => Modelo::count(),
+            'total_motores' => Motor::count(),
+            'total_partes' => Parte::count(),
         ];
 
         return Inertia::render('Mecanico.Dashboard', [

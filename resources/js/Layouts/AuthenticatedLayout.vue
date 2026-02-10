@@ -1,7 +1,6 @@
 <script setup>
-import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
-import { Link } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { router, Link, usePage } from '@inertiajs/vue3';
 import ThemeSwitcher from '@/Components/ThemeSwitcher.vue';
 import GlobalSearch from '@/Components/GlobalSearch.vue';
 import PageViewsCounter from '@/Components/PageViewsCounter.vue';
@@ -11,6 +10,10 @@ import { useTheme } from '@/Composables/useTheme';
 useTheme();
 
 const showingNavigationDropdown = ref(false);
+const page = usePage();
+const permisos = computed(() => page.props.auth?.permisos || []);
+
+const tienePermiso = (permiso) => permisos.value.includes(permiso);
 
 const logout = () => {
     router.post(route('logout'));
@@ -106,6 +109,54 @@ const logout = () => {
                                     :class="{ 'hover:opacity-80': true }"
                                 >
                                 Órdenes de Trabajo
+                                </Link>
+                                <Link
+                                    v-if="tienePermiso('marca.listar')"
+                                    :href="route('marcas.index')"
+                                    class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none"
+                                    :style="{
+                                        borderColor: $page.url.startsWith('/marcas') ? 'var(--color-primary)' : 'transparent',
+                                        color: 'var(--color-text)'
+                                    }"
+                                    :class="{ 'hover:opacity-80': true }"
+                                >
+                                Marcas
+                                </Link>
+                                <Link
+                                    v-if="tienePermiso('modelo.listar')"
+                                    :href="route('modelos.index')"
+                                    class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none"
+                                    :style="{
+                                        borderColor: $page.url.startsWith('/modelos') ? 'var(--color-primary)' : 'transparent',
+                                        color: 'var(--color-text)'
+                                    }"
+                                    :class="{ 'hover:opacity-80': true }"
+                                >
+                                Modelos
+                                </Link>
+                                <Link
+                                    v-if="tienePermiso('motor.listar')"
+                                    :href="route('motores.index')"
+                                    class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none"
+                                    :style="{
+                                        borderColor: $page.url.startsWith('/motores') ? 'var(--color-primary)' : 'transparent',
+                                        color: 'var(--color-text)'
+                                    }"
+                                    :class="{ 'hover:opacity-80': true }"
+                                >
+                                Motores
+                                </Link>
+                                <Link
+                                    v-if="tienePermiso('parte.listar')"
+                                    :href="route('partes.index')"
+                                    class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none"
+                                    :style="{
+                                        borderColor: $page.url.startsWith('/partes') ? 'var(--color-primary)' : 'transparent',
+                                        color: 'var(--color-text)'
+                                    }"
+                                    :class="{ 'hover:opacity-80': true }"
+                                >
+                                Partes
                                 </Link>
                             </template>
 
@@ -291,6 +342,58 @@ const logout = () => {
                             :class="{ 'hover:opacity-80': true }"
                         >
                         Órdenes de Trabajo
+                        </Link>
+                        <Link
+                            v-if="tienePermiso('marca.listar')"
+                            :href="route('marcas.index')"
+                            class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition duration-150 ease-in-out focus:outline-none"
+                            :style="{
+                                borderColor: $page.url.startsWith('/marcas') ? 'var(--color-primary)' : 'transparent',
+                                backgroundColor: $page.url.startsWith('/marcas') ? 'var(--color-primary)' : 'transparent',
+                                color: $page.url.startsWith('/marcas') ? 'white' : 'var(--color-text-light)'
+                            }"
+                            :class="{ 'hover:opacity-80': true }"
+                        >
+                        Marcas
+                        </Link>
+                        <Link
+                            v-if="tienePermiso('modelo.listar')"
+                            :href="route('modelos.index')"
+                            class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition duration-150 ease-in-out focus:outline-none"
+                            :style="{
+                                borderColor: $page.url.startsWith('/modelos') ? 'var(--color-primary)' : 'transparent',
+                                backgroundColor: $page.url.startsWith('/modelos') ? 'var(--color-primary)' : 'transparent',
+                                color: $page.url.startsWith('/modelos') ? 'white' : 'var(--color-text-light)'
+                            }"
+                            :class="{ 'hover:opacity-80': true }"
+                        >
+                        Modelos
+                        </Link>
+                        <Link
+                            v-if="tienePermiso('motor.listar')"
+                            :href="route('motores.index')"
+                            class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition duration-150 ease-in-out focus:outline-none"
+                            :style="{
+                                borderColor: $page.url.startsWith('/motores') ? 'var(--color-primary)' : 'transparent',
+                                backgroundColor: $page.url.startsWith('/motores') ? 'var(--color-primary)' : 'transparent',
+                                color: $page.url.startsWith('/motores') ? 'white' : 'var(--color-text-light)'
+                            }"
+                            :class="{ 'hover:opacity-80': true }"
+                        >
+                        Motores
+                        </Link>
+                        <Link
+                            v-if="tienePermiso('parte.listar')"
+                            :href="route('partes.index')"
+                            class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition duration-150 ease-in-out focus:outline-none"
+                            :style="{
+                                borderColor: $page.url.startsWith('/partes') ? 'var(--color-primary)' : 'transparent',
+                                backgroundColor: $page.url.startsWith('/partes') ? 'var(--color-primary)' : 'transparent',
+                                color: $page.url.startsWith('/partes') ? 'white' : 'var(--color-text-light)'
+                            }"
+                            :class="{ 'hover:opacity-80': true }"
+                        >
+                        Partes
                         </Link>
                     </template>
 

@@ -53,6 +53,38 @@ class TrackPageView
             'dashboard' => 'Dashboard',
             'admin.dashboard' => 'Dashboard Admin',
             'mecanico.dashboard' => 'Dashboard Mecánico',
+            // Admin - Marcas
+            'admin.marcas.index' => 'Gestión de Marcas',
+            'admin.marcas.create' => 'Crear Marca',
+            'admin.marcas.store' => 'Crear Marca',
+            'admin.marcas.show' => 'Ver Marca',
+            'admin.marcas.edit' => 'Editar Marca',
+            'admin.marcas.update' => 'Editar Marca',
+            'admin.marcas.destroy' => 'Eliminar Marca',
+            // Admin - Modelos
+            'admin.modelos.index' => 'Gestión de Modelos',
+            'admin.modelos.create' => 'Crear Modelo',
+            'admin.modelos.store' => 'Crear Modelo',
+            'admin.modelos.show' => 'Ver Modelo',
+            'admin.modelos.edit' => 'Editar Modelo',
+            'admin.modelos.update' => 'Editar Modelo',
+            'admin.modelos.destroy' => 'Eliminar Modelo',
+            // Admin - Motores
+            'admin.motores.index' => 'Gestión de Motores',
+            'admin.motores.create' => 'Crear Motor',
+            'admin.motores.store' => 'Crear Motor',
+            'admin.motores.show' => 'Ver Motor',
+            'admin.motores.edit' => 'Editar Motor',
+            'admin.motores.update' => 'Editar Motor',
+            'admin.motores.destroy' => 'Eliminar Motor',
+            // Admin - Partes
+            'admin.partes.index' => 'Gestión de Partes',
+            'admin.partes.create' => 'Crear Parte',
+            'admin.partes.store' => 'Crear Parte',
+            'admin.partes.show' => 'Ver Parte',
+            'admin.partes.edit' => 'Editar Parte',
+            'admin.partes.update' => 'Editar Parte',
+            'admin.partes.destroy' => 'Eliminar Parte',
             
             // Cliente - Vehículos
             'cliente.vehiculos.index' => 'Mis Vehículos',

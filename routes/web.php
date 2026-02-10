@@ -25,6 +25,11 @@ use App\Http\Controllers\Cliente\CitaController as ClienteCitaController;
 use App\Http\Controllers\Cliente\OrdenController as ClienteOrdenController;
 use App\Http\Controllers\Cliente\PagoController as ClientePagoController;
 
+use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\ModeloController;
+use App\Http\Controllers\MotorController;
+use App\Http\Controllers\ParteController;
+
 use App\Http\Controllers\Api\QrController as QrController;
 
 use App\Http\Controllers\ProfileController;
@@ -109,6 +114,37 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/pagofacil/consultar-estado', [AdminPagoFacilController::class, 'consultarEstado'])->name('pagofacil.consultar-estado');
 
     });
+
+    // ============================================================================
+    // GESTIÓN DE MARCAS, MODELOS, MOTORES Y PARTES
+    // ============================================================================
+    Route::get('/marcas', [MarcaController::class, 'index'])->name('marcas.index');
+    Route::get('/marcas/create', [MarcaController::class, 'create'])->name('marcas.create');
+    Route::post('/marcas', [MarcaController::class, 'store'])->name('marcas.store');
+    Route::get('/marcas/{marca}/edit', [MarcaController::class, 'edit'])->name('marcas.edit');
+    Route::put('/marcas/{marca}', [MarcaController::class, 'update'])->name('marcas.update');
+    Route::delete('/marcas/{marca}', [MarcaController::class, 'destroy'])->name('marcas.destroy');
+
+    Route::get('/modelos', [ModeloController::class, 'index'])->name('modelos.index');
+    Route::get('/modelos/create', [ModeloController::class, 'create'])->name('modelos.create');
+    Route::post('/modelos', [ModeloController::class, 'store'])->name('modelos.store');
+    Route::get('/modelos/{modelo}/edit', [ModeloController::class, 'edit'])->name('modelos.edit');
+    Route::put('/modelos/{modelo}', [ModeloController::class, 'update'])->name('modelos.update');
+    Route::delete('/modelos/{modelo}', [ModeloController::class, 'destroy'])->name('modelos.destroy');
+
+    Route::get('/motores', [MotorController::class, 'index'])->name('motores.index');
+    Route::get('/motores/create', [MotorController::class, 'create'])->name('motores.create');
+    Route::post('/motores', [MotorController::class, 'store'])->name('motores.store');
+    Route::get('/motores/{motor}/edit', [MotorController::class, 'edit'])->name('motores.edit');
+    Route::put('/motores/{motor}', [MotorController::class, 'update'])->name('motores.update');
+    Route::delete('/motores/{motor}', [MotorController::class, 'destroy'])->name('motores.destroy');
+
+    Route::get('/partes', [ParteController::class, 'index'])->name('partes.index');
+    Route::get('/partes/create', [ParteController::class, 'create'])->name('partes.create');
+    Route::post('/partes', [ParteController::class, 'store'])->name('partes.store');
+    Route::get('/partes/{parte}/edit', [ParteController::class, 'edit'])->name('partes.edit');
+    Route::put('/partes/{parte}', [ParteController::class, 'update'])->name('partes.update');
+    Route::delete('/partes/{parte}', [ParteController::class, 'destroy'])->name('partes.destroy');
 
     // ========================================================================
     // RUTAS ESPECÍFICAS PARA MECÁNICOS

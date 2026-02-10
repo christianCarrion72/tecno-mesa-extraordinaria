@@ -1,5 +1,5 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head } from '@inertiajs/vue3';
 
 defineProps({
@@ -13,7 +13,7 @@ defineProps({
 <template>
     <Head title="Mis Órdenes de Trabajo" />
 
-    <AuthenticatedLayout>
+    <AdminLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-taller-black leading-tight">
                 Mis Órdenes de Trabajo
@@ -72,5 +72,5 @@ defineProps({
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </AdminLayout>
 </template>
