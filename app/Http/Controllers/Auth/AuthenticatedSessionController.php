@@ -18,7 +18,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Login', [
+        return Inertia::render('Auth/Login2', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
         ]);
@@ -57,10 +57,12 @@ class AuthenticatedSessionController extends Controller
      */
     private function redirectToDashboard($user): RedirectResponse
     {
-        return match($user->tipo) {
+        $roleName = strtolower($user->rol->nombre ?? '');
+
+        return match ($roleName) {
             'propietario', 'secretaria' => redirect()->intended(route('admin.dashboard', absolute: false)),
             'mecanico' => redirect()->intended(route('mecanico.dashboard', absolute: false)),
-            default => redirect()->intended(route('cliente.dashboard', absolute: false)), // cliente
+            default => redirect()->intended(route('dashboard', absolute: false)),
         };
     }
 }

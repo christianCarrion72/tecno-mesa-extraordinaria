@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\ConfiguracionController as AdminConfiguracionCont
 use App\Http\Controllers\Admin\DiagnosticoController as AdminDiagnosticoController;
 use App\Http\Controllers\Admin\PagoController as AdminPagoController;
 use App\Http\Controllers\Admin\PagoFacilController as AdminPagoFacilController;
+use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
+use App\Http\Controllers\Admin\PermisoController as AdminPermisoController;
 
 
 use App\Http\Controllers\Mecanico\DashboardController as MecanicoDashboardController;
@@ -164,6 +166,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/vehiculos/{vehiculo}', [AdminVehiculoController::class, 'update'])->name('vehiculos.update');
         Route::delete('/vehiculos/{vehiculo}', [AdminVehiculoController::class, 'destroy'])->name('vehiculos.destroy');
 
+        // Gestión de Usuarios
+        Route::get('/usuarios', [AdminUsuarioController::class, 'index'])->name('usuarios.index');
+        Route::get('/usuarios/create', [AdminUsuarioController::class, 'create'])->name('usuarios.create');
+        Route::post('/usuarios', [AdminUsuarioController::class, 'store'])->name('usuarios.store');
+        Route::get('/usuarios/{usuario}/edit', [AdminUsuarioController::class, 'edit'])->name('usuarios.edit');
+        Route::put('/usuarios/{usuario}', [AdminUsuarioController::class, 'update'])->name('usuarios.update');
+        Route::delete('/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy'])->name('usuarios.destroy');
+
         // Gestión de Servicios
         Route::get('/servicios', [AdminServicioController::class, 'index'])->name('servicios.index');
         Route::get('/servicios/create', [AdminServicioController::class, 'create'])->name('servicios.create');
@@ -224,6 +234,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/reportes', [AdminReportController::class, 'index'])->name('reportes.index');
         Route::post('/reportes/exportar', [AdminReportController::class, 'exportar'])->name('reportes.exportar');
 
+        // Gestión de Permisos
+        Route::get('/permisos', [AdminPermisoController::class, 'index'])->name('permisos.index');
+        Route::post('/permisos/actualizar', [AdminPermisoController::class, 'actualizar'])->name('permisos.actualizar');
+
         // Configuración
         Route::get('/configuracion', [AdminConfiguracionController::class, 'index'])->name('configuracion.index');
 
@@ -244,4 +258,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/page/{pageName}', [PageViewController::class, 'getPageViews'])->name('page');
     });
 });
-

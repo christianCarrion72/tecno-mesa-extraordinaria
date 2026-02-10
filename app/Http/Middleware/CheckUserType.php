@@ -13,7 +13,14 @@ class CheckUserType
     {
         $user = Auth::user();
 
-        if (!$user || !in_array($user->tipo, $types)) {
+        if (! $user || ! $user->rol) {
+            abort(403, 'No tienes permiso para acceder a esta página.');
+        }
+
+        $roleName = strtolower($user->rol->nombre);
+        $allowedTypes = array_map('strtolower', $types);
+
+        if (! in_array($roleName, $allowedTypes, true)) {
             abort(403, 'No tienes permiso para acceder a esta página.');
         }
 

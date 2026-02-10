@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('page_views', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('usuarios')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('page_name'); // Ej: 'dashboard', 'vehiculos', 'citas'
             $table->string('page_route'); // Ej: '/dashboard', '/mis-vehiculos'
             $table->string('ip_address')->nullable();

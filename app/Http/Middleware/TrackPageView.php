@@ -146,6 +146,18 @@ class TrackPageView
             'admin.pagos.destroy' => 'Eliminar Pago',
             'admin.pagos.cobrar' => 'Cobrar Pago',
             
+            // Admin - Usuarios
+            'admin.usuarios.index' => 'Gestión de Usuarios',
+            'admin.usuarios.create' => 'Crear Usuario',
+            'admin.usuarios.store' => 'Crear Usuario',
+            'admin.usuarios.edit' => 'Editar Usuario',
+            'admin.usuarios.update' => 'Editar Usuario',
+            'admin.usuarios.destroy' => 'Eliminar Usuario',
+            
+            // Admin - Permisos
+            'admin.permisos.index' => 'Gestión de Permisos',
+            'admin.permisos.actualizar' => 'Actualizar Permisos',
+            
             // Admin - Reportes
             'admin.reportes.index' => 'Reportes',
             'admin.reportes.exportar' => 'Exportar Reportes',

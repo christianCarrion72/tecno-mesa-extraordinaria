@@ -13,8 +13,18 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Dejamos solo un usuario por defecto (propietario)
+        $usuario1 = [
+            'name' => 'Propietario Ejemplo',
+            'email' => 'propietario@example.com',
+            'password' => bcrypt('00000000'),
+            'rol_id' => 1,
+            'foto' => null,
+        ];
+
+        User::firstOrCreate(['email' => $usuario1['email']], $usuario1);
         // Propietario
-        User::create([
+        /*User::create([
             'nombre' => 'Juan Pérez',
             'email' => 'propietario@taller.com',
             'password_hash' => Hash::make('password'),
@@ -85,6 +95,6 @@ class UserSeeder extends Seeder
             'direccion' => 'Boulevard Industrial 404',
             'tipo' => 'cliente',
             'estado' => 'activo',
-        ]);
+        ]);*/
     }
 }

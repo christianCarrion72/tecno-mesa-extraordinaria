@@ -61,10 +61,12 @@ class RegisteredUserController extends Controller
      */
     private function redirectToDashboard(User $user): RedirectResponse
     {
-        return match($user->tipo) {
+        $roleName = strtolower($user->rol->nombre ?? '');
+
+        return match ($roleName) {
             'propietario', 'secretaria' => redirect()->route('admin.dashboard'),
             'mecanico' => redirect()->route('mecanico.dashboard'),
-            default => redirect()->route('cliente.dashboard'), // cliente
+            default => redirect()->route('dashboard'),
         };
     }
 }
