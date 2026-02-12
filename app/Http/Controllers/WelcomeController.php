@@ -10,15 +10,15 @@ class WelcomeController extends Controller
 {
     public function index()
     {
-        $servicios = Servicio::activos()
-            ->select('id', 'nombre', 'descripcion', 'tipo', 'precio_base')
-            ->get()
-            ->groupBy('tipo');
+        // $servicios = Servicio::activos()
+        //     ->select('id', 'nombre', 'descripcion', 'tipo', 'precio_base')
+        //     ->get()
+        //     ->groupBy('tipo');
 
         return Inertia::render('Welcome', [
             'canLogin' => route('login'),
             'canRegister' => route('register'),
-            'servicios' => $servicios,
+            //'servicios' => $servicios,
         ]);
     }
 }

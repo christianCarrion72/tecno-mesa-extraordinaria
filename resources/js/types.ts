@@ -20,6 +20,15 @@ export interface Usuario {
   rol?: Rol | null;
 }
 
+export interface Cliente {
+  id: number;
+  nombre: string;
+  telefono: string;
+  foto?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface PaginationLink {
   url: string | null;
   label: string;

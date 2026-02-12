@@ -20,7 +20,7 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => false, // No tenemos verificación de email en tu BD
             'status' => session('status'),
-            'user' => $request->user()->only(['id', 'nombre', 'email', 'telefono', 'direccion', 'foto', 'tipo']),
+            'user' => $request->user()->only(['id', 'name', 'email', 'telefono', 'direccion', 'foto', 'tipo']),
         ]);
     }
 
@@ -31,7 +31,7 @@ class ProfileController extends Controller
     {
         // Actualizar los campos según tu base de datos
         $user = $request->user();
-        $user->nombre = $request->nombre;
+        $user->name = $request->name;
         $user->email = $request->email;
         $user->telefono = $request->telefono;
         $user->direccion = $request->direccion;

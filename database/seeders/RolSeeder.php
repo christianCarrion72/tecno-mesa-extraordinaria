@@ -132,6 +132,108 @@ class RolSeeder extends Seeder
         Permiso::create([
             'nombre' => 'parte.eliminar',
             'descripcion' => 'Eliminar partes',
-        ])->roles()->attach([$propietario->id]);  
+        ])->roles()->attach([$propietario->id]);
+
+        Permiso::create([
+            'nombre' => 'orden_trabajo.listar',
+            'descripcion' => 'Listar órdenes de trabajo',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'orden_trabajo.crear',
+            'descripcion' => 'Crear órdenes de trabajo',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'orden_trabajo.editar',
+            'descripcion' => 'Editar órdenes de trabajo',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'orden_trabajo.eliminar',
+            'descripcion' => 'Eliminar órdenes de trabajo',
+        ])->roles()->attach([$propietario->id]);
+
+        Permiso::create([
+            'nombre' => 'servicio.listar',
+            'descripcion' => 'Listar servicios',
+        ])->roles()->attach([$propietario->id, $mecanico->id]);
+        Permiso::create([
+            'nombre' => 'servicio.crear',
+            'descripcion' => 'Crear servicios',
+        ])->roles()->attach([$propietario->id, $mecanico->id]);
+        Permiso::create([
+            'nombre' => 'servicio.editar',
+            'descripcion' => 'Editar servicios',
+        ])->roles()->attach([$propietario->id, $mecanico->id]);
+        Permiso::create([
+            'nombre' => 'servicio.eliminar',
+            'descripcion' => 'Eliminar servicios',
+        ])->roles()->attach([$propietario->id]);
+
+        Permiso::create([
+            'nombre' => 'incidencia.listar',
+            'descripcion' => 'Listar incidencias',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'incidencia.crear',
+            'descripcion' => 'Crear incidencias',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'incidencia.editar',
+            'descripcion' => 'Editar incidencias',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'incidencia.eliminar',
+            'descripcion' => 'Eliminar incidencias',
+        ])->roles()->attach([$propietario->id]);
+
+        Permiso::create([
+            'nombre' => 'plan_pago.listar',
+            'descripcion' => 'Listar planes de pago',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'plan_pago.crear',
+            'descripcion' => 'Crear planes de pago',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'plan_pago.editar',
+            'descripcion' => 'Editar planes de pago',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'plan_pago.eliminar',
+            'descripcion' => 'Eliminar planes de pago',
+        ])->roles()->attach([$propietario->id]);
+
+        Permiso::create([
+            'nombre' => 'pago.listar',
+            'descripcion' => 'Listar pagos de planes',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'pago.crear',
+            'descripcion' => 'Crear pagos de planes',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'pago.editar',
+            'descripcion' => 'Editar pagos de planes',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'pago.eliminar',
+            'descripcion' => 'Eliminar pagos de planes',
+        ])->roles()->attach([$propietario->id]);
+
+        Permiso::create([
+            'nombre' => 'factura.listar',
+            'descripcion' => 'Listar facturas',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'factura.crear',
+            'descripcion' => 'Crear facturas',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'factura.editar',
+            'descripcion' => 'Editar facturas',
+        ])->roles()->attach([$propietario->id]);
+        Permiso::create([
+            'nombre' => 'factura.eliminar',
+            'descripcion' => 'Eliminar facturas',
+        ])->roles()->attach([$propietario->id]);
     }
 }

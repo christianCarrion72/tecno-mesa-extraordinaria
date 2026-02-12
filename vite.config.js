@@ -3,7 +3,7 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-    //base: "/inf513/grupo01sa/ardayaMotors/public/build/",
+    //base: "/inf513/grupo06sa/mesa-extraordinaria/tecno-mesa-extraordinaria/public/build/",
     plugins: [
         laravel({
             input: 'resources/js/app.js',

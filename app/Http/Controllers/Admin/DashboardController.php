@@ -17,15 +17,43 @@ use App\Models\Marca;
 use App\Models\Modelo;
 use App\Models\Motor;
 use App\Models\Parte;
+use App\Models\Cliente;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $stats = $this->getAdminStats();
+        $totalClientes = Cliente::count();
+        $totalMotores = Motor::count();
 
-        return Inertia::render('Admin.Dashboard', [
-            'stats' => $stats,
+        $motoresRecientes = Motor::with(['marca', 'modelo'])
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function ($motor) {
+                return [
+                    'numero_serie' => $motor->numero_serie,
+                    'marca' => $motor->marca->nombre ?? 'N/A',
+                    'modelo' => $motor->modelo->nombre ?? 'N/A',
+                    'anio' => $motor->anio,
+                ];
+            });
+
+        $clientesRecientes = Cliente::latest()
+            ->take(10)
+            ->get()
+            ->map(function ($cliente) {
+                return [
+                    'nombre' => $cliente->nombre,
+                    'telefono' => $cliente->telefono,
+                ];
+            });
+
+        return Inertia::render('Admin.Dashboard2', [
+            'totalClientes' => $totalClientes,
+            'totalMotores' => $totalMotores,
+            'motoresRecientes' => $motoresRecientes,
+            'clientesRecientes' => $clientesRecientes,
         ]);
     }
 

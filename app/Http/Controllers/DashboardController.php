@@ -1,26 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Mecanico;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Inertia\Inertia;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Diagnostico;
-use App\Models\OrdenTrabajo;
-use App\Models\Marca;
-use App\Models\Modelo;
-use App\Models\Motor;
-use App\Models\Parte;
 use App\Models\Cliente;
+use App\Models\Motor;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        // Totales
         $totalClientes = Cliente::count();
         $totalMotores = Motor::count();
 
+        // Últimos registros de motores
         $motoresRecientes = Motor::with(['marca', 'modelo'])
             ->latest()
             ->take(10)
@@ -34,6 +28,7 @@ class DashboardController extends Controller
                 ];
             });
 
+        // Últimos registros de clientes
         $clientesRecientes = Cliente::latest()
             ->take(10)
             ->get()
@@ -44,7 +39,7 @@ class DashboardController extends Controller
                 ];
             });
 
-        return Inertia::render('Admin.Dashboard2', [
+        return Inertia::render('Dashboard', [
             'totalClientes' => $totalClientes,
             'totalMotores' => $totalMotores,
             'motoresRecientes' => $motoresRecientes,

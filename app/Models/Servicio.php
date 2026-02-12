@@ -4,34 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Servicio extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'nombre',
         'descripcion',
-        'tipo',
-        'precio_base',
-        'duracion_estimada',
-        'estado',
+        'costo',
     ];
 
-    // Relaciones
-    public function ordenServicios()
+    // Muchas órdenes pueden usar muchos servicios (pivot)
+    public function ordenesTrabajo()
     {
-        return $this->hasMany(OrdenServicio::class);
-    }
-
-    // Scopes
-    public function scopeActivos($query)
-    {
-        return $query->where('estado', 'activo');
-    }
-
-    public function scopePorTipo($query, $tipo)
-    {
-        return $query->where('tipo', $tipo);
+        return $this->belongsToMany(OrdenTrabajo::class, 'orden_trabajo_servicios')
+                    ->withPivot(['cantidad', 'precio', 'subtotal'])
+                    ->withTimestamps();
     }
 }

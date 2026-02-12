@@ -25,10 +25,17 @@ use App\Http\Controllers\Cliente\CitaController as ClienteCitaController;
 use App\Http\Controllers\Cliente\OrdenController as ClienteOrdenController;
 use App\Http\Controllers\Cliente\PagoController as ClientePagoController;
 
+use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\ModeloController;
 use App\Http\Controllers\MotorController;
 use App\Http\Controllers\ParteController;
+use App\Http\Controllers\OrdenTrabajoController;
+use App\Http\Controllers\OrdenTrabajoServicioController;
+use App\Http\Controllers\IncidenciaController;
+use App\Http\Controllers\PlanPagoController;
+use App\Http\Controllers\FacturaController;
+use App\Http\Controllers\PagoController;
 
 use App\Http\Controllers\Api\QrController as QrController;
 
@@ -45,6 +52,12 @@ Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 // ⚠️ IMPORTANTE: Rutas del callback y PagoFácil (return se mantiene aqui, callback en api.php)
 Route::get('/pagos/pagofacil/return', [AdminPagoFacilController::class, 'return'])->name('pagos.return');
+Route::post('/pagofacil/callback', [PagoController::class, 'pagofacilCallback'])
+    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)
+    ->name('pagofacil.callback');
+Route::post('/webhooks/pagofacil', [PagoController::class, 'pagofacilCallback'])
+    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)
+    ->name('pagofacil.callback.webhook');
 
 // ============================================================================
 // RUTAS DE AUTENTICACIÓN
@@ -116,8 +129,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // ============================================================================
-    // GESTIÓN DE MARCAS, MODELOS, MOTORES Y PARTES
+    // GESTIÓN DE MARCAS, MODELOS, MOTORES, PARTES Y SERVICIOS
     // ============================================================================
+    Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+    Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
+    Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
+    Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
+    Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
+    Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+
     Route::get('/marcas', [MarcaController::class, 'index'])->name('marcas.index');
     Route::get('/marcas/create', [MarcaController::class, 'create'])->name('marcas.create');
     Route::post('/marcas', [MarcaController::class, 'store'])->name('marcas.store');
@@ -145,6 +165,59 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/partes/{parte}/edit', [ParteController::class, 'edit'])->name('partes.edit');
     Route::put('/partes/{parte}', [ParteController::class, 'update'])->name('partes.update');
     Route::delete('/partes/{parte}', [ParteController::class, 'destroy'])->name('partes.destroy');
+
+    Route::get('/servicios', [\App\Http\Controllers\ServicioController::class, 'index'])->name('servicios.index');
+    Route::get('/servicios/create', [\App\Http\Controllers\ServicioController::class, 'create'])->name('servicios.create');
+    Route::post('/servicios', [\App\Http\Controllers\ServicioController::class, 'store'])->name('servicios.store');
+    Route::get('/servicios/{servicio}/edit', [\App\Http\Controllers\ServicioController::class, 'edit'])->name('servicios.edit');
+    Route::put('/servicios/{servicio}', [\App\Http\Controllers\ServicioController::class, 'update'])->name('servicios.update');
+    Route::delete('/servicios/{servicio}', [\App\Http\Controllers\ServicioController::class, 'destroy'])->name('servicios.destroy');
+
+    Route::get('/orden-trabajos', [OrdenTrabajoController::class, 'index'])->name('orden-trabajos.index');
+    Route::get('/orden-trabajos/create', [OrdenTrabajoController::class, 'create'])->name('orden-trabajos.create');
+    Route::post('/orden-trabajos', [OrdenTrabajoController::class, 'store'])->name('orden-trabajos.store');
+    Route::get('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'show'])->name('orden-trabajos.show');
+    Route::get('/orden-trabajos/{ordenTrabajo}/edit', [OrdenTrabajoController::class, 'edit'])->name('orden-trabajos.edit');
+    Route::put('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'update'])->name('orden-trabajos.update');
+    Route::delete('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'destroy'])->name('orden-trabajos.destroy');
+
+    Route::post('/orden-trabajos/{ordenTrabajo}/servicios', [OrdenTrabajoServicioController::class, 'store'])->name('orden-trabajos.servicios.store');
+    Route::put('/orden-trabajos/servicios/{detalle}', [OrdenTrabajoServicioController::class, 'update'])->name('orden-trabajos.servicios.update');
+    Route::delete('/orden-trabajos/servicios/{detalle}', [OrdenTrabajoServicioController::class, 'destroy'])->name('orden-trabajos.servicios.destroy');
+
+    Route::get('/incidencias', [IncidenciaController::class, 'index'])->name('incidencias.index');
+    Route::get('/orden-trabajos/{ordenTrabajo}/incidencias/create', [IncidenciaController::class, 'create'])->name('incidencias.create');
+    Route::post('/orden-trabajos/{ordenTrabajo}/incidencias', [IncidenciaController::class, 'store'])->name('incidencias.store');
+    Route::get('/incidencias/{incidencia}/edit', [IncidenciaController::class, 'edit'])->name('incidencias.edit');
+    Route::put('/incidencias/{incidencia}', [IncidenciaController::class, 'update'])->name('incidencias.update');
+    Route::delete('/incidencias/{incidencia}', [IncidenciaController::class, 'destroy'])->name('incidencias.destroy');
+
+    Route::get('/plan-pagos', [PlanPagoController::class, 'index'])->name('plan-pagos.index');
+    Route::get('/plan-pagos/{planPago}', [PlanPagoController::class, 'show'])->name('plan-pagos.show');
+    Route::get('/orden-trabajos/{ordenTrabajo}/plan-pagos/create', [PlanPagoController::class, 'create'])->name('plan-pagos.create');
+    Route::post('/orden-trabajos/{ordenTrabajo}/plan-pagos', [PlanPagoController::class, 'store'])->name('plan-pagos.store');
+    Route::get('/plan-pagos/{planPago}/edit', [PlanPagoController::class, 'edit'])->name('plan-pagos.edit');
+    Route::put('/plan-pagos/{planPago}', [PlanPagoController::class, 'update'])->name('plan-pagos.update');
+    Route::delete('/plan-pagos/{planPago}', [PlanPagoController::class, 'destroy'])->name('plan-pagos.destroy');
+
+    Route::get('/plan-pagos/{planPago}/pagos', [PagoController::class, 'index'])->name('plan-pagos.pagos.index');
+    Route::get('/plan-pagos/{planPago}/pagos/create', [PagoController::class, 'create'])->name('plan-pagos.pagos.create');
+    Route::post('/plan-pagos/{planPago}/pagos', [PagoController::class, 'store'])->name('plan-pagos.pagos.store');
+    Route::get('/pagos/{pago}', [PagoController::class, 'show'])->name('plan-pagos.pagos.show');
+    Route::get('/pagos/{pago}/edit', [PagoController::class, 'edit'])->name('plan-pagos.pagos.edit');
+    Route::put('/pagos/{pago}', [PagoController::class, 'update'])->name('plan-pagos.pagos.update');
+    Route::delete('/pagos/{pago}', [PagoController::class, 'destroy'])->name('plan-pagos.pagos.destroy');
+
+    Route::get('/pagofacil/login', [PagoController::class, 'pagofacilLogin'])->name('pagofacil.login');
+    Route::get('/pagofacil/list-enabled-services', [PagoController::class, 'pagofacilListEnabledServices'])->name('pagofacil.list');
+    Route::post('/pagofacil/generate-qr', [PagoController::class, 'pagofacilGenerateQr'])->name('pagofacil.generate');
+    Route::get('/pagofacil/callback-url', [PagoController::class, 'pagofacilCallbackUrl'])->name('pagofacil.callback-url');
+    Route::post('/pagofacil/query-transaction', [PagoController::class, 'pagofacilQueryTransaction'])->name('pagofacil.query');
+
+    Route::get('/facturas/{factura}', [FacturaController::class, 'show'])->name('facturas.show');
+    Route::get('/pagos/{pago}/facturas/create', [FacturaController::class, 'create'])->name('facturas.create');
+    Route::post('/pagos/{pago}/facturas', [FacturaController::class, 'store'])->name('facturas.store');
+    Route::delete('/facturas/{factura}', [FacturaController::class, 'destroy'])->name('facturas.destroy');
 
     // ========================================================================
     // RUTAS ESPECÍFICAS PARA MECÁNICOS
@@ -185,13 +258,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/citas/por-fecha', [AdminCitaController::class, 'getCitasPorFecha'])->name('citas.por-fecha');
 
         // Gestión de Clientes
-        Route::get('/clientes', [AdminClienteController::class, 'index'])->name('clientes.index');
-        Route::get('/clientes/create', [AdminClienteController::class, 'create'])->name('clientes.create');
-        Route::post('/clientes', [AdminClienteController::class, 'store'])->name('clientes.store');
-        Route::get('/clientes/{cliente}', [AdminClienteController::class, 'show'])->name('clientes.show');
-        Route::get('/clientes/{cliente}/edit', [AdminClienteController::class, 'edit'])->name('clientes.edit');
-        Route::put('/clientes/{cliente}', [AdminClienteController::class, 'update'])->name('clientes.update');
-        Route::delete('/clientes/{cliente}', [AdminClienteController::class, 'destroy'])->name('clientes.destroy');
+        Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+        Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
+        Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
+        Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
+        Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
+        Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
 
         // Gestión de Vehículos
         Route::get('/vehiculos', [AdminVehiculoController::class, 'index'])->name('vehiculos.index');
@@ -209,15 +281,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/usuarios/{usuario}/edit', [AdminUsuarioController::class, 'edit'])->name('usuarios.edit');
         Route::put('/usuarios/{usuario}', [AdminUsuarioController::class, 'update'])->name('usuarios.update');
         Route::delete('/usuarios/{usuario}', [AdminUsuarioController::class, 'destroy'])->name('usuarios.destroy');
-
-        // Gestión de Servicios
-        Route::get('/servicios', [AdminServicioController::class, 'index'])->name('servicios.index');
-        Route::get('/servicios/create', [AdminServicioController::class, 'create'])->name('servicios.create');
-        Route::post('/servicios', [AdminServicioController::class, 'store'])->name('servicios.store');
-        Route::get('/servicios/{servicio}/edit', [AdminServicioController::class, 'edit'])->name('servicios.edit');
-        Route::put('/servicios/{servicio}', [AdminServicioController::class, 'update'])->name('servicios.update');
-        Route::delete('/servicios/{servicio}', [AdminServicioController::class, 'destroy'])->name('servicios.destroy');
-        Route::put('/servicios/{servicio}/status', [AdminServicioController::class, 'updateStatus'])->name('servicios.status');
 
         // Gestión de Diagnósticos
         Route::get('/diagnosticos', [AdminDiagnosticoController::class, 'index'])->name('diagnosticos.index');

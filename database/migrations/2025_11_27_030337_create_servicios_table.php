@@ -13,12 +13,10 @@ return new class extends Migration
     {
         Schema::create('servicios', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 100);
+            $table->string('nombre');
             $table->text('descripcion')->nullable();
-            $table->enum('tipo', ['diagnostico', 'mantenimiento', 'reparacion']);
-            $table->decimal('precio_base', 10, 2)->unsigned();
-            $table->integer('duracion_estimada')->nullable(); // minutos
-            $table->enum('estado', ['activo', 'inactivo'])->default('activo');
+            $table->decimal('costo', 10, 2);   
+            $table->softDeletes();
             $table->timestamps();
         });
     }
