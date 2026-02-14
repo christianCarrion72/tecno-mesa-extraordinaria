@@ -41,7 +41,7 @@ const getIconForType = (tipo) => {
 </script>
 
 <template>
-    <Head title="Taller Mecánico Especializado" />
+    <Head title="Torneria y Rectificaciones" />
 
     <div class="min-h-screen bg-taller-cream overflow-x-hidden">
         <header class="bg-taller-black text-white shadow-lg sticky top-0 z-50 animate-slide-down">
@@ -49,11 +49,12 @@ const getIconForType = (tipo) => {
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4 group cursor-pointer">
                         <div class="w-14 h-14 bg-taller-blue-light rounded-full flex items-center justify-center border-2 border-transparent group-hover:border-white transition-all duration-300 transform group-hover:rotate-12">
-                            <img src="https://res.cloudinary.com/dcdhuwp0y/image/upload/v1762306771/ARDAYA_MOTORS_pojle3.png" alt="Logo" class="w-full h-full object-cover rounded-full">
+                            <img src="../../img/logo.png" alt="Logo" class="w-full h-full object-cover rounded-lg">
                         </div>
                         <div>
-                            <h1 class="text-2xl font-bold text-taller-blue-light tracking-wide">Ardaya Motors</h1>
-                            <p class="text-taller-blue-dark text-xs uppercase tracking-widest font-semibold">Expertos en Mecánica</p>
+                            <h1 class="text-2xl font-bold text-taller-blue-light tracking-wide">Torneria y Rectificaciones</h1>
+                            <h1 class="text-2xl font-bold text-red-500 tracking-wide">Choko</h1>
+                            <p class="text-taller-blue-dark text-xs uppercase tracking-widest font-semibold"> PRECISION Y CALIDAD</p>
                         </div>
                     </div>
 
@@ -95,16 +96,14 @@ const getIconForType = (tipo) => {
 
             <div class="container mx-auto px-6 relative z-10 text-center">
                 <div class="animate-fade-in-up">
-                    <span class="inline-block py-1 px-3 rounded-full bg-taller-blue-light/20 text-taller-blue-light text-sm font-semibold mb-4 border border-taller-blue-light/30">
-                        Servicio Premium Automotriz
-                    </span>
-                    <h2 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
-                        Cuidamos tu vehículo <br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-taller-blue-light to-white">como si fuera nuestro</span>
+                    <h2 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight bg-gradient-to-r from-taller-blue-light to-taller-blue-dark bg-clip-text text-transparent">
+                        Expertos en rectificación <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-taller-blue-light to-white">y trabajos de tornería</span>
                     </h2>
-                    <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-                        Servicios mecánicos especializados con la más alta calidad y tecnología de punta.
-                        Tu seguridad y satisfacción son nuestra prioridad absoluta.
+                    <p class="text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
+                        En <strong>Tornería y Rectificaciones Choko</strong> ofrecemos servicios profesionales especializados en motores. 
+                        Contamos con más de <strong>5 años de experiencia</strong>, maquinaria de última generación y un compromiso 
+                        inquebrantable con la calidad para devolverle el máximo rendimiento a su motor.
                     </p>
 
                     <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
@@ -114,7 +113,7 @@ const getIconForType = (tipo) => {
                             class="group relative bg-white text-taller-black px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:-translate-y-1 overflow-hidden"
                         >
                             <span class="relative z-10 flex items-center gap-2">
-                                Agendar Cita
+                                Solicitar Cotización
                                 <CalendarDaysIcon class="h-5 w-5 group-hover:rotate-12 transition-transform" />
                             </span>
                         </Link>
@@ -124,12 +123,12 @@ const getIconForType = (tipo) => {
                             class="group relative bg-white text-taller-black px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:-translate-y-1"
                         >
                             <span class="flex items-center gap-2">
-                                Agendar Cita
+                                Solicitar Cotización
                                 <CalendarDaysIcon class="h-5 w-5 group-hover:rotate-12 transition-transform" />
                             </span>
                         </Link>
 
-                        <a href="#servicios" class="flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-semibold text-white border border-white/30 hover:bg-white/10 transition-all duration-300">
+                        <a href="#servicios" class="flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-semibold text-white border-2 border-white/30 hover:bg-white/10 transition-all duration-300">
                             Ver Servicios
                             <CursorArrowRaysIcon class="h-5 w-5" />
                         </a>
@@ -138,109 +137,279 @@ const getIconForType = (tipo) => {
             </div>
         </section>
 
-        <section id="servicios" class="py-20 bg-white relative">
-            <div class="container mx-auto px-6">
+        <section id="servicios" class="pt-5 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-taller-blue-light/5 rounded-full blur-3xl"></div>
+            
+            <div class="container mx-auto px-6 relative z-10">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-taller-black mb-4">Nuestros Servicios</h2>
-                    <div class="h-1 w-24 bg-taller-blue-dark mx-auto rounded-full"></div>
+                    <!--span class="inline-block px-4 py-2 bg-taller-blue-light/10 text-taller-blue-dark text-sm font-bold rounded-full mb-4">
+                        SERVICIOS ESPECIALIZADOS
+                    </span-->
+                    <h2 class="text-4xl md:text-5xl font-bold text-taller-black mb-4">Nuestros Servicios</h2>
+                    <div class="h-1 w-24 bg-gradient-to-r from-taller-blue-dark to-taller-blue-light mx-auto rounded-full"></div>
+                    <p class="text-gray-600 mt-6 max-w-3xl mx-auto text-lg leading-relaxed">
+                        Ofrecemos soluciones completas en rectificación de motores y trabajos de tornería de precisión 
+                        para vehículos livianos y maquinaria pesada, garantizando <strong>calidad, precisión y durabilidad</strong>.
+                    </p>
                 </div>
 
-                <div v-for="(serviciosGrupo, tipo) in servicios" :key="tipo" class="mb-16 last:mb-0">
-                    <div class="flex items-center gap-3 mb-8">
-                        <component
-                            :is="getIconForType(tipo)"
-                            class="h-8 w-8 text-taller-blue-dark"
-                        />
-                        <h3 class="text-2xl font-bold text-taller-black capitalize">
-                            {{ serviciosPorTipo[tipo] || tipo }}
-                        </h3>
+                <!-- Servicios Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <Cog6ToothIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Rectificación de motores</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Recuperación completa del motor con mediciones exactas y acabados de precisión.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div
-                            v-for="(servicio, index) in serviciosGrupo"
-                            :key="servicio.id"
-                            class="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:border-taller-blue-light transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden"
-                            :style="{ animationDelay: `${index * 100}ms` }"
-                        >
-                            <div class="absolute top-0 right-0 w-24 h-24 bg-taller-blue-light/10 rounded-bl-full transition-transform duration-500 transform translate-x-12 -translate-y-12 group-hover:scale-150"></div>
-
-                            <div class="flex justify-between items-start mb-4 relative z-10">
-                                <h4 class="text-xl font-bold text-taller-black group-hover:text-taller-blue-dark transition-colors">{{ servicio.nombre }}</h4>
-                                <span class="bg-taller-blue-dark/10 text-taller-blue-dark px-3 py-1 rounded-full text-sm font-bold">
-                                    ${{ servicio.precio_base }}
-                                </span>
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <WrenchScrewdriverIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
                             </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Encamisado de motores</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Instalación de camisas nuevas para restaurar cilindros desgastados.</p>
+                            </div>
+                        </div>
+                    </div>
 
-                            <p class="text-gray-600 mb-6 line-clamp-3 text-sm leading-relaxed relative z-10">
-                                {{ servicio.descripcion }}
-                            </p>
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <Cog6ToothIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Rectificación de cilindros</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Mecanizado de precisión para recuperar dimensiones y geometría original.</p>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div class="flex justify-between items-center border-t border-gray-100 pt-4 relative z-10">
-                                <span class="flex items-center text-sm text-gray-500 font-medium">
-                                    <ClockIcon class="h-4 w-4 mr-1 text-taller-blue-light" />
-                                    {{ servicio.duracion_estimada }} min
-                                </span>
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <Cog6ToothIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Rectificación de cigüeñales</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Rectificado y pulido de muñones para eliminar desgaste y ovalamiento.</p>
+                            </div>
+                        </div>
+                    </div>
 
-                                <Link
-                                    v-if="!$page.props.auth.user"
-                                    :href="canRegister"
-                                    class="text-taller-blue-dark font-bold text-sm hover:text-taller-blue-light transition-colors flex items-center gap-1"
-                                >
-                                    Solicitar <span class="text-lg">→</span>
-                                </Link>
-                                <Link
-                                    v-else
-                                    :href="route('cliente.citas.index')"
-                                    class="text-taller-blue-dark font-bold text-sm hover:text-taller-blue-light transition-colors flex items-center gap-1"
-                                >
-                                    Solicitar <span class="text-lg">→</span>
-                                </Link>
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <WrenchScrewdriverIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Asientos y válvulas</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Instalación y rectificado de asientos de válvulas para sellado perfecto.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <Cog6ToothIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Cepillado de blocks y culatas</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Planificado de superficies para eliminar deformaciones y alabeos.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <WrenchScrewdriverIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Alineado de bancada</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Corrección de alineación del block para óptimo funcionamiento del cigüeñal.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <Cog6ToothIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Trabajos de tornería de precisión</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Mecanizado especializado de piezas con tolerancias milimétricas.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <WrenchScrewdriverIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Fabricación de piezas</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Manufactura y ajuste de componentes mecánicos según especificaciones.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <ShieldCheckIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Reparación de componentes</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Restauración de piezas desgastadas o dañadas con técnicas especializadas.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl border border-gray-100 hover:border-taller-blue-light transition-all duration-300 hover:-translate-y-2">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-taller-blue-dark/10 rounded-xl flex items-center justify-center group-hover:bg-taller-blue-dark group-hover:scale-110 transition-all duration-300">
+                                <CheckBadgeIcon class="w-6 h-6 text-taller-blue-dark group-hover:text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-taller-black mb-2 group-hover:text-taller-blue-dark transition-colors">Trabajos especiales</h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">Adaptaciones y soluciones personalizadas según necesidades específicas.</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Garantía -->
+                <!--div class="bg-gradient-to-r from-taller-blue-light via-taller-blue-dark to-taller-black text-white rounded-3xl p-10 md:p-12 text-center relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')]"></div>
+                    <div class="relative z-10">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-6 backdrop-blur-sm">
+                            <ShieldCheckIcon class="w-10 h-10 text-white" />
+                        </div>
+                        <h3 class="text-3xl md:text-4xl font-bold mb-4">Nuestro Compromiso con la Calidad</h3>
+                        <p class="text-xl text-gray-100 max-w-3xl mx-auto leading-relaxed mb-6">
+                            Realizamos cada trabajo con <strong>mediciones exactas</strong>, <strong>maquinaria especializada de última generación</strong> 
+                            y <strong>materiales de primera calidad</strong>, asegurando el correcto funcionamiento y mayor vida útil de su motor.
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-8 mt-8">
+                            <div class="text-center">
+                                <div class="text-4xl font-bold mb-1">5+</div>
+                                <div class="text-sm text-gray-200">Años de experiencia</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl font-bold mb-1">1000+</div>
+                                <div class="text-sm text-gray-200">Motores rectificados</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl font-bold mb-1">100%</div>
+                                <div class="text-sm text-gray-200">Clientes satisfechos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div-->
             </div>
         </section>
 
-        <section class="py-20 bg-taller-blue-dark text-white relative overflow-hidden">
+        <section class=" bg-gradient-to-b from-taller-blue-dark to-taller-black text-white relative overflow-hidden">
             <div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+            <div class="absolute top-20 left-10 w-64 h-64 bg-taller-blue-light/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 right-10 w-80 h-80 bg-taller-blue-light/5 rounded-full blur-3xl"></div>
 
             <div class="container mx-auto px-6 relative z-10">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold mb-4">¿Por qué elegirnos?</h2>
-                    <p class="text-taller-blue-light max-w-xl mx-auto">Nos diferenciamos por nuestra excelencia y atención al detalle.</p>
+                    <!--span class="inline-block px-4 py-2 bg-taller-blue-light/20 text-taller-blue-light border border-taller-blue-light/40 text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
+                        NUESTRA VENTAJA COMPETITIVA
+                    </span-->
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6 pt-3">
+                        ¿Por qué <span class="text-transparent bg-clip-text bg-gradient-to-r from-taller-blue-light to-white">elegirnos</span>?
+                    </h2>
+                    <p class="text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed">
+                        En <strong>Tornería y Rectificaciones Choko</strong> nos destacamos por la <span class="text-taller-blue-light font-semibold">calidad excepcional</span> del trabajo, 
+                        la <span class="text-taller-blue-light font-semibold">responsabilidad</span> y la <span class="text-taller-blue-light font-semibold">atención personalizada</span> en cada motor que recibimos.
+                    </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                    <div class="text-center group p-6 rounded-2xl hover:bg-white/5 transition-colors duration-300">
-                        <div class="bg-taller-blue-light text-taller-black rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-taller-blue-light/30 group-hover:scale-110 transition-transform duration-300">
-                            <ShieldCheckIcon class="w-10 h-10" />
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <div class="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-taller-blue-light/20 hover:border-taller-blue-light/50 transition-all duration-500 hover:bg-white/10">
+                        <div class="absolute inset-0 bg-gradient-to-br from-taller-blue-light/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500"></div>
+                        
+                        <div class="relative z-10 text-center">
+                            <div class="bg-gradient-to-br from-taller-blue-light to-taller-blue-dark rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-taller-blue-light/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                <ShieldCheckIcon class="w-10 h-10 text-white" />
+                            </div>
+                            <span class="inline-block px-3 py-1 bg-taller-blue-light/20 text-taller-blue-light text-xs font-bold rounded-full mb-3">01</span>
+                            <h3 class="text-2xl font-bold mb-4 group-hover:text-taller-blue-light transition-colors">Calidad Garantizada</h3>
+                            <p class="text-gray-300 text-sm leading-relaxed">
+                                Utilizamos <strong>maquinaria especializada</strong>, mediciones precisas y repuestos certificados 
+                                para garantizar durabilidad y rendimiento óptimo del motor.
+                            </p>
+                            <div class="mt-6 pt-6 border-t border-taller-blue-light/20">
+                                <div class="flex items-center justify-center gap-2 text-taller-blue-light">
+                                    <CheckBadgeIcon class="w-5 h-5" />
+                                    <span class="text-sm font-semibold">Garantía extendida</span>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Calidad Garantizada</h3>
-                        <p class="text-gray-300 text-sm leading-relaxed">Trabajamos con los más altos estándares de calidad y repuestos originales para asegurar la vida útil de tu motor.</p>
                     </div>
 
-                    <div class="text-center group p-6 rounded-2xl hover:bg-white/5 transition-colors duration-300">
-                        <div class="bg-taller-blue-light text-taller-black rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-taller-blue-light/30 group-hover:scale-110 transition-transform duration-300">
-                            <ClockIcon class="w-10 h-10" />
+                    <div class="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-taller-blue-light/20 hover:border-taller-blue-light/50 transition-all duration-500 hover:bg-white/10">
+                        <div class="absolute inset-0 bg-gradient-to-br from-taller-blue-light/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500"></div>
+                        
+                        <div class="relative z-10 text-center">
+                            <div class="bg-gradient-to-br from-taller-blue-light to-taller-blue-dark rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-taller-blue-light/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                <ClockIcon class="w-10 h-10 text-white" />
+                            </div>
+                            <span class="inline-block px-3 py-1 bg-taller-blue-light/20 text-taller-blue-light text-xs font-bold rounded-full mb-3">02</span>
+                            <h3 class="text-2xl font-bold mb-4 group-hover:text-taller-blue-light transition-colors">Cumplimiento y Responsabilidad</h3>
+                            <p class="text-gray-300 text-sm leading-relaxed">
+                                Respetamos los <strong>tiempos acordados</strong> y trabajamos con seriedad y compromiso 
+                                para que tu vehículo vuelva a funcionar lo antes posible.
+                            </p>
+                            <div class="mt-6 pt-6 border-t border-taller-blue-light/20">
+                                <div class="flex items-center justify-center gap-2 text-taller-blue-light">
+                                    <CheckBadgeIcon class="w-5 h-5" />
+                                    <span class="text-sm font-semibold">Entrega puntual</span>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Servicio Rápido</h3>
-                        <p class="text-gray-300 text-sm leading-relaxed">Entendemos el valor de tu tiempo. Tiempos de entrega optimizados sin comprometer la precisión del trabajo.</p>
                     </div>
 
-                    <div class="text-center group p-6 rounded-2xl hover:bg-white/5 transition-colors duration-300">
-                        <div class="bg-taller-blue-light text-taller-black rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-taller-blue-light/30 group-hover:scale-110 transition-transform duration-300">
-                            <DevicePhoneMobileIcon class="w-10 h-10" />
+                    <div class="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-taller-blue-light/20 hover:border-taller-blue-light/50 transition-all duration-500 hover:bg-white/10">
+                        <div class="absolute inset-0 bg-gradient-to-br from-taller-blue-light/10 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500"></div>
+                        
+                        <div class="relative z-10 text-center">
+                            <div class="bg-gradient-to-br from-taller-blue-light to-taller-blue-dark rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-taller-blue-light/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                <UserCircleIcon class="w-10 h-10 text-white"/>
+                            </div>
+                            <span class="inline-block px-3 py-1 bg-taller-blue-light/20 text-taller-blue-light text-xs font-bold rounded-full mb-3">03</span>
+                            <h3 class="text-2xl font-bold mb-4 group-hover:text-taller-blue-light transition-colors">Atención Directa y Confianza</h3>
+                            <p class="text-gray-300 text-sm leading-relaxed">
+                                Brindamos <strong>asesoramiento profesional</strong>, presupuestos transparentes y un trato 
+                                honesto y cercano con cada cliente.
+                            </p>
+                            <div class="mt-6 pt-6 border-t border-taller-blue-light/20">
+                                <div class="flex items-center justify-center gap-2 text-taller-blue-light">
+                                    <CheckBadgeIcon class="w-5 h-5" />
+                                    <span class="text-sm font-semibold">Comunicación directa</span>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Seguimiento Digital</h3>
-                        <p class="text-gray-300 text-sm leading-relaxed">Monitorea el estado de tu vehículo en tiempo real desde nuestra plataforma web moderna y accesible.</p>
                     </div>
                 </div>
+
             </div>
         </section>
 
-        <section class="py-20 bg-taller-black text-white relative">
+        <!--section class="py-20 bg-taller-black text-white relative">
             <div class="container mx-auto px-6 text-center">
                 <div class="bg-gradient-to-r from-gray-800 to-gray-900 rounded-3xl p-10 md:p-16 shadow-2xl border border-gray-700 animate-float">
                     <h2 class="text-3xl md:text-4xl font-bold mb-6">¿Listo para renovar tu vehículo?</h2>
@@ -272,7 +441,7 @@ const getIconForType = (tipo) => {
                     </div>
                 </div>
             </div>
-        </section>
+        </section-->
 
         <footer class="bg-gray-900 text-white py-12 border-t border-gray-800">
             <div class="container mx-auto px-6">
@@ -280,7 +449,7 @@ const getIconForType = (tipo) => {
                     <div>
                         <div class="flex items-center space-x-2 mb-4">
                             <WrenchScrewdriverIcon class="h-6 w-6 text-taller-blue-light" />
-                            <h3 class="text-xl font-bold text-white">Ardaya Motors</h3>
+                            <h3 class="text-xl font-bold text-white">Torneria y Rectificaciones Choko</h3>
                         </div>
                         <p class="text-gray-400 text-sm leading-relaxed">
                             Transformamos la manera de cuidar tu vehículo. Tecnología, confianza y experiencia en un solo lugar.
@@ -291,15 +460,15 @@ const getIconForType = (tipo) => {
                         <ul class="space-y-4">
                             <li class="flex items-center text-gray-400 hover:text-white transition-colors">
                                 <PhoneIcon class="h-5 w-5 mr-3 text-taller-blue-dark" />
-                                (123) 456-7890
+                                (+591) 79946959
                             </li>
                             <li class="flex items-center text-gray-400 hover:text-white transition-colors">
                                 <EnvelopeIcon class="h-5 w-5 mr-3 text-taller-blue-dark" />
-                                info@ardayamotors.com
+                                info@rectificacioneschoko.com
                             </li>
                             <li class="flex items-center text-gray-400 hover:text-white transition-colors">
                                 <MapPinIcon class="h-5 w-5 mr-3 text-taller-blue-dark" />
-                                Av. Principal #123, Santa Cruz
+                                Av.3 pasos al frente pasando el 4to anillo, barrio convifag, calle livigstone #4205, Santa Cruz
                             </li>
                         </ul>
                     </div>
@@ -322,7 +491,7 @@ const getIconForType = (tipo) => {
                     </div>
                 </div>
                 <div class="border-t border-gray-800 mt-12 pt-8 text-center">
-                    <p class="text-gray-500 text-sm">&copy; 2025 Ardaya Motors. Todos los derechos reservados.</p>
+                    <p class="text-gray-500 text-sm">&copy; 2026 Torneria y Rectificaciones Choko. Todos los derechos reservados.</p>
                 </div>
             </div>
         </footer>

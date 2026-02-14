@@ -1,12 +1,12 @@
 <script setup>
 import { useTheme } from '@/Composables/useTheme'
 import { ChevronDownIcon } from '@heroicons/vue/24/outline'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const { theme, availableThemes, setTheme, getCurrentThemeInfo } = useTheme()
 const isOpen = ref(false)
 
-const currentTheme = getCurrentThemeInfo()
+const currentTheme = computed(() => getCurrentThemeInfo())
 </script>
 
 <template>
@@ -14,7 +14,14 @@ const currentTheme = getCurrentThemeInfo()
         <!-- Botón del tema actual -->
         <button
             @click="isOpen = !isOpen"
-            class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-150 ease-in-out border"
+            :style="{ 
+                backgroundColor: 'var(--color-primary)',
+                color: 'white',
+                opacity: '0.95'
+            }"
+            @mouseenter="$event.target.style.opacity = '1'"
+            @mouseleave="$event.target.style.opacity = '0.95'"
             :title="`Tema actual: ${currentTheme.name}`"
         >
             <span class="text-lg">{{ currentTheme.icon }}</span>

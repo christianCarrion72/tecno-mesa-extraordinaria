@@ -34,8 +34,7 @@ const logout = () => {
                     <div class="flex items-center space-x-3">
                                 <div
                                     class="w-18 h-12 bg-taller-blue-light rounded-full flex items-center justify-center">
-                                    <img src="https://res.cloudinary.com/dcdhuwp0y/image/upload/v1762306771/ARDAYA_MOTORS_pojle3.png"
-                                        alt="Logo" class="w-full h-full object-cover">
+                                    <img src="../../img/logo.png" alt="Logo" class="w-full h-full object-cover rounded-lg">
                                 </div>
                             </div>
                     <span class="text-xl font-bold text-white">

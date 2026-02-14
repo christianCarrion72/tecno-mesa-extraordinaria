@@ -13,7 +13,7 @@ export const Card = defineComponent({
         {
           ...attrs,
           class: mergeClass(
-            'rounded-lg border bg-white shadow-sm dark:bg-gray-900 dark:border-gray-800',
+            'rounded-lg border bg-white shadow-sm dark:bg-transparent dark:border-gray-800',
             (attrs as any).class,
           ),
         },

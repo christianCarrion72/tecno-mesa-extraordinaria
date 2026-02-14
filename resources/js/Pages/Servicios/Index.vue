@@ -35,7 +35,7 @@ const paginator = computed(() => props.servicios);
 
             <div class="border rounded-lg overflow-hidden">
                 <table class="w-full text-left">
-                    <thead class="bg-gray-100">
+                    <thead class="bg-transparent">
                         <tr>
                             <th class="p-2">ID</th>
                             <th class="p-2">Nombre</th>
