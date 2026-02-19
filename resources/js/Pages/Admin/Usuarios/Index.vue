@@ -81,7 +81,12 @@ watch(buscar, (query) => {
                         </div>
                     </div>
                     <div class="flex flex-col gap-2">
-                        <Link :href="route('admin.usuarios.create')">
+                        <Link :href="route('admin.usuarios.create')"class="group px-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center gap-2 text-sm"
+                    :style="{
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'var(--color-base)',
+                        ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                    }">
                             <Button>
                                 Nuevo Usuario
                             </Button>

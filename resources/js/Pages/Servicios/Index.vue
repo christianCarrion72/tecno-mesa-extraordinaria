@@ -27,9 +27,17 @@ const paginator = computed(() => props.servicios);
                 <h1 class="text-xl font-bold">Servicios</h1>
 
                 <Button>
-                    <Link :href="route('servicios.create')" class="flex items-center gap-2">
-                        <PlusIcon class="h-4 w-4" /> Nuevo Servicio
-                    </Link>
+                    <Link :href="route('servicios.create')"class="group px-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center gap-2 text-sm"
+                    :style="{
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'var(--color-base)',
+                        ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                    }">
+                            <Button>
+                                <PlusIcon class="h-4 w-4" /> 
+                                Nuevo Servicio
+                            </Button>
+                        </Link>
                 </Button>
             </div>
 

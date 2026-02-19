@@ -95,7 +95,12 @@ const deleteOrden = (orden: OrdenTrabajo) => {
                         </div>
                     </div>
 
-                    <Link :href="route('orden-trabajos.create')">
+                    <Link :href="route('orden-trabajos.create')" class="group px-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center gap-2 text-sm"
+                    :style="{
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'var(--color-base)',
+                        ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                    }">
                         <Button>
                             <PlusIcon class="mr-2 h-4 w-4" />
                             Nueva Orden
