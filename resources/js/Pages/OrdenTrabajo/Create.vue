@@ -142,7 +142,13 @@ const submit = () => {
 
                         <!-- Acciones -->
                         <div class="flex items-center gap-4">
-                            <Button :disabled="form.processing" type="submit">
+                            <Button :disabled="form.processing" type="submit"
+                            :style="{
+                                backgroundColor: 'var(--color-primary)',
+                                color: 'white',
+                                ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                            }"
+                            >
                                 {{ form.processing ? 'Guardando…' : 'Guardar Orden' }}
                             </Button>
 

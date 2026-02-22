@@ -44,12 +44,12 @@ const getIconForType = (tipo) => {
     <Head title="Torneria y Rectificaciones" />
 
     <div class="min-h-screen bg-taller-cream overflow-x-hidden">
-        <header class="bg-taller-black text-white shadow-lg sticky top-0 z-50 animate-slide-down">
+        <header class="bg-taller-black text-white shadow-lg sticky top-0 z-50 animate-slide-down" role="banner">
             <div class="container mx-auto px-6 py-3">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4 group cursor-pointer">
-                        <div class="w-14 h-14 bg-taller-blue-light rounded-full flex items-center justify-center border-2 border-transparent group-hover:border-white transition-all duration-300 transform group-hover:rotate-12">
-                            <img src="../../img/logo.png" alt="Logo" class="w-full h-full object-cover rounded-lg">
+                    <div class="flex items-center space-x-4 group cursor-pointer" role="img" aria-label="Torneria y Rectificaciones Choko">
+                        <div class="w-14 h-14 bg-taller-blue-light rounded-full flex items-center justify-center border-2 border-transparent group-hover:border-white transition-all duration-300 transform group-hover:rotate-12 group-hover:shadow-lg group-hover:shadow-taller-blue-light/50">
+                            <img src="/img/logo.png" alt="Logo Torneria y Rectificaciones Choko" class="w-full h-full object-cover rounded-lg" loading="eager">
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold text-taller-blue-light tracking-wide">Torneria y Rectificaciones</h1>
@@ -58,11 +58,12 @@ const getIconForType = (tipo) => {
                         </div>
                     </div>
 
-                    <nav v-if="canLogin" class="hidden md:flex items-center space-x-6">
+                    <nav v-if="canLogin" class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Navegación principal">
                         <Link
                             v-if="$page.props.auth.user"
                             :href="route('dashboard')"
-                            class="flex items-center gap-2 bg-taller-blue-dark hover:bg-taller-blue-light text-white px-6 py-2.5 rounded-full transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                            class="flex items-center gap-2 bg-taller-blue-dark hover:bg-taller-blue-light text-white px-6 py-2.5 rounded-full transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:scale-105"
+                            aria-label="Ir a mi panel de control"
                         >
                             <UserCircleIcon class="h-5 w-5" />
                             Mi Panel
@@ -71,7 +72,8 @@ const getIconForType = (tipo) => {
                         <template v-else>
                             <Link
                                 :href="canLogin"
-                                class="flex items-center gap-2 text-white hover:text-taller-blue-light transition-colors duration-300 font-medium"
+                                class="flex items-center gap-2 text-white hover:text-taller-blue-light transition-colors duration-300 font-medium hover:scale-105"
+                                aria-label="Iniciar sesión en tu cuenta"
                             >
                                 <ArrowRightOnRectangleIcon class="h-5 w-5" />
                                 Iniciar Sesión
@@ -80,7 +82,8 @@ const getIconForType = (tipo) => {
                             <Link
                                 v-if="canRegister"
                                 :href="canRegister"
-                                class="bg-taller-blue-light hover:bg-taller-blue-dark hover:text-white text-taller-black px-6 py-2.5 rounded-full transition-all duration-300 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                class="bg-taller-blue-light hover:bg-taller-blue-dark hover:text-white text-taller-black px-6 py-2.5 rounded-full transition-all duration-300 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:scale-105"
+                                aria-label="Crear una cuenta nueva"
                             >
                                 Registrarse
                             </Link>
@@ -90,15 +93,15 @@ const getIconForType = (tipo) => {
             </div>
         </header>
 
-        <section class="relative bg-gradient-to-br from-taller-blue-dark to-taller-black text-white py-24 overflow-hidden">
+        <section class="relative bg-gradient-to-br from-taller-black via-gray-900 to-taller-black text-white py-24 overflow-hidden" role="region" aria-label="Sección hero">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-taller-blue-light opacity-10 rounded-full blur-3xl animate-pulse-slow"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-blue-600 opacity-10 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
 
             <div class="container mx-auto px-6 relative z-10 text-center">
                 <div class="animate-fade-in-up">
-                    <h2 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight bg-gradient-to-r from-taller-blue-light to-taller-blue-dark bg-clip-text text-transparent">
-                        Expertos en rectificación <br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-taller-blue-light to-white">y trabajos de tornería</span>
+                    <h2 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
+                        <span class="bg-gradient-to-r from-taller-blue-light to-taller-blue-dark bg-clip-text text-transparent">Expertos en rectificación</span> <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-taller-blue-light via-blue-400 to-white animate-gradient">y trabajos de tornería</span>
                     </h2>
                     <p class="text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
                         En <strong>Tornería y Rectificaciones Choko</strong> ofrecemos servicios profesionales especializados en motores. 
@@ -108,29 +111,24 @@ const getIconForType = (tipo) => {
 
                     <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
                         <Link
-                            v-if="!$page.props.auth.user"
-                            :href="canRegister"
-                            class="group relative bg-white text-taller-black px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:-translate-y-1 overflow-hidden"
+                            :href="$page.props.auth.user ? route('cliente.citas.index') : canRegister"
+                            class="group relative bg-white text-taller-black px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:-translate-y-1 overflow-hidden hover:scale-105"
+                            :aria-label="$page.props.auth.user ? 'Solicitar cotización de servicio' : 'Registrarse para solicitar cotización'"
                         >
                             <span class="relative z-10 flex items-center gap-2">
                                 Solicitar Cotización
                                 <CalendarDaysIcon class="h-5 w-5 group-hover:rotate-12 transition-transform" />
                             </span>
-                        </Link>
-                        <Link
-                            v-else
-                            :href="route('cliente.citas.index')"
-                            class="group relative bg-white text-taller-black px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:-translate-y-1"
-                        >
-                            <span class="flex items-center gap-2">
-                                Solicitar Cotización
-                                <CalendarDaysIcon class="h-5 w-5 group-hover:rotate-12 transition-transform" />
-                            </span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-taller-blue-light to-taller-blue-dark opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
                         </Link>
 
-                        <a href="#servicios" class="flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-semibold text-white border-2 border-white/30 hover:bg-white/10 transition-all duration-300">
+                        <a 
+                            href="#servicios" 
+                            class="flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-semibold text-white border-2 border-white/30 hover:bg-white/10 transition-all duration-300 hover:border-white/60 hover:scale-105"
+                            aria-label="Ver lista de servicios disponibles"
+                        >
                             Ver Servicios
-                            <CursorArrowRaysIcon class="h-5 w-5" />
+                            <CursorArrowRaysIcon class="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                         </a>
                     </div>
                 </div>
@@ -540,9 +538,25 @@ const getIconForType = (tipo) => {
     }
 }
 
+@keyframes gradient {
+    0%, 100% {
+        background-size: 200% 200%;
+        background-position: left center;
+    }
+    50% {
+        background-size: 200% 200%;
+        background-position: right center;
+    }
+}
+
 /* Utility Classes for Animations */
 .animate-fade-in-up {
     animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.animate-gradient {
+    animation: gradient 3s ease infinite;
+    background-size: 200% 200%;
 }
 
 .animate-slide-down {

@@ -241,7 +241,13 @@ onUnmounted(() => {
                         </div>
 
                         <div class="flex items-center gap-4">
-                            <Button type="submit" :disabled="form.processing">
+                            <Button type="submit" :disabled="form.processing"
+                            :style="{
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'white',
+                        ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                    }">
+                            
                                 {{ form.processing ? 'Actualizando...' : 'Actualizar Motor' }}
                             </Button>
 

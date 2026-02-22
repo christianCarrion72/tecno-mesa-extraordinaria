@@ -7,7 +7,7 @@ export const Separator = defineComponent({
       h('hr', {
         ...attrs,
         class: [
-          'my-4 border-t border-gray-200 dark:border-gray-700',
+          'my-4 border-t border-border',
           (attrs as any).class ?? '',
         ]
           .filter(Boolean)

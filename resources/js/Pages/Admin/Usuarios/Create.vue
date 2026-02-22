@@ -214,6 +214,11 @@ const submit = () => {
                             <Button 
                                 type="submit" 
                                 :disabled="form.processing"
+                                :style="{
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'white',
+                                    borderColor: 'var(--color-primary)',
+                                }"
                             >
                                 {{ form.processing ? 'Guardando...' : 'Guardar Usuario' }}
                             </Button>

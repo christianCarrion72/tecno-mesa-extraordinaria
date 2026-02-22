@@ -13,7 +13,7 @@ export const Card = defineComponent({
         {
           ...attrs,
           class: mergeClass(
-            'rounded-lg border bg-white shadow-sm dark:bg-transparent dark:border-gray-800',
+            'rounded-lg border border-border bg-card shadow-sm',
             (attrs as any).class,
           ),
         },
@@ -64,7 +64,7 @@ export const CardDescription = defineComponent({
         {
           ...attrs,
           class: mergeClass(
-            'text-sm text-gray-500 dark:text-gray-400',
+            'text-sm text-muted-foreground',
             (attrs as any).class,
           ),
         },

@@ -8,7 +8,7 @@ const availableThemes = [
         icon: '☀️',
         colors: {
             primary: '#3b82f6',     // blue-500 - azul brillante
-            secondary: '#8b5cf6',   // violet-500 - violeta
+            secondary: '#6b7280',   // gray-500 - gris medio
             accent: '#06b6d4',      // cyan-500 - cian
             neutral: '#6b7280',     // gray-500 - gris medio
             base: '#ffffff',        // white - blanco puro
@@ -28,7 +28,7 @@ const availableThemes = [
         icon: '🌙',
         colors: {
             primary: '#60a5fa',     // blue-400 - azul claro
-            secondary: '#a78bfa',   // violet-400 - violeta claro
+            secondary: '#3d4a5b',   // Gray-700 - gris oscuro
             accent: '#22d3ee',      // cyan-400 - cian claro
             neutral: '#9ca3af',     // gray-400 - gris claro
             base: '#111827',        // gray-900 - gris muy oscuro
@@ -47,16 +47,16 @@ const availableThemes = [
         name: '🎨 Jóvenes',
         icon: '🎨',
         colors: {
-            primary: '#ec4899',     // pink-500 - rosa vibrante
-            secondary: '#8b5cf6',   // violet-500 - violeta
+            primary: '#6b26ac',     // violet-700 - violeta oscuro
+            secondary: '#389da8',   // teal-500 - verde azulado
             accent: '#06b6d4',      // cyan-500 - cian
             neutral: '#f97316',     // orange-500 - naranja
-            base: '#fef7ed',        // orange-50 - fondo cálido
+            base: '#fef7edf',        // orange-50 - fondo cálido#fef7ed
             info: '#3b82f6',        // blue-500 - azul
             success: '#10b981',     // emerald-500 - verde
             warning: '#f59e0b',     // amber-500 - amarillo
             error: '#ef4444',       // red-500 - rojo
-            sidebarBg: '#fed7aa',   // orange-200 - sidebar cálido
+            sidebarBg: '#d2e5e7',   // orange-200 - sidebar cálido
             text: '#9a3412',        // orange-800 - texto oscuro
             textLight: '#ea580c',   // orange-600 - texto medio
             border: '#fed7aa',      // orange-200 - borde cálido

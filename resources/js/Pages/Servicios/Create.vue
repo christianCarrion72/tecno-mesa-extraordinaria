@@ -61,7 +61,11 @@ const submit = () => {
                         </div>
 
                         <div class="flex gap-4">
-                            <Button type="submit">Guardar</Button>
+                            <Button type="submit" :style="{
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'white',
+                        ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                    }">Guardar</Button>
                             <Button type="button" variant="outline" @click="$inertia.visit(route('servicios.index'))">
                                 Cancelar
                             </Button>

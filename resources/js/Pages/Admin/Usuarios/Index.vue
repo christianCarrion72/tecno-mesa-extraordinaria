@@ -92,7 +92,11 @@ watch(buscar, (query) => {
                             </Button>
                         </Link>
                         <Link :href="route('admin.permisos.index')">
-                            <Button>
+                            <Button :style="{
+                                backgroundColor: 'var(--color-secondary)',
+                                color: 'white',
+                                ':hover': { backgroundColor: 'var(--color-secondary)', opacity: '0.9' }
+                            }">
                                 Administrar Permisos
                             </Button>
                         </Link>

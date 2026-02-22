@@ -115,6 +115,11 @@ onUnmounted(() => {
                             <Button 
                                 type="submit" 
                                 :disabled="form.processing"
+                                :style="{
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'white',
+                                    ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                                }"
                             >
                                 {{ form.processing ? 'Guardando...' : 'Guardar Modelo' }}
                             </Button>

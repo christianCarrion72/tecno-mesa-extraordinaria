@@ -73,7 +73,12 @@ const submit = () => {
 
                         <!-- Botones -->
                         <div class="flex gap-4">
-                            <Button type="submit" :disabled="form.processing">
+                            <Button type="submit" :disabled="form.processing" 
+                            :style="{
+                                backgroundColor: 'var(--color-primary)',
+                                color: 'white',
+                        ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                    }">
                                 Guardar Cambios
                             </Button>
 
