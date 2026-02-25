@@ -7,7 +7,6 @@ import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 
 import { Button } from '@/Components/ui/button';
-import Combobox from '@/Components/ui/Combobox.vue';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/Components/ui/card';
 import { ArrowLeftIcon, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { computed, watch, ref } from 'vue';
@@ -66,12 +65,6 @@ const props = defineProps<{
     orden: OrdenTrabajo;
     serviciosCatalogo: ServicioCatalogo[];
 }>();
-
-const serviciosItems = computed<{ id: number; label: string }[]>(() =>
-    Array.isArray(props.serviciosCatalogo)
-        ? props.serviciosCatalogo.map(s => ({ id: s.id, label: `${s.nombre} (${s.costo} Bs)` }))
-        : []
-);
 
 // ==============================
 //   Breadcrumbs
@@ -219,7 +212,8 @@ const confirmDelete = (id: number) => {
                     <div class="mt-2">
                         <template v-if="!orden.plan_pago">
                             <Link :href="route('plan-pagos.create', { ordenTrabajo: orden.id })">
-                                <Button size="sm">
+                                <Button size="sm"
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'white' }"    >
                                     Generar Plan de Pago
                                 </Button>
                             </Link>
@@ -309,11 +303,24 @@ const confirmDelete = (id: number) => {
                             <!-- Servicio -->
                             <div class="md:col-span-2 flex flex-col gap-1">
                                 <label class="text-sm font-medium">Servicio</label>
-                                <Combobox
-                                    v-model="formServicio.servicio_id"
-                                    :items="serviciosItems"
-                                    placeholder="Seleccione un servicio"
-                                />
+                                <div class="relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <select
+                                        v-model="formServicio.servicio_id"
+                                        :disabled="formServicio.processing"
+                                        class="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none text-sm"
+                                    >
+                                        <option value="">Seleccione un servicio</option>
+                                        <option v-for="serv in serviciosCatalogo" :key="serv.id" :value="serv.id">
+                                            {{ serv.nombre }} ({{ serv.costo }} Bs)
+                                        </option>
+                                    </select>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
                             </div>
 
                             <!-- Cantidad -->
@@ -353,6 +360,11 @@ const confirmDelete = (id: number) => {
                                 <Button 
                                     type="button"
                                     :disabled="!formServicio.servicio_id || formServicio.processing"
+                                    :style="{
+                                        backgroundColor: formServicio.servicio_id ? 'var(--color-primary)' : 'var(--color-muted)',
+                                        color: formServicio.servicio_id ? 'white' : 'var(--color-text)',
+                                        cursor: formServicio.servicio_id ? 'pointer' : 'not-allowed',
+                                    }"
                                     @click.prevent="agregarAlCarrito"
                                 >
                                     Añadir a la lista
@@ -393,7 +405,14 @@ const confirmDelete = (id: number) => {
 
                             <div class="text-right">
                                 <span class="text-sm mr-4">Total a agregar: <strong>{{ carritoTotal }} Bs</strong></span>
-                                <Button :disabled="formBatch.processing" @click.prevent="guardarTodos">Guardar todos</Button>
+                                <Button :disabled="formBatch.processing"
+                                :style="{
+                                    backgroundColor: carrito.length > 0 ? 'var(--color-primary)' : 'var(--color-muted)',
+                                    color: carrito.length > 0 ? 'white' : 'var(--color-text)',
+                                    cursor: carrito.length > 0 ? 'pointer' : 'not-allowed',
+                                }"
+
+                                 @click.prevent="guardarTodos">Guardar todos</Button>
                             </div>
                         </div>
                     </div>
