@@ -16,8 +16,8 @@ class PageViewController extends Controller
         $userId = Auth::id();
         
         return PageView::where('user_id', $userId)
-            ->distinct('page_name')
-            ->count('page_name');
+            ->selectRaw('COUNT(DISTINCT page_name) as count')
+            ->value('count');
     }
 
     /**
@@ -89,12 +89,13 @@ class PageViewController extends Controller
     }
 
     /**
-     * Obtener vistas de una página específica
+     * Obtener vistas de una página específica (TODAS las visitas, no solo del usuario actual)
      */
     public function getPageViews($pageName)
     {
-        $count = PageView::where('user_id', Auth::id())
-            ->where('page_name', $pageName)
+        // Laravel decodifica automáticamente los parámetros de URL
+        // Contar TODAS las visitas a esta página (de todos los usuarios)
+        $count = PageView::where('page_name', $pageName)
             ->count();
         
         return response()->json($count);

@@ -24,7 +24,7 @@ const fetchPageViews = async () => {
     currentPageName.value = pageName
 
     // Obtener las vistas de esta página específica
-    const response = await fetch(route('api.page-views.page', pageName))
+    const response = await fetch(`/api/page-views/page/${encodeURIComponent(pageName)}`)
     
     if (!response.ok) {
       console.error('Error response:', response.status)
@@ -93,8 +93,8 @@ const extractPageName = () => {
     if (isEdit) return 'Editar Servicio'
     if (isShow) return 'Ver Servicio'
     return 'Servicios'
-  } else if (component.includes('Admin/Dashboard')) {
-    return 'Dashboard Admin'
+  } else if (component.includes('Dashboard')) {
+    return 'Dashboard'
   }
   // Cliente routes
   else if (component.includes('Cliente/Vehiculo')) {
@@ -124,19 +124,15 @@ const extractPageName = () => {
     if (isEdit) return 'Editar Orden'
     if (isShow) return 'Ver Orden'
     return 'Órdenes de Trabajo'
-  } else if (component.includes('Mecanico/Dashboard')) {
-    return 'Dashboard Mecánico'
   }
   // Profile
   else if (component.includes('Profile')) {
     return 'Editar Perfil'
-  } else if (component.includes('Dashboard')) {
-    return 'Dashboard'
   }
   
   // Fallback: detectar por URL si el componente no fue específico
-  if (url.includes('/admin/dashboard')) {
-    return 'Dashboard Admin'
+  if (url.includes('/dashboard')) {
+    return 'Dashboard'
   } else if (url.includes('/admin/vehiculos')) {
     if (isCreate) return 'Crear Vehículo'
     if (isEdit) return 'Editar Vehículo'
@@ -152,6 +148,11 @@ const extractPageName = () => {
     if (isEdit) return 'Editar Diagnóstico'
     if (isShow) return 'Ver Diagnóstico'
     return 'Diagnósticos'
+  } else if (url.includes('/orden-trabajos')) {
+    if (isCreate) return 'Crear Orden'
+    if (isEdit) return 'Editar Orden'
+    if (isShow) return 'Ver Orden'
+    return 'Órdenes de Trabajo'
   } else if (url.includes('/admin/ordenes')) {
     if (isCreate) return 'Crear Orden'
     if (isEdit) return 'Editar Orden'
@@ -164,16 +165,51 @@ const extractPageName = () => {
     return 'Pagos'
   } else if (url.includes('/admin/reportes')) {
     return 'Reportes'
-  } else if (url.includes('/admin/clientes')) {
+  } else if (url.includes('/clientes')) {
     if (isCreate) return 'Crear Cliente'
     if (isEdit) return 'Editar Cliente'
     if (isShow) return 'Ver Cliente'
     return 'Gestión de Clientes'
-  } else if (url.includes('/admin/servicios')) {
+  } else if (url.includes('/servicios')) {
     if (isCreate) return 'Crear Servicio'
     if (isEdit) return 'Editar Servicio'
     if (isShow) return 'Ver Servicio'
-    return 'Servicios'
+    return 'Gestión de Servicios'
+  } else if (url.includes('/usuarios')) {
+    if (isCreate) return 'Crear Usuario'
+    if (isEdit) return 'Editar Usuario'
+    if (isShow) return 'Ver Usuario'
+    return 'Gestión de Usuarios'
+  } else if (url.includes('/marcas')) {
+    if (isCreate) return 'Crear Marca'
+    if (isEdit) return 'Editar Marca'
+    if (isShow) return 'Ver Marca'
+    return 'Gestión de Marcas'
+  } else if (url.includes('/modelos')) {
+    if (isCreate) return 'Crear Modelo'
+    if (isEdit) return 'Editar Modelo'
+    if (isShow) return 'Ver Modelo'
+    return 'Gestión de Modelos'
+  } else if (url.includes('/motores')) {
+    if (isCreate) return 'Crear Motor'
+    if (isEdit) return 'Editar Motor'
+    if (isShow) return 'Ver Motor'
+    return 'Gestión de Motores'
+  } else if (url.includes('/partes')) {
+    if (isCreate) return 'Crear Parte'
+    if (isEdit) return 'Editar Parte'
+    if (isShow) return 'Ver Parte'
+    return 'Gestión de Partes'
+  } else if (url.includes('/incidencias')) {
+    if (isCreate) return 'Crear Incidencia'
+    if (isEdit) return 'Editar Incidencia'
+    if (isShow) return 'Ver Incidencia'
+    return 'Gestión de Incidencias'
+  } else if (url.includes('/plan-pagos')) {
+    if (isCreate) return 'Crear Plan de Pago'
+    if (isEdit) return 'Editar Plan de Pago'
+    if (isShow) return 'Ver Plan de Pago'
+    return 'Planes de Pago'
   } 
   // Cliente routes
   else if (url.includes('/mis-vehiculos') || url.includes('/cliente/vehiculos')) {
@@ -186,7 +222,7 @@ const extractPageName = () => {
     if (isEdit) return 'Editar Cita'
     if (isShow) return 'Ver Cita'
     return 'Mis Citas'
-  } else if (url.includes('/mis-ordenes') || url.includes('/cliente/ordenes')) {
+  } else if (url.includes('/ordenes')) {
     if (isShow) return 'Ver Orden'
     return 'Mis Órdenes'
   } else if (url.includes('/mis-pagos') || url.includes('/cliente/pagos')) {
@@ -199,16 +235,15 @@ const extractPageName = () => {
     if (isEdit) return 'Editar Diagnóstico'
     if (isShow) return 'Ver Diagnóstico'
     return 'Diagnósticos'
-  } else if (url.includes('/mecanico/ordenes') || url.includes('/ordenes-trabajo')) {
-    if (isEdit) return 'Editar Orden'
-    if (isShow) return 'Ver Orden'
-    return 'Órdenes de Trabajo'
   } 
   // Profile
   else if (url.includes('/profile')) {
     return 'Editar Perfil'
-  } else if (url.includes('/dashboard')) {
-    return 'Dashboard'
+  } else if (url.includes('/usuarios')) {
+    if (isCreate) return 'Crear Usuario'
+    if (isEdit) return 'Editar Usuario'
+    if (isShow) return 'Ver Usuario'
+    return 'Gestión de Usuarios'
   }
   
   console.log('Component name not mapped:', component)

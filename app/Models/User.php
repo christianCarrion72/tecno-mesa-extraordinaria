@@ -92,10 +92,10 @@ class User extends Authenticatable
     //     return $this->hasMany(PagoDetalle::class, 'recibido_por');
     // }
 
-    // public function pageViews()
-    // {
-    //     return $this->hasMany(PageView::class);
-    // }
+    public function pageViews()
+    {
+        return $this->hasMany(PageView::class);
+    }
 
     // // Scopes
     // public function scopeClientes($query)

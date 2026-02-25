@@ -49,10 +49,8 @@ class TrackPageView
 
         // Mapeo de rutas a nombres de página - SEPARAR index/create/edit/show
         $pageMap = [
-            // Dashboard
+            // Dashboard único para todos los roles
             'dashboard' => 'Dashboard',
-            'admin.dashboard' => 'Dashboard Admin',
-            'mecanico.dashboard' => 'Dashboard Mecánico',
             // Admin - Marcas
             'admin.marcas.index' => 'Gestión de Marcas',
             'admin.marcas.create' => 'Crear Marca',
@@ -85,6 +83,90 @@ class TrackPageView
             'admin.partes.edit' => 'Editar Parte',
             'admin.partes.update' => 'Editar Parte',
             'admin.partes.destroy' => 'Eliminar Parte',
+            
+            // Rutas generales (sin prefijo admin/cliente/mecanico)
+            // Marcas
+            'marcas.index' => 'Gestión de Marcas',
+            'marcas.create' => 'Crear Marca',
+            'marcas.store' => 'Crear Marca',
+            'marcas.show' => 'Ver Marca',
+            'marcas.edit' => 'Editar Marca',
+            'marcas.update' => 'Editar Marca',
+            'marcas.destroy' => 'Eliminar Marca',
+            // Modelos
+            'modelos.index' => 'Gestión de Modelos',
+            'modelos.create' => 'Crear Modelo',
+            'modelos.store' => 'Crear Modelo',
+            'modelos.show' => 'Ver Modelo',
+            'modelos.edit' => 'Editar Modelo',
+            'modelos.update' => 'Editar Modelo',
+            'modelos.destroy' => 'Eliminar Modelo',
+            // Motores
+            'motores.index' => 'Gestión de Motores',
+            'motores.create' => 'Crear Motor',
+            'motores.store' => 'Crear Motor',
+            'motores.show' => 'Ver Motor',
+            'motores.edit' => 'Editar Motor',
+            'motores.update' => 'Editar Motor',
+            'motores.destroy' => 'Eliminar Motor',
+            // Partes
+            'partes.index' => 'Gestión de Partes',
+            'partes.create' => 'Crear Parte',
+            'partes.store' => 'Crear Parte',
+            'partes.show' => 'Ver Parte',
+            'partes.edit' => 'Editar Parte',
+            'partes.update' => 'Editar Parte',
+            'partes.destroy' => 'Eliminar Parte',
+            // Clientes
+            'clientes.index' => 'Gestión de Clientes',
+            'clientes.create' => 'Crear Cliente',
+            'clientes.store' => 'Crear Cliente',
+            'clientes.show' => 'Ver Cliente',
+            'clientes.edit' => 'Editar Cliente',
+            'clientes.update' => 'Editar Cliente',
+            'clientes.destroy' => 'Eliminar Cliente',
+            // Servicios
+            'servicios.index' => 'Gestión de Servicios',
+            'servicios.create' => 'Crear Servicio',
+            'servicios.store' => 'Crear Servicio',
+            'servicios.show' => 'Ver Servicio',
+            'servicios.edit' => 'Editar Servicio',
+            'servicios.update' => 'Editar Servicio',
+            'servicios.destroy' => 'Eliminar Servicio',
+            // Usuarios
+            'usuarios.index' => 'Gestión de Usuarios',
+            'usuarios.create' => 'Crear Usuario',
+            'usuarios.store' => 'Crear Usuario',
+            'usuarios.show' => 'Ver Usuario',
+            'usuarios.edit' => 'Editar Usuario',
+            'usuarios.update' => 'Editar Usuario',
+            'usuarios.destroy' => 'Eliminar Usuario',
+            // Órdenes de Trabajo
+            'orden-trabajos.index' => 'Órdenes de Trabajo',
+            'orden-trabajos.create' => 'Crear Orden',
+            'orden-trabajos.store' => 'Crear Orden',
+            'orden-trabajos.show' => 'Ver Orden',
+            'orden-trabajos.edit' => 'Editar Orden',
+            'orden-trabajos.update' => 'Editar Orden',
+            'orden-trabajos.destroy' => 'Eliminar Orden',
+            'orden-trabajos.servicios.store' => 'Agregar Servicio a Orden',
+            'orden-trabajos.servicios.update' => 'Actualizar Servicio de Orden',
+            'orden-trabajos.servicios.destroy' => 'Eliminar Servicio de Orden',
+            // Incidencias
+            'incidencias.create' => 'Crear Incidencia',
+            'incidencias.store' => 'Crear Incidencia',
+            'incidencias.show' => 'Ver Incidencia',
+            'incidencias.edit' => 'Editar Incidencia',
+            'incidencias.update' => 'Editar Incidencia',
+            'incidencias.destroy' => 'Eliminar Incidencia',
+            // Plan de Pagos
+            'plan-pagos.index' => 'Planes de Pago',
+            'plan-pagos.create' => 'Crear Plan de Pago',
+            'plan-pagos.store' => 'Crear Plan de Pago',
+            'plan-pagos.show' => 'Ver Plan de Pago',
+            'plan-pagos.edit' => 'Editar Plan de Pago',
+            'plan-pagos.update' => 'Editar Plan de Pago',
+            'plan-pagos.destroy' => 'Eliminar Plan de Pago',
             
             // Cliente - Vehículos
             'cliente.vehiculos.index' => 'Mis Vehículos',
@@ -206,7 +288,12 @@ class TrackPageView
             'mecanico.ordenes.update' => 'Actualizar Orden',
         ];
 
-        return $pageMap[$routeName] ?? ucfirst(str_replace('-', ' ', $request->path()));
+        // Si existe en el mapa, retornar directamente
+        if (isset($pageMap[$routeName])) {
+            return $pageMap[$routeName];
+        }
+
+        return ucfirst(str_replace('-', ' ', $request->path()));
     }
 
     /**
