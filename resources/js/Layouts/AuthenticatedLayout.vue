@@ -33,7 +33,7 @@ const logout = () => {
                             <div class="flex items-center space-x-3">
                                 <div
                                     class="w-18 h-12 bg-taller-blue-light rounded-full flex items-center justify-center">
-                                    <img src="/img/logo.png" alt="Logo Torneria Rectificaciones Choko" class="w-full h-full object-cover rounded-full" loading="lazy">
+                                    <img :src="'/img/logo.png'" alt="Logo Torneria Rectificaciones Choko" class="w-full h-full object-cover rounded-full" loading="lazy">
                                 </div>
                                 <span class="text-xl font-bold text-taller-blue-light">Torneria Rectificaciones Choko</span>
                             </div>

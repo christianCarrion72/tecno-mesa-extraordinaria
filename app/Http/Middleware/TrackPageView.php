@@ -51,6 +51,9 @@ class TrackPageView
         $pageMap = [
             // Dashboard único para todos los roles
             'dashboard' => 'Dashboard',
+            'admin.dashboard' => 'Dashboard',
+            'mecanico.dashboard' => 'Dashboard',
+            'cliente.dashboard' => 'Dashboard',
             // Admin - Marcas
             'admin.marcas.index' => 'Gestión de Marcas',
             'admin.marcas.create' => 'Crear Marca',
@@ -240,6 +243,10 @@ class TrackPageView
             'admin.diagnosticos.edit' => 'Editar Diagnóstico',
             'admin.diagnosticos.update' => 'Editar Diagnóstico',
             'admin.diagnosticos.destroy' => 'Eliminar Diagnóstico',
+            'mecanico.diagnosticos.index' => 'Diagnósticos',
+            'mecanico.diagnosticos.show' => 'Ver Diagnóstico',
+            'mecanico.diagnosticos.edit' => 'Editar Diagnóstico',
+            'mecanico.diagnosticos.update' => 'Actualizar Diagnóstico',
             
             // Admin - Órdenes de Trabajo
             'admin.ordenes.index' => 'Órdenes de Trabajo',
@@ -249,7 +256,11 @@ class TrackPageView
             'admin.ordenes.edit' => 'Editar Orden',
             'admin.ordenes.update' => 'Editar Orden',
             'admin.ordenes.destroy' => 'Eliminar Orden',
-            
+             // Mecánico - Órdenes de Trabajo
+            'mecanico.ordenes.index' => 'Órdenes de Trabajo',
+            'mecanico.ordenes.show' => 'Ver Orden',
+            'mecanico.ordenes.edit' => 'Editar Orden',
+            'mecanico.ordenes.update' => 'Editar Orden',
             // Admin - Pagos
             'admin.pagos.index' => 'Pagos',
             'admin.pagos.create' => 'Crear Pago',
@@ -281,11 +292,7 @@ class TrackPageView
             'profile.update' => 'Actualizar Perfil',
             'profile.destroy' => 'Eliminar Cuenta',
             
-            // Mecánico - Órdenes de Trabajo
-            'mecanico.ordenes.index' => 'Órdenes de Trabajo',
-            'mecanico.ordenes.show' => 'Ver Orden',
-            'mecanico.ordenes.edit' => 'Editar Orden',
-            'mecanico.ordenes.update' => 'Actualizar Orden',
+           
         ];
 
         // Si existe en el mapa, retornar directamente

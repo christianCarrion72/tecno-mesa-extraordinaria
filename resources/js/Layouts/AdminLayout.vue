@@ -34,7 +34,7 @@ const logout = () => {
                     <div class="flex items-center space-x-3">
                                 <div
                                     class="w-18 h-12 bg-taller-blue-light rounded-full flex items-center justify-center">
-                                    <img src="/img/logo.png" alt="Logo Torneria Rectificaciones Choko" class="w-full h-full object-cover rounded-lg" loading="lazy">
+                                    <img :src="'/img/logo.png'" alt="Logo Torneria Rectificaciones Choko" class="w-full h-full object-cover rounded-lg" loading="lazy">
                                 </div>
                             </div>
                     <span class="text-xl font-bold text-white">
@@ -74,9 +74,10 @@ const logout = () => {
                     </Link>
 
                     <Link
-                        :href="route('mecanico.ordenes.index')"
+                        v-if="tienePermiso('orden_trabajo.listar')"
+                        :href="route('orden-trabajos.index')"
                         class="flex items-center px-4 py-3 rounded-lg transition duration-200"
-                        :style="{ color: $page.url.startsWith('/mecanico/ordenes') ? 'white' : 'var(--color-text-light)', backgroundColor: $page.url.startsWith('/mecanico/ordenes') ? 'var(--color-primary)' : 'transparent' }"
+                        :style="{ color: $page.url.startsWith('/orden-trabajos') ? 'white' : 'var(--color-text-light)', backgroundColor: $page.url.startsWith('/orden-trabajos') ? 'var(--color-primary)' : 'transparent' }"
                         :class="{ 'hover:opacity-80': true }"
                     >
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

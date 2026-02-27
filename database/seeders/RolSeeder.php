@@ -137,15 +137,15 @@ class RolSeeder extends Seeder
         Permiso::create([
             'nombre' => 'orden_trabajo.listar',
             'descripcion' => 'Listar órdenes de trabajo',
-        ])->roles()->attach([$propietario->id]);
+        ])->roles()->attach([$propietario->id, $mecanico->id]);
         Permiso::create([
             'nombre' => 'orden_trabajo.crear',
             'descripcion' => 'Crear órdenes de trabajo',
-        ])->roles()->attach([$propietario->id]);
+        ])->roles()->attach([$propietario->id, $mecanico->id]);
         Permiso::create([
             'nombre' => 'orden_trabajo.editar',
             'descripcion' => 'Editar órdenes de trabajo',
-        ])->roles()->attach([$propietario->id]);
+        ])->roles()->attach([$propietario->id, $mecanico->id]);
         Permiso::create([
             'nombre' => 'orden_trabajo.eliminar',
             'descripcion' => 'Eliminar órdenes de trabajo',
