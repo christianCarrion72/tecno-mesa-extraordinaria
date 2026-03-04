@@ -34,7 +34,7 @@ const logout = () => {
                     <div class="flex items-center space-x-3">
                                 <div
                                     class="w-18 h-12 bg-taller-blue-light rounded-full flex items-center justify-center">
-                                    <img :src="'/img/logo.png'" alt="Logo Torneria Rectificaciones Choko" class="w-full h-full object-cover rounded-lg" loading="lazy">
+                                    <img src="/img/logo.png" alt="Logo Torneria Rectificaciones Choko" class="w-full h-full object-cover rounded-lg" loading="lazy">
                                 </div>
                             </div>
                     <span class="text-xl font-bold text-white">
@@ -74,10 +74,9 @@ const logout = () => {
                     </Link>
 
                     <Link
-                        v-if="tienePermiso('orden_trabajo.listar')"
-                        :href="route('orden-trabajos.index')"
+                        :href="route('mecanico.ordenes.index')"
                         class="flex items-center px-4 py-3 rounded-lg transition duration-200"
-                        :style="{ color: $page.url.startsWith('/orden-trabajos') ? 'white' : 'var(--color-text-light)', backgroundColor: $page.url.startsWith('/orden-trabajos') ? 'var(--color-primary)' : 'transparent' }"
+                        :style="{ color: $page.url.startsWith('/mecanico/ordenes') ? 'white' : 'var(--color-text-light)', backgroundColor: $page.url.startsWith('/mecanico/ordenes') ? 'var(--color-primary)' : 'transparent' }"
                         :class="{ 'hover:opacity-80': true }"
                     >
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -298,6 +297,19 @@ const logout = () => {
                         </svg>
 
                         Plan de Pagos
+                    </Link>
+
+                    <!-- Reportes -->
+                    <Link
+                        :href="route('admin.reportes.index')"
+                        class="flex items-center px-4 py-3 rounded-lg transition duration-200"
+                        :style="{ color: $page.url.startsWith('/admin/reportes') ? 'white' : 'var(--color-text-light)', backgroundColor: $page.url.startsWith('/admin/reportes') ? 'var(--color-primary)' : 'transparent' }"
+                        :class="{ 'hover:opacity-80': true }"
+                    >
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Reportes
                     </Link>
 
                 </div>
