@@ -6,6 +6,12 @@ import type { BreadcrumbItem } from '@/types';
 
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 
+function formatDate(value: string | Date | null) {
+    if (!value) return '';
+    const d = new Date(value);
+    return d.toLocaleDateString();
+}
+
 import { Button } from '@/Components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/Components/ui/card';
 import { ArrowLeftIcon, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
@@ -232,8 +238,8 @@ const confirmDelete = (id: number) => {
                     <p><strong>Asignado a:</strong> {{ orden.usuario.name }}</p>
                     <p><strong>Motor:</strong> {{ orden.motor.numero_serie }}</p>
 
-                    <p><strong>Fecha Inicio:</strong> {{ orden.fechainicio }}</p>
-                    <p><strong>Fecha Fin:</strong> {{ orden.fechafin ?? 'Sin finalizar' }}</p>
+                    <p><strong>Fecha Inicio:</strong> {{ formatDate(orden.fechainicio) }}</p>
+                    <p><strong>Fecha Fin:</strong> {{ orden.fechafin ? formatDate(orden.fechafin) : 'Sin finalizar' }}</p>
 
                     <p><strong>Estado:</strong> 
                         <span class="px-2 py-1 rounded bg-blue-100 text-blue-800">
