@@ -44,8 +44,34 @@ defineProps<{ factura: any }>();
                     <CardTitle>Orden de Trabajo</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p><strong>Nro. Orden:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.id }}</p>
-                    <p><strong>Cliente:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.cliente?.nombre }}</p>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <p><strong>Nro. Orden:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.id }}</p>
+                        <p><strong>Cliente:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.cliente?.nombre }}</p>
+                    </div>
+
+                    <div v-if="factura.pago?.plan_pago?.orden_trabajo?.servicios?.length > 0">
+                        <h4 class="font-semibold mb-2">Servicios Realizados:</h4>
+                        <div class="space-y-2">
+                            <div v-for="servicio in factura.pago?.plan_pago?.orden_trabajo?.servicios"
+                                 :key="servicio.id"
+                                 class="border rounded-lg p-3 bg-gray-50 dark:bg-gray-700">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-medium">{{ servicio.nombre }}</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">{{ servicio.descripcion }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm">Cant: {{ servicio.pivot.cantidad }}</p>
+                                        <p class="text-sm">Precio: ${{ servicio.pivot.precio }}</p>
+                                        <p class="font-semibold">Subtotal: ${{ servicio.pivot.subtotal }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <p class="text-gray-500">No hay servicios registrados para esta orden de trabajo.</p>
+                    </div>
                 </CardContent>
             </Card>
         </div>
