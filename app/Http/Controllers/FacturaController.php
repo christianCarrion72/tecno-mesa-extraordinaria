@@ -81,7 +81,7 @@ class FacturaController extends Controller
             return redirect()->route('dashboard')->with('error', 'No tenés permiso para ver facturas.');
         }
 
-        $factura->load(['pago.planPago', 'pago.planPago.ordenTrabajo']);
+        $factura->load(['pago.planPago', 'pago.planPago.ordenTrabajo', 'pago.planPago.ordenTrabajo.cliente']);
         return Inertia::render('Facturas/Show', [
             'factura' => $factura,
         ]);

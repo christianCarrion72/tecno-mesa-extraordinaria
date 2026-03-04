@@ -50,6 +50,14 @@ class OrdenTrabajo extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // relación alternativa llamada "mecánico" para mantener compatibilidad con
+    // fetch anteriores; apunta al mismo usuario_id.
+    public function mecanico()
+    {
+        return $this->belongsTo(User::class, 'usuario_id');
+    }
+
     public function motor()
     {
         return $this->belongsTo(Motor::class);

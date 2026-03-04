@@ -69,6 +69,14 @@ const periodos = [
     { id: 'anual', nombre: 'Anual' },
 ]
 
+const formatosExportacion = [
+    { id: 'csv', nombre: 'CSV', icono: '📄' },
+    { id: 'pdf', nombre: 'PDF', icono: '📑' },
+]
+
+const mostrarMenuExportacion = ref(false)
+const formatoSeleccionado = ref('csv')
+
 // Métodos de formato
 const formatMoney = (amount) => {
     if (!amount) return 'S/. 0.00'
@@ -96,10 +104,17 @@ watch(() => form.data(), (value) => {
     })
 }, { deep: true })
 
-const exportarReporte = () => {
-    form.post(route('admin.reportes.exportar'), {
-        preserveScroll: true
-    })
+const exportarReporte = (formato = 'csv') => {
+    const datosExportacion = {
+        ...form.data(),
+        formato: formato
+    }
+
+    // construir query string para GET y abrir en nueva pestaña para forzar descarga
+    const query = new URLSearchParams(datosExportacion).toString();
+    const url = route('admin.reportes.exportar') + '?' + query;
+    window.open(url, '_blank');
+    mostrarMenuExportacion.value = false;
 }
 
 // Computed para gráficos
@@ -444,21 +459,48 @@ const chartOptionsPie = {
                     </p>
                 </div>
 
-                <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
-                    <button
-                        @click="exportarReporte"
-                        class="inline-flex items-center gap-2 px-4 py-2 border text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all"
-                        :style="{ 
-                          backgroundColor: 'var(--color-base)',
-                          color: 'var(--color-primary)',
-                          borderColor: 'var(--color-primary)'
-                        }"
-                        onMouseOver="this.style.backgroundColor='var(--color-primary-light)'"
-                        onMouseOut="this.style.backgroundColor='var(--color-base)'"
-                    >
-                        <ArrowDownTrayIcon class="h-4 w-4" />
-                        Exportar
-                    </button>
+                <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3 relative">
+                    <!-- Botón Exportar con Dropdown -->
+                    <div class="relative">
+                        <button
+                            @click="mostrarMenuExportacion = !mostrarMenuExportacion"
+                            class="inline-flex items-center gap-2 px-4 py-2 border text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all"
+                            :style="{ 
+                              backgroundColor: 'var(--color-base)',
+                              color: 'var(--color-primary)',
+                              borderColor: 'var(--color-primary)'
+                            }"
+                        >
+                            <ArrowDownTrayIcon class="h-4 w-4" />
+                            Exportar
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div
+                            v-if="mostrarMenuExportacion"
+                            class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50 border"
+                            :style="{ 
+                              backgroundColor: 'var(--color-base)',
+                              borderColor: 'var(--color-border)'
+                            }"
+                        >
+                            <div class="py-2">
+                                <button
+                                    v-for="formato in formatosExportacion"
+                                    :key="formato.id"
+                                    @click="exportarReporte(formato.id); mostrarMenuExportacion = false"
+                                    class="w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-opacity-10 hover:bg-primary transition"
+                                    :style="{ color: 'var(--color-text)' }"
+                                >
+                                    <span>{{ formato.icono }}</span>
+                                    <span>{{ formato.nombre }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -540,6 +582,7 @@ const chartOptionsPie = {
                     </div>
                 </div>
             </div>
+
 
             <!-- Filtros -->
             <div class="rounded-xl shadow-sm border p-6 mb-8"
@@ -733,35 +776,6 @@ const chartOptionsPie = {
                         </div>
                     </div>
 
-                    <!-- Tabla de Servicios Más Solicitados -->
-                    <div class="rounded-xl shadow-sm border p-6"
-                        :style="{ 
-                          backgroundColor: 'var(--color-base)',
-                          borderColor: 'var(--color-border)'
-                        }">
-                        <h3 class="text-lg font-semibold mb-4" :style="{ color: 'var(--color-text)' }">Servicios Más Solicitados</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y"
-                                :style="{ borderColor: 'var(--color-border)' }">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" :style="{ color: 'var(--color-text-light)' }">Servicio</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" :style="{ color: 'var(--color-text-light)' }">Tipo</th>
-                                        <th class="px-4 py-3 text-right text-xs font-medium uppercase" :style="{ color: 'var(--color-text-light)' }">Cantidad</th>
-                                        <th class="px-4 py-3 text-right text-xs font-medium uppercase" :style="{ color: 'var(--color-text-light)' }">Ingresos</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y" :style="{ borderColor: 'var(--color-border)' }">
-                                    <tr v-for="servicio in datos.servicios_mas_usados" :key="servicio.nombre" class="hover" :style="{ backgroundColor: 'var(--color-base)' }">
-                                        <td class="px-4 py-3 text-sm font-medium" :style="{ color: 'var(--color-text)' }">{{ servicio.nombre }}</td>
-                                        <td class="px-4 py-3 text-sm capitalize" :style="{ color: 'var(--color-text-light)' }">{{ servicio.tipo }}</td>
-                                        <td class="px-4 py-3 text-sm text-right" :style="{ color: 'var(--color-text)' }">{{ formatNumber(servicio.cantidad) }}</td>
-                                        <td class="px-4 py-3 text-sm text-right font-medium" :style="{ color: 'var(--color-text)' }">{{ formatMoney(servicio.ingresos) }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Reporte de Citas -->

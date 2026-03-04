@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pago;
 use App\Models\OrdenTrabajo;
-use App\Models\Cita;
 use App\Models\Servicio;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\PDF;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ReportController extends Controller
 {
@@ -34,20 +36,17 @@ class ReportController extends Controller
         $datos = match ($tipoReporte) {
             'financiero' => $this->datosFinancieros($fechaInicio, $fechaFin, $periodo),
             'servicios' => $this->datosServicios($fechaInicio, $fechaFin, $periodo),
-            'citas' => $this->datosCitas($fechaInicio, $fechaFin, $periodo),
+            'ordenes' => $this->datosOrdenes($fechaInicio, $fechaFin, $periodo),
             'mecanicos' => $this->datosMecanicos($fechaInicio, $fechaFin),
             default => $this->datosFinancieros($fechaInicio, $fechaFin, $periodo),
         };
 
         // Asegurar que siempre haya datos para evitar errores en el frontend
-        if (!isset($datos['citas_por_estado'])) {
-            $datos['citas_por_estado'] = [];
+        if (!isset($datos['ordenes_por_estado'])) {
+            $datos['ordenes_por_estado'] = [];
         }
-        if (!isset($datos['citas_periodo'])) {
-            $datos['citas_periodo'] = [];
-        }
-        if (!isset($datos['tasa_conversion_periodo'])) {
-            $datos['tasa_conversion_periodo'] = [];
+        if (!isset($datos['ordenes_periodo'])) {
+            $datos['ordenes_periodo'] = [];
         }
 
         return Inertia::render('Admin.Reportes.Index', [
@@ -67,15 +66,15 @@ class ReportController extends Controller
      */
     private function obtenerKPIs($fechaInicio, $fechaFin)
     {
-        // Ingresos
+        // Ingresos (pagos completados/terminados)
         $ingresos = Pago::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->whereIn('estado', ['pagado_total', 'pagado_parcial'])
-            ->sum('monto_pagado');
+            ->where('estado', 'terminado')
+            ->sum('monto');
 
-        // Pendiente por cobrar
+        // Pendiente por cobrar (pagos no completados)
         $pendiente = Pago::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->where('estado', '!=', 'pagado')
-            ->sum('monto_pendiente');
+            ->where('estado', '!=', 'terminado')
+            ->sum('monto');
 
         // Órdenes completadas
         $ordenesCompletadas = OrdenTrabajo::whereBetween('created_at', [$fechaInicio, $fechaFin])
@@ -87,28 +86,16 @@ class ReportController extends Controller
             ->where('estado', '!=', 'cancelada')
             ->count();
 
-        // Citas del período
-        $citasTotal = Cita::whereBetween('created_at', [$fechaInicio, $fechaFin])
+        // Monto promedio por pago
+        $pagosTotales = Pago::whereBetween('created_at', [$fechaInicio, $fechaFin])
+            ->where('estado', 'terminado')
             ->count();
-
-        // Citas confirmadas
-        $citasConfirmadas = Cita::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->where('estado', 'confirmada')
-            ->count();
-
-        // Tasa de conversión
-        $tasaConversion = $citasTotal > 0 ? round(($citasConfirmadas / $citasTotal) * 100, 2) : 0;
-
-        // Ticket promedio
-        $ticketPromedio = $ingresos > 0 ? $ingresos / max($ordenesCompletadas, 1) : 0;
+        $montoPromedio = $pagosTotales > 0 ? $ingresos / $pagosTotales : 0;
 
         // Ingresos hoy
         $ingresosHoy = Pago::whereDate('created_at', Carbon::today())
-            ->whereIn('estado', ['pagado_total', 'pagado_parcial'])
-            ->sum('monto_pagado');
-
-        // Citas hoy
-        $citasHoy = Cita::whereDate('created_at', Carbon::today())->count();
+            ->where('estado', 'terminado')
+            ->sum('monto');
 
         return [
             'ingresos_totales' => round($ingresos, 2),
@@ -116,11 +103,8 @@ class ReportController extends Controller
             'pendiente_cobrar' => round($pendiente, 2),
             'ordenes_completadas' => $ordenesCompletadas,
             'ordenes_pendientes' => $ordenesPendientes,
-            'citas_total' => $citasTotal,
-            'citas_confirmadas' => $citasConfirmadas,
-            'citas_hoy' => $citasHoy,
-            'tasa_conversion' => $tasaConversion,
-            'ticket_promedio' => round($ticketPromedio, 2),
+            'ordenes_pendientes_hoy' => OrdenTrabajo::whereDate('created_at', Carbon::today())->count(),
+            'ticket_promedio' => round($montoPromedio, 2),
         ];
     }
 
@@ -131,12 +115,12 @@ class ReportController extends Controller
     {
         // Ingresos por método de pago
         $ingresosPorMetodo = Pago::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->whereIn('estado', ['pagado_total', 'pagado_parcial'])
-            ->selectRaw('tipo_pago, COUNT(*) as cantidad, SUM(monto_pagado) as total')
-            ->groupBy('tipo_pago')
+            ->where('estado', 'terminado')
+            ->selectRaw('metodopago, COUNT(*) as cantidad, SUM(monto) as total')
+            ->groupBy('metodopago')
             ->get()
             ->map(fn($item) => [
-                'name' => ucfirst(str_replace('_', ' ', $item->tipo_pago)),
+                'name' => ucfirst(str_replace('_', ' ', $item->metodopago)),
                 'cantidad' => $item->cantidad,
                 'total' => round($item->total, 2),
             ]);
@@ -146,21 +130,20 @@ class ReportController extends Controller
 
         // Estado de pagos
         $estadoPagos = Pago::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->selectRaw('estado, COUNT(*) as cantidad, SUM(monto_total) as monto_total, SUM(monto_pagado) as monto_pagado')
+            ->selectRaw('estado, COUNT(*) as cantidad, SUM(monto) as monto_total')
             ->groupBy('estado')
             ->get()
             ->map(fn($item) => [
                 'estado' => $item->estado,
                 'cantidad' => $item->cantidad,
                 'monto_total' => round($item->monto_total, 2),
-                'monto_pagado' => round($item->monto_pagado, 2),
             ]);
 
         // Ingresos vs Pendiente
         $totalIngresos = $ingresosPorMetodo->sum('total');
         $totalPendiente = Pago::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->where('estado', '!=', 'pagado')
-            ->sum('monto_pendiente');
+            ->where('estado', '!=', 'terminado')
+            ->sum('monto');
 
         return [
             'ingresos_por_metodo' => $ingresosPorMetodo,
@@ -221,42 +204,33 @@ class ReportController extends Controller
     }
 
     /**
-     * Datos de citas para gráficos
+     * Datos de órdenes para gráficos
      */
-    private function datosCitas($fechaInicio, $fechaFin, $periodo)
+    private function datosOrdenes($fechaInicio, $fechaFin, $periodo)
     {
-        // Citas por estado
-        $citasPorEstado = Cita::whereBetween('created_at', [$fechaInicio, $fechaFin])
+        // Órdenes por estado
+        $ordenesPorEstado = OrdenTrabajo::whereBetween('created_at', [$fechaInicio, $fechaFin])
             ->selectRaw('estado, COUNT(*) as cantidad')
             ->groupBy('estado')
             ->get()
             ->map(fn($item) => [
-                'estado' => ucfirst($item->estado),
+                'estado' => ucfirst(str_replace('_', ' ', $item->estado)),
                 'cantidad' => $item->cantidad,
             ]);
 
-        // Citas por período
-        $citasPeriodo = $this->generarCitasPeriodo($fechaInicio, $fechaFin, $periodo);
+        // Órdenes por período
+        $ordenesPeriodo = $this->generarOrdenesPeriodo($fechaInicio, $fechaFin, $periodo);
 
-        // Tasa de conversión por período
-        $tasaConversionPeriodo = $this->generarTasaConversionPeriodo($fechaInicio, $fechaFin, $periodo);
-
-        // Distribución por hora del día
-        $distribucionHora = Cita::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->selectRaw("TO_CHAR(hora, 'HH24:00') as hora, COUNT(*) as cantidad")
-            ->groupBy('hora')
-            ->orderBy('hora')
+        // Total de servicios realizados
+        $serviciosRealizados = OrdenTrabajo::whereBetween('created_at', [$fechaInicio, $fechaFin])
+            ->withCount('servicios')
             ->get()
-            ->map(fn($item) => [
-                'hora' => $item->hora ?? 'Sin hora',
-                'cantidad' => $item->cantidad,
-            ]);
+            ->sum('servicios_count');
 
         return [
-            'citas_por_estado' => $citasPorEstado,
-            'citas_periodo' => $citasPeriodo,
-            'tasa_conversion_periodo' => $tasaConversionPeriodo,
-            'distribucion_hora' => $distribucionHora,
+            'ordenes_por_estado' => $ordenesPorEstado,
+            'ordenes_periodo' => $ordenesPeriodo,
+            'servicios_realizados' => $serviciosRealizados,
         ];
     }
 
@@ -272,14 +246,14 @@ class ReportController extends Controller
                     $query->whereBetween('created_at', [$fechaInicio, $fechaFin]);
                 },
                 'ordenesTrabajo.pagos' => function ($query) {
-                    $query->whereIn('estado', ['pagado_total', 'pagado_parcial']);
+                    $query->where('estado', 'terminado');
                 }
             ])
             ->get()
             ->map(function ($mecanico) {
                 $ordenes = $mecanico->ordenesTrabajo ?? [];
                 $ordenesCompletadas = $ordenes->where('estado', 'completada')->count();
-                $ingresos = $ordenes->sum(fn($o) => $o->pagos->sum('monto_pagado'));
+                $ingresos = $ordenes->sum(fn($o) => $o->pagos()->where('estado', 'terminado')->sum('monto'));
 
                 return [
                     'id' => $mecanico->id,
@@ -317,7 +291,7 @@ class ReportController extends Controller
                 default => $fecha->format('d-m-Y'),
             };
 
-            $ingresos = Pago::whereIn('estado', ['pagado_total', 'pagado_parcial']);
+            $ingresos = Pago::where('estado', 'terminado');
 
             match ($periodo) {
                 'diario' => $ingresos->whereDate('created_at', $fecha),
@@ -330,7 +304,7 @@ class ReportController extends Controller
                 'anual' => $ingresos->whereYear('created_at', $fecha->year),
             };
 
-            $datos[$key] = round($ingresos->sum('monto_pagado'), 2);
+            $datos[$key] = round($ingresos->sum('monto'), 2);
 
             match ($periodo) {
                 'diario' => $fecha->addDay(),
@@ -390,7 +364,10 @@ class ReportController extends Controller
     /**
      * Generar citas por período
      */
-    private function generarCitasPeriodo($fechaInicio, $fechaFin, $periodo)
+    /**
+     * Generar órdenes por período
+     */
+    private function generarOrdenesPeriodo($fechaInicio, $fechaFin, $periodo)
     {
         $datos = [];
         $fecha = $fechaInicio->copy();
@@ -404,7 +381,7 @@ class ReportController extends Controller
                 default => $fecha->format('d-m-Y'),
             };
 
-            $query = Cita::query();
+            $query = OrdenTrabajo::query();
 
             match ($periodo) {
                 'diario' => $query->whereDate('created_at', $fecha),
@@ -431,76 +408,301 @@ class ReportController extends Controller
     }
 
     /**
-     * Generar tasa de conversión por período
-     */
-    private function generarTasaConversionPeriodo($fechaInicio, $fechaFin, $periodo)
-    {
-        $datos = [];
-        $fecha = $fechaInicio->copy();
-
-        while ($fecha <= $fechaFin) {
-            $key = match ($periodo) {
-                'diario' => $fecha->format('d-m-Y'),
-                'semanal' => 'Semana ' . $fecha->format('W'),
-                'mensual' => $fecha->format('m-Y'),
-                'anual' => $fecha->format('Y'),
-                default => $fecha->format('d-m-Y'),
-            };
-
-            $queryTotal = Cita::query();
-            $queryConfirmadas = Cita::where('estado', 'confirmada');
-
-            match ($periodo) {
-                'diario' => [
-                    $queryTotal->whereDate('created_at', $fecha),
-                    $queryConfirmadas->whereDate('created_at', $fecha),
-                ],
-                'semanal' => [
-                    $queryTotal->whereBetween('created_at', [$fecha->copy()->startOfWeek(), $fecha->copy()->endOfWeek()]),
-                    $queryConfirmadas->whereBetween('created_at', [$fecha->copy()->startOfWeek(), $fecha->copy()->endOfWeek()]),
-                ],
-                'mensual' => [
-                    $queryTotal->whereYear('created_at', $fecha->year)->whereMonth('created_at', $fecha->month),
-                    $queryConfirmadas->whereYear('created_at', $fecha->year)->whereMonth('created_at', $fecha->month),
-                ],
-                'anual' => [
-                    $queryTotal->whereYear('created_at', $fecha->year),
-                    $queryConfirmadas->whereYear('created_at', $fecha->year),
-                ],
-            };
-
-            $total = $queryTotal->count();
-            $confirmadas = $queryConfirmadas->count();
-            $tasa = $total > 0 ? round(($confirmadas / $total) * 100, 2) : 0;
-            $datos[$key] = $tasa;
-
-            match ($periodo) {
-                'diario' => $fecha->addDay(),
-                'semanal' => $fecha->addWeek(),
-                'mensual' => $fecha->addMonth(),
-                'anual' => $fecha->addYear(),
-            };
-        }
-
-        return $datos;
-    }
-
-    /**
-     * Exportar reporte a Excel
+     * Exportar reporte en múltiples formatos
      */
     public function exportar(Request $request)
     {
+        $formato = $request->input('formato', 'csv');
+        $tipoReporte = $request->input('tipo_reporte', 'financiero');
         $fechaInicio = $request->input('fecha_inicio', Carbon::now()->subDays(30)->format('Y-m-d'));
         $fechaFin = $request->input('fecha_fin', Carbon::now()->format('Y-m-d'));
 
         $fechaInicio = Carbon::createFromFormat('Y-m-d', $fechaInicio);
         $fechaFin = Carbon::createFromFormat('Y-m-d', $fechaFin);
 
-        // Implementar exportación a Excel aquí
-        // Por ahora retornamos un JSON con los datos
+        $datos = $this->obtenerDatosExportacion($tipoReporte, $fechaInicio, $fechaFin);
 
-        return response()->json([
-            'mensaje' => 'Exportación en desarrollo',
-        ]);
+        return match ($formato) {
+            'csv' => $this->exportarCSV($datos, $tipoReporte, $fechaInicio, $fechaFin),
+            'pdf' => $this->exportarPDF($datos, $tipoReporte, $fechaInicio, $fechaFin),
+            default => $this->exportarCSV($datos, $tipoReporte, $fechaInicio, $fechaFin),
+        };
+    }
+
+    /**
+     * Obtener datos para exportación
+     */
+    private function obtenerDatosExportacion($tipoReporte, $fechaInicio, $fechaFin)
+    {
+        $kpis = $this->obtenerKPIs($fechaInicio, $fechaFin);
+        
+        $datos = match ($tipoReporte) {
+            'financiero' => $this->datosFinancieros($fechaInicio, $fechaFin, 'mensual'),
+            'servicios' => $this->datosServicios($fechaInicio, $fechaFin, 'mensual'),
+            'ordenes' => $this->datosOrdenes($fechaInicio, $fechaFin, 'mensual'),
+            'mecanicos' => $this->datosMecanicos($fechaInicio, $fechaFin),
+            default => $this->datosFinancieros($fechaInicio, $fechaFin, 'mensual'),
+        };
+
+        return [
+            'kpis' => $kpis,
+            'datos' => $datos,
+            'tipoReporte' => $tipoReporte,
+            'fechaInicio' => $fechaInicio,
+            'fechaFin' => $fechaFin,
+        ];
+    }
+
+    /**
+     * Exportar a CSV
+     */
+    private function exportarCSV($datosExport, $tipoReporte, $fechaInicio, $fechaFin)
+    {
+        $filename = "reporte_{$tipoReporte}_{$fechaInicio->format('Y-m-d')}_a_{$fechaFin->format('Y-m-d')}.csv";
+        
+        return response()->stream(
+            function () use ($datosExport) {
+                if (ob_get_length()) {
+                    @ob_end_clean();
+                }
+
+                $output = fopen('php://output', 'w');
+
+                // Configurar codificación UTF-8
+                fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+
+                // Cabecera
+                fputcsv($output, ['REPORTE DE ' . strtoupper($datosExport['tipoReporte']), 'TALLER MECÁNICO']);
+                fputcsv($output, ['Período:', $datosExport['fechaInicio']->format('d/m/Y') . ' - ' . $datosExport['fechaFin']->format('d/m/Y')]);
+                fputcsv($output, ['Fecha de Generación:', Carbon::now()->format('d/m/Y H:i:s')]);
+                fputcsv($output, []); // Línea en blanco
+
+                // KPIs
+                fputcsv($output, ['INDICADORES CLAVE DE DESEMPEÑO']);
+                foreach ($datosExport['kpis'] as $key => $value) {
+                    fputcsv($output, [ucfirst(str_replace('_', ' ', $key)), is_numeric($value) ? number_format($value, 2, ',', '.') : $value]);
+                }
+
+                fputcsv($output, []); // Línea en blanco
+                fputcsv($output, ['DATOS DETALLADOS']);
+
+                // Datos según tipo
+                if ($datosExport['tipoReporte'] === 'financiero') {
+                    fputcsv($output, ['Método de Pago', 'Cantidad', 'Total']);
+                    foreach ($datosExport['datos']['ingresos_por_metodo'] ?? [] as $item) {
+                        fputcsv($output, [$item['name'], $item['cantidad'], number_format($item['total'], 2, ',', '.')]);
+                    }
+                }
+
+                fflush($output);
+                fclose($output);
+            },
+            200,
+            [
+                'Content-Type' => 'text/csv; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]
+        );
+    }
+
+    /**
+     * Exportar a Excel (archivo real .xlsx usando PhpSpreadsheet)
+     */
+    private function exportarExcel($datosExport, $tipoReporte, $fechaInicio, $fechaFin)
+    {
+        $filename = "reporte_{$tipoReporte}_{$fechaInicio->format('Y-m-d')}_a_{$fechaFin->format('Y-m-d')}.xlsx";
+
+        return response()->stream(
+            function () use ($datosExport) {
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+
+                // Cabecera
+                $sheet->setCellValue('A1', 'REPORTE DE ' . strtoupper($datosExport['tipoReporte']))
+                      ->setCellValue('B1', 'TALLER MECÁNICO');
+                $sheet->setCellValue('A2', 'Período:')
+                      ->setCellValue('B2', $datosExport['fechaInicio']->format('d/m/Y') . ' - ' . $datosExport['fechaFin']->format('d/m/Y'));
+                $sheet->setCellValue('A3', 'Fecha de Generación:')
+                      ->setCellValue('B3', Carbon::now()->format('d/m/Y H:i:s'));
+
+                // KPIs
+                $row = 5;
+                $sheet->setCellValue('A4', 'INDICADORES CLAVE DE DESEMPEÑO');
+                foreach ($datosExport['kpis'] as $key => $value) {
+                    $label = ucfirst(str_replace('_', ' ', $key));
+                    $sheet->setCellValue("A{$row}", $label);
+                    $sheet->setCellValue("B{$row}", is_numeric($value) ? number_format($value, 2, ',', '.') : $value);
+                    $row++;
+                }
+
+                // Datos detallados
+                $row += 2;
+                if ($datosExport['tipoReporte'] === 'financiero') {
+                    $sheet->setCellValue("A{$row}", 'Método de Pago');
+                    $sheet->setCellValue("B{$row}", 'Cantidad');
+                    $sheet->setCellValue("C{$row}", 'Total');
+                    $row++;
+                    foreach ($datosExport['datos']['ingresos_por_metodo'] ?? [] as $item) {
+                        $sheet->setCellValue("A{$row}", $item['name']);
+                        $sheet->setCellValue("B{$row}", $item['cantidad']);
+                        $sheet->setCellValue("C{$row}", number_format($item['total'], 2, ',', '.'));
+                        $row++;
+                    }
+                }
+
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            },
+            200,
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]
+        );
+    }
+
+    /**
+     * Exportar a PDF usando DomPDF
+     */
+    private function exportarPDF($datosExport, $tipoReporte, $fechaInicio, $fechaFin)
+    {
+        $filename = "reporte_{$tipoReporte}_{$fechaInicio->format('Y-m-d')}_a_{$fechaFin->format('Y-m-d')}.pdf";
+        
+        $html = $this->generarHTMLPDF($datosExport);
+        
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadHTML($html);
+        $pdf->setPaper('A4', 'portrait');
+        
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Generar HTML para PDF
+     */
+    private function generarHTMLPDF($datosExport)
+    {
+        $html = '<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            color: #333;
+            margin: 20px;
+        }
+        h1 {
+            color: #1a472a;
+            text-align: center;
+            border-bottom: 3px solid #1a472a;
+            padding-bottom: 10px;
+            font-size: 24px;
+        }
+        h2 {
+            color: #2d5a3d;
+            font-size: 16px;
+            margin-top: 20px;
+            border-left: 4px solid #2d5a3d;
+            padding-left: 10px;
+        }
+        .info {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .info p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 12px;
+        }
+        th {
+            background-color: #1a472a;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .kpi-label {
+            font-weight: bold;
+            width: 40%;
+        }
+        .kpi-value {
+            text-align: right;
+            font-weight: bold;
+            color: #1a472a;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>';
+        
+        $html .= '<h1>REPORTE DE ' . strtoupper($datosExport['tipoReporte']) . '</h1>';
+        
+        $html .= '<div class="info">';
+        $html .= '<p><strong>Período:</strong> ' . $datosExport['fechaInicio']->format('d/m/Y') . ' - ' . $datosExport['fechaFin']->format('d/m/Y') . '</p>';
+        $html .= '<p><strong>Fecha de Generación:</strong> ' . Carbon::now()->format('d/m/Y H:i:s') . '</p>';
+        $html .= '</div>';
+        
+        $html .= '<h2>INDICADORES CLAVE DE DESEMPEÑO</h2>';
+        $html .= '<table>';
+        foreach ($datosExport['kpis'] as $key => $value) {
+            $label = ucfirst(str_replace('_', ' ', $key));
+            $displayValue = is_numeric($value) ? number_format($value, 2, ',', '.') : $value;
+            $html .= '<tr>';
+            $html .= '<td class="kpi-label">' . $label . '</td>';
+            $html .= '<td class="kpi-value">' . $displayValue . '</td>';
+            $html .= '</tr>';
+        }
+        $html .= '</table>';
+        
+        $html .= '<h2>DATOS DETALLADOS</h2>';
+        
+        if ($datosExport['tipoReporte'] === 'financiero' && isset($datosExport['datos']['ingresos_por_metodo'])) {
+            $html .= '<table>';
+            $html .= '<thead><tr><th>Método de Pago</th><th>Cantidad</th><th>Total</th></tr></thead>';
+            $html .= '<tbody>';
+            foreach ($datosExport['datos']['ingresos_por_metodo'] as $item) {
+                $html .= '<tr>';
+                $html .= '<td>' . $item['name'] . '</td>';
+                $html .= '<td style="text-align: center;">' . $item['cantidad'] . '</td>';
+                $html .= '<td style="text-align: right;">' . number_format($item['total'], 2, ',', '.') . '</td>';
+                $html .= '</tr>';
+            }
+            $html .= '</tbody>';
+            $html .= '</table>';
+        }
+        
+        $html .= '<div class="footer">';
+        $html .= '<p>Reporte generado automáticamente por el Sistema de Gestión - Taller Mecánico</p>';
+        $html .= '</div>';
+        
+        $html .= '</body></html>';
+        
+        return $html;
     }
 }

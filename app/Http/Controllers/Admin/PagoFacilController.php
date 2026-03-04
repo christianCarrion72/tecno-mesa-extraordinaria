@@ -408,21 +408,17 @@ class PagoFacilController extends Controller
                             // El modelo Pago NO actualiza automáticamente sus acumulados en registrarPago (solo crea detalle).
                             // Tenemos que actualizar explícitamente el Pago padre.
 
-                            $nuevoMontoPagado = $pago->monto_pagado + $montoReal;
-                            $nuevasCuotas = $pago->cuotas_pagadas + 1; // Asumiendo 1 cuota por pago
-
-                            $nuevoEstado = $pago->estado;
-                            if ($nuevoMontoPagado >= $pago->monto_total - 0.1) { // Tolerancia decimal
-                                $nuevoEstado = 'pagado_total';
-                            } elseif ($nuevoMontoPagado > 0) {
-                                $nuevoEstado = 'pagado_parcial';
-                            }
+                            // Cambiar estado a terminado cuando el pago de Pago Fácil es exitoso
+                            $nuevoEstado = 'terminado';
 
                             $pago->update([
-                                'monto_pagado' => $nuevoMontoPagado,
-                                'cuotas_pagadas' => $nuevasCuotas,
                                 'estado' => $nuevoEstado
                             ]);
+                            
+                            // Actualizar estado del plan de pago
+                            if ($pago->planPago) {
+                                $pago->planPago->actualizarEstadoSegunPagos();
+                            }
 
                             DB::commit();
                             Log::info('Pago QR registrado exitosamente', ['pago_id' => $pagoId, 'monto' => $montoReal]);

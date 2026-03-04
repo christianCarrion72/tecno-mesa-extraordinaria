@@ -331,7 +331,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         //Route::post('/pagos/callback', [QrController::class, 'handleCallback'])->name('api.pagos.callback');
         // Reportes
         Route::get('/reportes', [AdminReportController::class, 'index'])->name('reportes.index');
-        Route::post('/reportes/exportar', [AdminReportController::class, 'exportar'])->name('reportes.exportar');
+        // Exportación puede usarse via GET (descarga directa) o POST (form Inertia)
+        Route::get('/reportes/exportar', [AdminReportController::class, 'exportar'])->name('reportes.exportar');
+        Route::post('/reportes/exportar', [AdminReportController::class, 'exportar']);
 
         // Gestión de Permisos
         Route::get('/permisos', [AdminPermisoController::class, 'index'])->name('permisos.index');

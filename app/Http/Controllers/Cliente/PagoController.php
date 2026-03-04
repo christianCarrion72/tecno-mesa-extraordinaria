@@ -243,18 +243,18 @@ class PagoController extends Controller
      */
     private function obtenerEstadisticas($user)
     {
-        $pagosQuery = Pago::whereHas('ordenTrabajo.diagnostico.cita', function ($query) use ($user) {
+        $pagosQuery = Pago::whereHas('planPago.ordenTrabajo', function ($query) use ($user) {
             $query->where('cliente_id', $user->id);
         });
 
         return [
             'total' => $pagosQuery->count(),
-            'pendientes' => (clone $pagosQuery)->pendientes()->count(),
-            'parciales' => (clone $pagosQuery)->pagadosParcialmente()->count(),
-            'completos' => (clone $pagosQuery)->pagadosTotalmente()->count(),
-            'vencidos' => (clone $pagosQuery)->vencidos()->count(),
-            'total_pagado' => (clone $pagosQuery)->sum('monto_pagado'),
-            'total_pendiente' => (clone $pagosQuery)->sum('monto_pendiente'),
+            'pendientes' => (clone $pagosQuery)->where('estado', 'pendiente')->count(),
+            'en_proceso' => (clone $pagosQuery)->where('estado', 'en proceso')->count(),
+            'completados' => (clone $pagosQuery)->where('estado', 'terminado')->count(),
+            'vencidos' => (clone $pagosQuery)->where('estado', '!=', 'terminado')->where('fechapago', '<', \Carbon\Carbon::today())->count(),
+            'total_pagado' => (clone $pagosQuery)->where('estado', 'terminado')->sum('monto'),
+            'total_pendiente' => (clone $pagosQuery)->where('estado', '!=', 'terminado')->sum('monto'),
         ];
     }
 

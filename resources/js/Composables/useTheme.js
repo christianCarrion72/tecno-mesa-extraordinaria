@@ -139,7 +139,8 @@ const applyTheme = (newTheme) => {
             })
             
             // Aplicar clase dark para Tailwind si es un tema oscuro
-            const darkThemes = ['dark', 'taller-night', 'neon']
+            // el tema 'oscuro' también debe activar la clase
+            const darkThemes = ['dark', 'oscuro', 'taller-night', 'neon']
             if (darkThemes.includes(newTheme)) {
                 root.classList.add('dark')
             } else {
