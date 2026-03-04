@@ -5,6 +5,12 @@ import { Head, Link } from '@inertiajs/vue3';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 
+function formatDate(value: string | Date | null) {
+    if (!value) return '';
+    const d = new Date(value);
+    return d.toLocaleDateString();
+}
+
 defineProps<{ factura: any }>();
 </script>
 
@@ -28,7 +34,7 @@ defineProps<{ factura: any }>();
                 <CardContent class="grid md:grid-cols-2 gap-4">
                     <div>
                         <p><strong>Descripción:</strong> {{ factura.descripcion }}</p>
-                        <p><strong>Fecha Emisión:</strong> {{ factura.fechaemision }}</p>
+                        <p><strong>Fecha Emisión:</strong> {{ formatDate(factura.fechaemision) }}</p>
                         <p><strong>Nro. Autorización:</strong> {{ factura.nroautorizacion }}</p>
                     </div>
                     <div>
