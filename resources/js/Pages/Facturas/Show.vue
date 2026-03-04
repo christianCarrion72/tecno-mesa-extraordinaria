@@ -25,7 +25,7 @@ defineProps<{ factura: any }>();
                         <Button variant="outline">Volver al Plan</Button>
                     </Link>
                 </CardHeader>
-                <CardContent class="grid md:grid-cols-3 gap-4">
+                <CardContent class="grid md:grid-cols-2 gap-4">
                     <div>
                         <p><strong>Descripción:</strong> {{ factura.descripcion }}</p>
                         <p><strong>Fecha Emisión:</strong> {{ factura.fechaemision }}</p>
@@ -36,11 +36,16 @@ defineProps<{ factura: any }>();
                         <p><strong>Pago:</strong> {{ factura.pago_id }}</p>
                         <p><strong>Estado:</strong> {{ factura.estado }}</p>
                     </div>
-                    <div class="border-l pl-4">
-                        <h3 class="font-semibold mb-2">Orden de Trabajo</h3>
-                        <p><strong>Nro. Orden:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.numero_orden }}</p>
-                        <p><strong>Cliente:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.cliente?.nombre }}</p>
-                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Orden de Trabajo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p><strong>Nro. Orden:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.numero_orden }}</p>
+                    <p><strong>Cliente:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.cliente?.nombre }}</p>
                 </CardContent>
             </Card>
         </div>
