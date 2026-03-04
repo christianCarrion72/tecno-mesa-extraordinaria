@@ -44,7 +44,7 @@ defineProps<{ factura: any }>();
                     <CardTitle>Orden de Trabajo</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p><strong>Nro. Orden:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.numero_orden }}</p>
+                    <p><strong>Nro. Orden:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.id }}</p>
                     <p><strong>Cliente:</strong> {{ factura.pago?.plan_pago?.orden_trabajo?.cliente?.nombre }}</p>
                 </CardContent>
             </Card>
