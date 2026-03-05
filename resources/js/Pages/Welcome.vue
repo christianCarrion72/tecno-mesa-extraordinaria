@@ -49,7 +49,7 @@ const getIconForType = (tipo) => {
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4 group cursor-pointer" role="img" aria-label="Torneria y Rectificaciones Choko">
                         <div class="w-14 h-14 bg-taller-blue-light rounded-full flex items-center justify-center border-2 border-transparent group-hover:border-white transition-all duration-300 transform group-hover:rotate-12 group-hover:shadow-lg group-hover:shadow-taller-blue-light/50">
-                            <img :src="'/img/logo.png'" alt="Logo Torneria y Rectificaciones Choko" class="w-full h-full object-cover rounded-lg" loading="eager">
+                            <img src="https://res.cloudinary.com/dganxbiix/image/upload/v1772673675/logo_p9xjbk.png" alt="Logo Torneria y Rectificaciones Choko" class="w-full h-full object-cover rounded-lg" loading="eager">
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold text-taller-blue-light tracking-wide">Torneria y Rectificaciones</h1>
