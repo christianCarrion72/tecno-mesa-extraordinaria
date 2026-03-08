@@ -8,8 +8,16 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 
 function formatDate(value: string | Date | null) {
     if (!value) return '';
-    const d = new Date(value);
-    return d.toLocaleDateString();
+
+    // Ensure date strings like "YYYY-MM-DD" are treated as local dates.
+    const iso = typeof value === 'string'
+        ? value.slice(0, 10)
+        : value.toISOString().slice(0, 10);
+
+    const [year, month, day] = iso.split('-').map(Number);
+    if (!year || !month || !day) return '';
+
+    return new Date(year, month - 1, day).toLocaleDateString();
 }
 
 import { Button } from '@/Components/ui/button';
