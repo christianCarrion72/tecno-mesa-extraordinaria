@@ -113,7 +113,7 @@ const submit = () => {
                         </div>
 
                         <div class="md:col-span-2 flex gap-4">
-                            <Button :disabled="form.processing" type="submit">Crear Plan</Button>
+                            <Button variant="outline" :disabled="form.processing" type="submit">Crear Plan</Button>
                             <Button
                                 type="button"
                                 variant="outline"
