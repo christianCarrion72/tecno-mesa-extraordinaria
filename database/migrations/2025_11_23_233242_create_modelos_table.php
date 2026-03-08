@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('modelos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->unique();
-            $table->string('foto')->nullable();
+            $table->text('foto')->nullable();
             $table->timestamps();
         });
     }

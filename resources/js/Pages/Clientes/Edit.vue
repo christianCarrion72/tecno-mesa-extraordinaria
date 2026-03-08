@@ -14,6 +14,7 @@ interface Cliente {
     id: number;
     nombre: string;
     telefono: string;
+    foto?: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -60,7 +61,7 @@ const onFotoChange = (e: Event) => {
 };
 
 const currentFotoUrl = computed(() =>
-    props.cliente && (props.cliente as any).foto ? `/storage/${(props.cliente as any).foto}` : null,
+    props.cliente && props.cliente.foto ? props.cliente.foto : null,
 );
 
 const newPreviewUrl = ref<string | null>(null);

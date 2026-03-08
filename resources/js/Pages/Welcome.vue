@@ -79,14 +79,14 @@ const getIconForType = (tipo) => {
                                 Iniciar Sesión
                             </Link>
 
-                            <Link
+                            <!--Link
                                 v-if="canRegister"
                                 :href="canRegister"
                                 class="bg-taller-blue-light hover:bg-taller-blue-dark hover:text-white text-taller-black px-6 py-2.5 rounded-full transition-all duration-300 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:scale-105"
                                 aria-label="Crear una cuenta nueva"
                             >
                                 Registrarse
-                            </Link>
+                            </Link-->
                         </template>
                     </nav>
                 </div>
@@ -110,7 +110,7 @@ const getIconForType = (tipo) => {
                     </p>
 
                     <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                        <Link
+                        <!--Link
                             :href="$page.props.auth.user ? route('cliente.citas.index') : canRegister"
                             class="group relative bg-white text-taller-black px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:-translate-y-1 overflow-hidden hover:scale-105"
                             :aria-label="$page.props.auth.user ? 'Solicitar cotización de servicio' : 'Registrarse para solicitar cotización'"
@@ -120,7 +120,7 @@ const getIconForType = (tipo) => {
                                 <CalendarDaysIcon class="h-5 w-5 group-hover:rotate-12 transition-transform" />
                             </span>
                             <div class="absolute inset-0 bg-gradient-to-r from-taller-blue-light to-taller-blue-dark opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                        </Link>
+                        </Link-->
 
                         <a 
                             href="#servicios" 

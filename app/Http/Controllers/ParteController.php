@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Parte;
 use App\Models\Motor;
 use Illuminate\Http\Request;
+use Cloudinary\Cloudinary;
+use Cloudinary\Api\Upload\UploadApi;
 
 class ParteController extends Controller
 {
@@ -53,8 +55,26 @@ class ParteController extends Controller
         ]);
 
         $data = $request->except('foto');
+        
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('partes', 'public');
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('cloudinary.cloud_name'),
+                    'api_key' => config('cloudinary.api_key'),
+                    'api_secret' => config('cloudinary.api_secret'),
+                ],
+            ]);
+
+            $uploadApi = new UploadApi();
+            $result = $uploadApi->upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'partes',
+                    'resource_type' => 'image'
+                ]
+            );
+            
+            $data['foto'] = $result['secure_url'];
         }
 
         Parte::create($data);
@@ -83,8 +103,26 @@ class ParteController extends Controller
         ]);
 
         $data = $request->except('foto');
+        
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('partes', 'public');
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('cloudinary.cloud_name'),
+                    'api_key' => config('cloudinary.api_key'),
+                    'api_secret' => config('cloudinary.api_secret'),
+                ],
+            ]);
+
+            $uploadApi = new UploadApi();
+            $result = $uploadApi->upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'partes',
+                    'resource_type' => 'image'
+                ]
+            );
+            
+            $data['foto'] = $result['secure_url'];
         }
 
         $parte->update($data);

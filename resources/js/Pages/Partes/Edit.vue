@@ -80,7 +80,7 @@ const onFotoChange = (e: Event) => {
 };
 
 const currentFotoUrl = computed(() =>
-    props.parte.foto ? `/storage/${props.parte.foto}` : null,
+    props.parte.foto ? props.parte.foto : null,
 );
 
 const newPreviewUrl = ref<string | null>(null);

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Cloudinary\Cloudinary;
+use Cloudinary\Api\Upload\UploadApi;
 
 class ClienteController extends Controller
 {
@@ -48,8 +50,29 @@ class ClienteController extends Controller
         ]);
 
         $data = $request->except('foto');
+        
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('clientes', 'public');
+            // Configurar Cloudinary
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('cloudinary.cloud_name'),
+                    'api_key' => config('cloudinary.api_key'),
+                    'api_secret' => config('cloudinary.api_secret'),
+                ],
+            ]);
+
+            // Subir imagen a Cloudinary
+            $uploadApi = new UploadApi();
+            $result = $uploadApi->upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'clientes',
+                    'resource_type' => 'image'
+                ]
+            );
+            
+            // Guardar la URL de Cloudinary
+            $data['foto'] = $result['secure_url'];
         }
 
         Cliente::create($data);
@@ -75,8 +98,29 @@ class ClienteController extends Controller
         ]);
 
         $data = $request->except('foto');
+        
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('clientes', 'public');
+            // Configurar Cloudinary
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('cloudinary.cloud_name'),
+                    'api_key' => config('cloudinary.api_key'),
+                    'api_secret' => config('cloudinary.api_secret'),
+                ],
+            ]);
+
+            // Subir imagen a Cloudinary
+            $uploadApi = new UploadApi();
+            $result = $uploadApi->upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'clientes',
+                    'resource_type' => 'image'
+                ]
+            );
+            
+            // Guardar la URL de Cloudinary
+            $data['foto'] = $result['secure_url'];
         }
 
         $cliente->update($data);

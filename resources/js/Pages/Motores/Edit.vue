@@ -89,7 +89,7 @@ const onFotoChange = (e: Event) => {
 };
 
 const currentFotoUrl = computed(() =>
-    motor.foto ? `/storage/${motor.foto}` : null,
+    motor.foto ? motor.foto : null,
 );
 
 const newPreviewUrl = ref<string | null>(null);

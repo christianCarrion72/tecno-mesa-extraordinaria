@@ -58,7 +58,7 @@ const onFotoChange = (e: Event) => {
 };
 
 const currentFotoUrl = computed(() =>
-    (props.marca as any).foto ? `/storage/${(props.marca as any).foto}` : null,
+    (props.marca as any).foto ? (props.marca as any).foto : null,
 );
 
 const newPreviewUrl = ref<string | null>(null);

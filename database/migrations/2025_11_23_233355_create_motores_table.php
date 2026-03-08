@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('descripcion');
             $table->foreignId('marca_id')->constrained('marcas');
             $table->foreignId('modelo_id')->constrained('modelos');
-            $table->string('foto')->nullable();
+            $table->text('foto')->nullable();
             $table->timestamps();
         });
     }

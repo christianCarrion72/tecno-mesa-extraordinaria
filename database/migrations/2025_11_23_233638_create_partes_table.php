@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->foreignId('motor_id')->constrained('motores');
-            $table->string('foto')->nullable();
+            $table->text('foto')->nullable();
             $table->timestamps();
         });
     }

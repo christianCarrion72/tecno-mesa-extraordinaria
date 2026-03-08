@@ -114,7 +114,7 @@ const submit = () => {
                                             Foto actual
                                         </p>
                                         <img
-                                            :src="`/storage/${cliente.foto}`"
+                                            :src="cliente.foto"
                                             alt="Foto del cliente"
                                             class="h-20 w-20 rounded-full object-cover border"
                                         />

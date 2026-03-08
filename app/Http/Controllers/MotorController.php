@@ -6,6 +6,8 @@ use App\Models\Motor;
 use App\Models\Marca;
 use App\Models\Modelo;
 use Illuminate\Http\Request;
+use Cloudinary\Cloudinary;
+use Cloudinary\Api\Upload\UploadApi;
 
 class MotorController extends Controller
 {
@@ -62,8 +64,26 @@ class MotorController extends Controller
         ]);
 
         $data = $request->except('foto');
+        
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('motores', 'public');
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('cloudinary.cloud_name'),
+                    'api_key' => config('cloudinary.api_key'),
+                    'api_secret' => config('cloudinary.api_secret'),
+                ],
+            ]);
+
+            $uploadApi = new UploadApi();
+            $result = $uploadApi->upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'motores',
+                    'resource_type' => 'image'
+                ]
+            );
+            
+            $data['foto'] = $result['secure_url'];
         }
 
         Motor::create($data);
@@ -96,8 +116,26 @@ class MotorController extends Controller
         ]);
 
         $data = $request->except('foto');
+        
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('motores', 'public');
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('cloudinary.cloud_name'),
+                    'api_key' => config('cloudinary.api_key'),
+                    'api_secret' => config('cloudinary.api_secret'),
+                ],
+            ]);
+
+            $uploadApi = new UploadApi();
+            $result = $uploadApi->upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'motores',
+                    'resource_type' => 'image'
+                ]
+            );
+            
+            $data['foto'] = $result['secure_url'];
         }
 
         $motor->update($data);

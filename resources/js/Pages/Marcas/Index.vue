@@ -160,7 +160,7 @@ watch(
                                     </td>
                                     <td class="p-4 align-middle">
                                         <template v-if="marca.foto">
-                                            <img :src="`/storage/${marca.foto}`" alt="Foto" class="h-10 w-10 rounded-full object-cover border" />
+                                            <img :src="marca.foto" alt="Foto" class="h-10 w-10 rounded-full object-cover border" />
                                         </template>
                                         <template v-else>
                                             -

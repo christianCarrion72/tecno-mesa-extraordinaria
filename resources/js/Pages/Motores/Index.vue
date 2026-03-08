@@ -181,7 +181,7 @@ watch(buscar, (query) => {
                                     </td>
                                     <td class="p-4 align-middle">
                                         <template v-if="motor.foto">
-                                            <img :src="`/storage/${motor.foto}`" alt="Foto" class="h-10 w-10 rounded-full object-cover border" />
+                                            <img :src="motor.foto" alt="Foto" class="h-10 w-10 rounded-full object-cover border" />
                                         </template>
                                         <template v-else>
                                             -

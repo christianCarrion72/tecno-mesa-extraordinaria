@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Modelo;
 use Illuminate\Http\Request;
+use Cloudinary\Cloudinary;
+use Cloudinary\Api\Upload\UploadApi;
 
 class ModeloController extends Controller
 {
@@ -39,8 +41,26 @@ class ModeloController extends Controller
         ]);
 
         $data = $request->except('foto');
+        
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('modelos', 'public');
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('cloudinary.cloud_name'),
+                    'api_key' => config('cloudinary.api_key'),
+                    'api_secret' => config('cloudinary.api_secret'),
+                ],
+            ]);
+
+            $uploadApi = new UploadApi();
+            $result = $uploadApi->upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'modelos',
+                    'resource_type' => 'image'
+                ]
+            );
+            
+            $data['foto'] = $result['secure_url'];
         }
 
         Modelo::create($data);
@@ -65,8 +85,26 @@ class ModeloController extends Controller
         ]);
 
         $data = $request->except('foto');
+        
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('modelos', 'public');
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('cloudinary.cloud_name'),
+                    'api_key' => config('cloudinary.api_key'),
+                    'api_secret' => config('cloudinary.api_secret'),
+                ],
+            ]);
+
+            $uploadApi = new UploadApi();
+            $result = $uploadApi->upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'modelos',
+                    'resource_type' => 'image'
+                ]
+            );
+            
+            $data['foto'] = $result['secure_url'];
         }
 
         $modelo->update($data);
