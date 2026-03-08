@@ -2,6 +2,7 @@
 declare function route(name: string, params?: any): string;
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import { watch } from 'vue';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
@@ -22,11 +23,26 @@ const form = useForm({
     observacion: '',
 });
 
+const montoTotalOrden = props.orden?.total ?? 0;
+
+const calcularMontoPorCuota = () => {
+    const cuotas = Number(form.numerocuotas) || 1;
+    const monto = Number(montoTotalOrden) || 0;
+    form.montoporcuota = (monto / cuotas).toFixed(2);
+};
+
+calcularMontoPorCuota();
+
+watch(
+    () => form.numerocuotas,
+    () => {
+        calcularMontoPorCuota();
+    }
+);
+
 const submit = () => {
     form.post(route('plan-pagos.store', props.orden.id));
 };
-
-const montoTotalOrden = props.orden?.total ?? 0;
 </script>
 
 <template>
@@ -62,8 +78,16 @@ const montoTotalOrden = props.orden?.total ?? 0;
 
                         <div>
                             <Label>Monto por Cuota</Label>
-                            <TextInput type="number" step="0.01" v-model="form.montoporcuota" />
+                            <TextInput
+                                type="number"
+                                step="0.01"
+                                v-model="form.montoporcuota"
+                                readonly
+                            />
                             <InputError :message="form.errors.montoporcuota" />
+                            <p class="text-xs text-muted-foreground">
+                                Se calcula automáticamente según el total de la orden y el número de cuotas.
+                            </p>
                         </div>
 
                         <div>
