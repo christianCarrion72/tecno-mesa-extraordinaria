@@ -98,7 +98,7 @@ const submit = () => {
 
                         <div>
                             <Label>Monto Total (de la Orden)</Label>
-                            <div class="border rounded-md px-3 py-2 text-sm text-muted-foreground bg-gray-50">
+                            <div class="border rounded-md px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800">
                                 {{ montoTotalOrden }}
                             </div>
                             <p class="text-xs text-muted-foreground">
