@@ -1,12 +1,25 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { usePage, router } from '@inertiajs/vue3'
 import { EyeIcon } from '@heroicons/vue/24/outline'
 
 const currentPageViews = ref(0)
 const currentPageName = ref('')
 const loading = ref(true)
 const page = usePage()
+
+// Helper para generar rutas con la base URL correcta
+const route = (name, params = {}) => {
+  const routes = window.routes || {}
+  let url = routes[name] || `/${name}`
+  
+  // Reemplazar parámetros en la URL
+  Object.keys(params).forEach(key => {
+    url = url.replace(`{${key}}`, params[key])
+  })
+  
+  return url
+}
 
 const fetchPageViews = async () => {
   try {
@@ -24,8 +37,8 @@ const fetchPageViews = async () => {
     currentPageName.value = pageName
 
     // Obtener las vistas de esta página específica
-    const baseUrl = window.location.origin
-    const url = `${baseUrl}/api/page-views/page/${encodeURIComponent(pageName)}`
+    // Usar route helper de Inertia para construir la URL correctamente
+    const url = route('api.page-views.page', { pageName: encodeURIComponent(pageName) })
     console.log('📊 Fetching page views:', { pageName, url })
     
     const response = await fetch(url)
