@@ -8,19 +8,24 @@ const currentPageName = ref('')
 const loading = ref(true)
 const page = usePage()
 
-// Obtener la base URL desde la página actual de Inertia
+// Obtener la base URL extrayendo hasta /public/ del pathname actual
 const getBaseUrl = () => {
-  // Inertia proporciona la URL completa en page.url
-  const currentUrl = page.url
-  const fullUrl = window.location.href
+  const pathname = window.location.pathname
   
-  // Extraer la base URL (todo antes de la ruta relativa)
-  if (currentUrl && fullUrl.includes(currentUrl)) {
-    return fullUrl.substring(0, fullUrl.indexOf(currentUrl))
+  // Buscar la posición de /public/ en la ruta
+  const publicIndex = pathname.indexOf('/public/')
+  
+  if (publicIndex !== -1) {
+    // Si existe /public/, tomar todo hasta /public (incluido)
+    const basePath = pathname.substring(0, publicIndex + 7) // +7 para incluir "/public"
+    return window.location.origin + basePath
   }
   
-  // Fallback: usar origin
-  return window.location.origin
+  // Fallback: quitar el último segmento de la ruta
+  const lastSlashIndex = pathname.lastIndexOf('/')
+  const basePath = lastSlashIndex > 0 ? pathname.substring(0, lastSlashIndex) : ''
+  
+  return window.location.origin + basePath
 }
 
 const fetchPageViews = async () => {
