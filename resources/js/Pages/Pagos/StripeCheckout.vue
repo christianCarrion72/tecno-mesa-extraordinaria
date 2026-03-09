@@ -2,16 +2,15 @@
 import { Head } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 
-interface Props {
+const props = defineProps<{
     token: string;
     monto: number;
     numerocuota: number;
     currency: string;
     stripePublicKey: string;
     clientSecret: string;
-}
-
-const props = defineProps<Props>();
+    confirmUrl: string;
+}>();
 
 const stripe = ref<any | null>(null);
 const cardElement = ref<any | null>(null);
@@ -62,7 +61,7 @@ const pagar = async () => {
             return;
         }
 
-        const res = await fetch(`/pagos/tarjeta/${props.token}/confirm`, {
+        const res = await fetch(props.confirmUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -122,4 +121,3 @@ const pagar = async () => {
         </div>
     </div>
 </template>
-

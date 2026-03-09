@@ -274,6 +274,7 @@ class PagoController extends Controller
             'currency' => config('services.stripe.currency', 'BOB'),
             'stripePublicKey' => config('services.stripe.key'),
             'clientSecret' => $intent->client_secret,
+            'confirmUrl' => route('pagos.stripe.confirm.public', ['token' => $token]),
         ]);
     }
 
