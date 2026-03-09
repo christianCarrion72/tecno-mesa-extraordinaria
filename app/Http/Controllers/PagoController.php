@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
+use Illuminate\Support\Str;
 
 class PagoController extends Controller
 {
@@ -169,23 +170,44 @@ class PagoController extends Controller
             'numerocuota' => 'required|integer|min:1',
         ]);
 
-        $stripe = new StripeClient(config('services.stripe.secret'));
-
         $amount = (float) $data['amount'];
+        $numerocuota = (int) $data['numerocuota'];
+
+        $token = Str::uuid()->toString();
+
+        $nuevo = [
+            'estado' => 'pendiente',
+            'fechapago' => now()->toDateString(),
+            'metodopago' => 'tarjeta',
+            'monto' => $amount,
+            'numerocuota' => $numerocuota,
+            'referencia' => $token,
+        ];
+
+        $pago = Pago::crearParaPlan($planPago, $nuevo);
+
+        $stripe = new StripeClient(config('services.stripe.secret'));
         $currency = strtolower(config('services.stripe.currency', 'BOB'));
 
         $intent = $stripe->paymentIntents->create([
             'amount' => (int) round($amount * 100),
             'currency' => $currency,
             'metadata' => [
+                'pago_id' => $pago->id,
                 'plan_pago_id' => $planPago->id,
-                'numerocuota' => (int) $data['numerocuota'],
+                'numerocuota' => $numerocuota,
             ],
         ]);
 
+        $pago->update([
+            'pf_transaction_id' => $intent->id,
+            'pf_status' => 0,
+        ]);
+
+        $checkoutUrl = route('pagos.stripe.checkout', ['token' => $token]);
+
         return response()->json([
-            'clientSecret' => $intent->client_secret,
-            'paymentIntentId' => $intent->id,
+            'checkoutUrl' => $checkoutUrl,
         ]);
     }
 
@@ -233,6 +255,63 @@ class PagoController extends Controller
             'success' => true,
             'pago_id' => $pago->id,
             'redirect' => route('plan-pagos.show', $planPago->id),
+        ]);
+    }
+
+    public function stripeCheckoutPublic(string $token)
+    {
+        $pago = Pago::where('referencia', $token)
+            ->where('metodopago', 'tarjeta')
+            ->firstOrFail();
+
+        $stripe = new StripeClient(config('services.stripe.secret'));
+        $intent = $stripe->paymentIntents->retrieve($pago->pf_transaction_id);
+
+        return Inertia::render('Pagos/StripeCheckout', [
+            'token' => $token,
+            'monto' => $pago->monto,
+            'numerocuota' => $pago->numerocuota,
+            'currency' => config('services.stripe.currency', 'BOB'),
+            'stripePublicKey' => config('services.stripe.key'),
+            'clientSecret' => $intent->client_secret,
+        ]);
+    }
+
+    public function stripeConfirmPublic(Request $request, string $token)
+    {
+        $pago = Pago::where('referencia', $token)
+            ->where('metodopago', 'tarjeta')
+            ->firstOrFail();
+
+        $data = $request->validate([
+            'payment_intent_id' => 'required|string',
+        ]);
+
+        $stripe = new StripeClient(config('services.stripe.secret'));
+        $intent = $stripe->paymentIntents->retrieve($data['payment_intent_id']);
+
+        if ($intent->status !== 'succeeded') {
+            return response()->json([
+                'error' => 1,
+                'message' => 'El pago aún no está confirmado en Stripe.',
+                'status' => $intent->status,
+            ], 422);
+        }
+
+        $pago->update([
+            'estado' => 'terminado',
+            'pf_transaction_id' => $intent->id,
+            'pf_payment_method_transaction_id' => $intent->payment_method ?? null,
+            'pf_status' => 1,
+            'pf_expiration_date' => null,
+            'pf_qr_base64' => null,
+        ]);
+
+        optional($pago->planPago)->refresh()->actualizarEstadoSegunPagos();
+
+        return response()->json([
+            'success' => true,
+            'redirect' => route('plan-pagos.show', $pago->plan_pago_id),
         ]);
     }
 

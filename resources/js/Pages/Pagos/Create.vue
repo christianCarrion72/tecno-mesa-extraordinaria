@@ -24,10 +24,10 @@ const form = useForm({
 
 const submit = async () => {
     if (esTarjeta.value) {
-        await procesarPagoStripe();
-    } else {
-        form.post(route('plan-pagos.pagos.store', props.plan.id));
+        alert('Para pagos con tarjeta, usa el botón \"Generar QR de pago\".');
+        return;
     }
+    form.post(route('plan-pagos.pagos.store', props.plan.id));
 };
 
 const getCookie = (name: string): string => {
@@ -223,55 +223,12 @@ const esTarjeta = computed(() => {
     return metodo === 'tarjeta';
 });
 
-const stripe = ref<any | null>(null);
-const cardElement = ref<any | null>(null);
-const stripeClientSecret = ref<string>('');
-const stripeLoading = ref(false);
-const stripeError = ref<string>('');
+const stripeQrUrl = ref<string>('');
 
-const initStripe = async () => {
-    stripeError.value = '';
+const generarQrStripe = async () => {
+    stripeQrUrl.value = '';
     try {
-        const res = await fetch('/stripe/config');
-        const cfg = await res.json();
-        if (!cfg.publicKey) {
-            stripeError.value = 'Configuración de Stripe incompleta.';
-            return;
-        }
-        const anyWindow = window as any;
-        if (!anyWindow.Stripe) {
-            stripeError.value = 'Stripe.js no está disponible.';
-            return;
-        }
-        stripe.value = anyWindow.Stripe(cfg.publicKey);
-        const elements = stripe.value.elements();
-        const card = elements.create('card');
-        card.mount('#stripe-card-element');
-        cardElement.value = card;
-    } catch (e) {
-        console.error('Error inicializando Stripe', e);
-        stripeError.value = 'No se pudo inicializar Stripe.';
-    }
-};
-
-watch(esTarjeta, async (isCard) => {
-    if (isCard && !stripe.value) {
-        await initStripe();
-    }
-});
-
-const procesarPagoStripe = async () => {
-    stripeError.value = '';
-    if (!stripe.value || !cardElement.value) {
-        await initStripe();
-        if (!stripe.value || !cardElement.value) {
-            stripeError.value = 'Stripe no está listo.';
-            return;
-        }
-    }
-    try {
-        stripeLoading.value = true;
-        const resIntent = await fetch(route('plan-pagos.pagos.stripe.intent', props.plan.id), {
+        const res = await fetch(route('plan-pagos.pagos.stripe.intent', props.plan.id), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -283,56 +240,16 @@ const procesarPagoStripe = async () => {
                 numerocuota: Number(form.numerocuota),
             }),
         });
-        const intentData = await resIntent.json();
-        if (!resIntent.ok || !intentData.clientSecret) {
-            stripeError.value = intentData.message || 'No se pudo crear el pago en Stripe.';
+        const data = await res.json();
+        if (!res.ok || !data.checkoutUrl) {
+            console.error(data);
+            alert(data.message || 'No se pudo generar el link de pago.');
             return;
         }
-        stripeClientSecret.value = intentData.clientSecret;
-        const result = await stripe.value.confirmCardPayment(stripeClientSecret.value, {
-            payment_method: {
-                card: cardElement.value,
-            },
-        });
-        if (result.error) {
-            console.error(result.error);
-            stripeError.value = result.error.message || 'Error procesando la tarjeta.';
-            return;
-        }
-        if (result.paymentIntent.status !== 'succeeded') {
-            stripeError.value = 'El pago no fue completado (status: ' + result.paymentIntent.status + ').';
-            return;
-        }
-        const confirmRes = await fetch(route('plan-pagos.pagos.stripe.confirm', props.plan.id), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify({
-                payment_intent_id: result.paymentIntent.id,
-                amount: Number(form.monto),
-                numerocuota: Number(form.numerocuota),
-            }),
-        });
-        const confirmData = await confirmRes.json();
-        if (!confirmRes.ok || !confirmData.success) {
-            stripeError.value = confirmData.message || 'No se pudo registrar el pago.';
-            return;
-        }
-        if (confirmData.redirect) {
-            window.location.href = confirmData.redirect;
-        } else if (confirmData.pago_id) {
-            router.visit(`/pagos/${confirmData.pago_id}`);
-        } else {
-            router.visit(route('plan-pagos.show', props.plan.id));
-        }
+        stripeQrUrl.value = data.checkoutUrl;
     } catch (e) {
-        console.error('Error procesando pago Stripe', e);
-        stripeError.value = 'Error inesperado procesando el pago.';
-    } finally {
-        stripeLoading.value = false;
+        console.error('Error generando QR Stripe', e);
+        alert('Error generando QR para tarjeta.');
     }
 };
 </script>
@@ -468,15 +385,33 @@ const procesarPagoStripe = async () => {
                         <div v-if="esTarjeta" class="md:col-span-2 border border-input rounded-lg p-4 bg-muted space-y-4">
                             <div class="flex items-center justify-between">
                                 <h3 class="text-lg font-semibold text-foreground">Pago con Tarjeta</h3>
-                                <span v-if="stripeLoading" class="text-sm text-blue-600">Procesando...</span>
-                            </div>
-                            <div v-if="stripeError" class="p-3 bg-destructive/15 border border-destructive/40 rounded text-sm text-destructive">
-                                {{ stripeError }}
                             </div>
                             <p class="text-sm text-muted-foreground">
-                                Introduce los datos de tu tarjeta de forma segura.
+                                Genera un código QR para que el cliente pague con su tarjeta desde su propio dispositivo.
                             </p>
-                            <div id="stripe-card-element" class="px-3 py-2 border rounded-md bg-background"></div>
+                            <div class="flex gap-3 flex-wrap items-center">
+                                <Button
+                                    type="button"
+                                    variant="default"
+                                    :disabled="form.processing"
+                                    @click="generarQrStripe"
+                                >
+                                    Generar QR de pago
+                                </Button>
+                            </div>
+                            <div v-if="stripeQrUrl" class="mt-4">
+                                <Label>Escanea este QR o abre el enlace:</Label>
+                                <div class="mt-2 flex flex-col md:flex-row gap-4 items-center">
+                                    <img
+                                        :src="`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(stripeQrUrl)}`"
+                                        alt="QR pago con tarjeta"
+                                        class="border rounded shadow-sm"
+                                    />
+                                    <div class="text-xs break-all text-muted-foreground max-w-xs">
+                                        {{ stripeQrUrl }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div>
@@ -524,6 +459,15 @@ const procesarPagoStripe = async () => {
                                 @click="generarQrPF"
                             >
                                 Generar QR
+                            </Button>
+                            <Button
+                                v-if="esTarjeta"
+                                type="button"
+                                variant="outline"
+                                :disabled="form.processing"
+                                @click="generarQrStripe"
+                            >
+                                Generar QR Tarjeta
                             </Button>
                         </div>
                     </form>

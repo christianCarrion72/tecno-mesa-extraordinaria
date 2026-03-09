@@ -59,6 +59,11 @@ Route::post('/webhooks/pagofacil', [PagoController::class, 'pagofacilCallback'])
     ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)
     ->name('pagofacil.callback.webhook');
 
+Route::get('/pagos/tarjeta/{token}', [PagoController::class, 'stripeCheckoutPublic'])
+    ->name('pagos.stripe.checkout');
+Route::post('/pagos/tarjeta/{token}/confirm', [PagoController::class, 'stripeConfirmPublic'])
+    ->name('pagos.stripe.confirm.public');
+
 // ============================================================================
 // RUTAS DE AUTENTICACIÓN
 // ============================================================================
