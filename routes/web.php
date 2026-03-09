@@ -208,6 +208,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/pagos/{pago}', [PagoController::class, 'update'])->name('plan-pagos.pagos.update');
     Route::delete('/pagos/{pago}', [PagoController::class, 'destroy'])->name('plan-pagos.pagos.destroy');
 
+    Route::get('/stripe/config', [PagoController::class, 'stripeConfig'])->name('stripe.config');
+    Route::post('/plan-pagos/{planPago}/pagos/stripe/intent', [PagoController::class, 'stripeCreatePaymentIntent'])->name('plan-pagos.pagos.stripe.intent');
+    Route::post('/plan-pagos/{planPago}/pagos/stripe/confirm', [PagoController::class, 'stripeConfirmPago'])->name('plan-pagos.pagos.stripe.confirm');
+
     Route::get('/pagofacil/login', [PagoController::class, 'pagofacilLogin'])->name('pagofacil.login');
     Route::get('/pagofacil/list-enabled-services', [PagoController::class, 'pagofacilListEnabledServices'])->name('pagofacil.list');
     Route::post('/pagofacil/generate-qr', [PagoController::class, 'pagofacilGenerateQr'])->name('pagofacil.generate');

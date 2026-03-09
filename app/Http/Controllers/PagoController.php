@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Stripe\StripeClient;
 
 class PagoController extends Controller
 {
@@ -151,6 +152,88 @@ class PagoController extends Controller
         }
         return redirect()->route('plan-pagos.show', $planId)
             ->with('success', 'Pago eliminado.');
+    }
+
+    public function stripeConfig()
+    {
+        return response()->json([
+            'publicKey' => config('services.stripe.key'),
+            'currency' => config('services.stripe.currency', 'BOB'),
+        ]);
+    }
+
+    public function stripeCreatePaymentIntent(Request $request, PlanPago $planPago)
+    {
+        $data = $request->validate([
+            'amount' => 'required|numeric|min:0.5',
+            'numerocuota' => 'required|integer|min:1',
+        ]);
+
+        $stripe = new StripeClient(config('services.stripe.secret'));
+
+        $amount = (float) $data['amount'];
+        $currency = strtolower(config('services.stripe.currency', 'BOB'));
+
+        $intent = $stripe->paymentIntents->create([
+            'amount' => (int) round($amount * 100),
+            'currency' => $currency,
+            'metadata' => [
+                'plan_pago_id' => $planPago->id,
+                'numerocuota' => (int) $data['numerocuota'],
+            ],
+        ]);
+
+        return response()->json([
+            'clientSecret' => $intent->client_secret,
+            'paymentIntentId' => $intent->id,
+        ]);
+    }
+
+    public function stripeConfirmPago(Request $request, PlanPago $planPago)
+    {
+        $data = $request->validate([
+            'payment_intent_id' => 'required|string',
+            'amount' => 'required|numeric|min:0.5',
+            'numerocuota' => 'required|integer|min:1',
+        ]);
+
+        $stripe = new StripeClient(config('services.stripe.secret'));
+        $intent = $stripe->paymentIntents->retrieve($data['payment_intent_id']);
+
+        if ($intent->status !== 'succeeded') {
+            return response()->json([
+                'error' => 1,
+                'message' => 'El pago aún no está confirmado en Stripe.',
+                'status' => $intent->status,
+            ], 422);
+        }
+
+        $nuevo = [
+            'estado' => 'terminado',
+            'fechapago' => now()->toDateString(),
+            'metodopago' => 'tarjeta',
+            'monto' => (float) $data['amount'],
+            'numerocuota' => (int) $data['numerocuota'],
+            'referencia' => $intent->id,
+        ];
+
+        $pago = Pago::crearParaPlan($planPago, $nuevo);
+
+        $pago->update([
+            'pf_transaction_id' => $intent->id,
+            'pf_payment_method_transaction_id' => $intent->payment_method ?? null,
+            'pf_status' => 1,
+            'pf_expiration_date' => null,
+            'pf_qr_base64' => null,
+        ]);
+
+        $planPago->refresh()->actualizarEstadoSegunPagos();
+
+        return response()->json([
+            'success' => true,
+            'pago_id' => $pago->id,
+            'redirect' => route('plan-pagos.show', $planPago->id),
+        ]);
     }
 
     public function pagofacilLogin(Request $request)

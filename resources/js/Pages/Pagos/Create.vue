@@ -22,8 +22,12 @@ const form = useForm({
     referencia: '',
 });
 
-const submit = () => {
-    form.post(route('plan-pagos.pagos.store', props.plan.id));
+const submit = async () => {
+    if (esTarjeta.value) {
+        await procesarPagoStripe();
+    } else {
+        form.post(route('plan-pagos.pagos.store', props.plan.id));
+    }
 };
 
 const getCookie = (name: string): string => {
@@ -213,6 +217,124 @@ watch(() => form.monto, (m) => {
     pfOrderPrice.value = String(val);
     pfOrderTotal.value = String(val);
 });
+
+const esTarjeta = computed(() => {
+    const metodo = String(form.metodopago).toLowerCase().trim();
+    return metodo === 'tarjeta';
+});
+
+const stripe = ref<any | null>(null);
+const cardElement = ref<any | null>(null);
+const stripeClientSecret = ref<string>('');
+const stripeLoading = ref(false);
+const stripeError = ref<string>('');
+
+const initStripe = async () => {
+    stripeError.value = '';
+    try {
+        const res = await fetch('/stripe/config');
+        const cfg = await res.json();
+        if (!cfg.publicKey) {
+            stripeError.value = 'Configuración de Stripe incompleta.';
+            return;
+        }
+        const anyWindow = window as any;
+        if (!anyWindow.Stripe) {
+            stripeError.value = 'Stripe.js no está disponible.';
+            return;
+        }
+        stripe.value = anyWindow.Stripe(cfg.publicKey);
+        const elements = stripe.value.elements();
+        const card = elements.create('card');
+        card.mount('#stripe-card-element');
+        cardElement.value = card;
+    } catch (e) {
+        console.error('Error inicializando Stripe', e);
+        stripeError.value = 'No se pudo inicializar Stripe.';
+    }
+};
+
+watch(esTarjeta, async (isCard) => {
+    if (isCard && !stripe.value) {
+        await initStripe();
+    }
+});
+
+const procesarPagoStripe = async () => {
+    stripeError.value = '';
+    if (!stripe.value || !cardElement.value) {
+        await initStripe();
+        if (!stripe.value || !cardElement.value) {
+            stripeError.value = 'Stripe no está listo.';
+            return;
+        }
+    }
+    try {
+        stripeLoading.value = true;
+        const resIntent = await fetch(route('plan-pagos.pagos.stripe.intent', props.plan.id), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({
+                amount: Number(form.monto),
+                numerocuota: Number(form.numerocuota),
+            }),
+        });
+        const intentData = await resIntent.json();
+        if (!resIntent.ok || !intentData.clientSecret) {
+            stripeError.value = intentData.message || 'No se pudo crear el pago en Stripe.';
+            return;
+        }
+        stripeClientSecret.value = intentData.clientSecret;
+        const result = await stripe.value.confirmCardPayment(stripeClientSecret.value, {
+            payment_method: {
+                card: cardElement.value,
+            },
+        });
+        if (result.error) {
+            console.error(result.error);
+            stripeError.value = result.error.message || 'Error procesando la tarjeta.';
+            return;
+        }
+        if (result.paymentIntent.status !== 'succeeded') {
+            stripeError.value = 'El pago no fue completado (status: ' + result.paymentIntent.status + ').';
+            return;
+        }
+        const confirmRes = await fetch(route('plan-pagos.pagos.stripe.confirm', props.plan.id), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({
+                payment_intent_id: result.paymentIntent.id,
+                amount: Number(form.monto),
+                numerocuota: Number(form.numerocuota),
+            }),
+        });
+        const confirmData = await confirmRes.json();
+        if (!confirmRes.ok || !confirmData.success) {
+            stripeError.value = confirmData.message || 'No se pudo registrar el pago.';
+            return;
+        }
+        if (confirmData.redirect) {
+            window.location.href = confirmData.redirect;
+        } else if (confirmData.pago_id) {
+            router.visit(`/pagos/${confirmData.pago_id}`);
+        } else {
+            router.visit(route('plan-pagos.show', props.plan.id));
+        }
+    } catch (e) {
+        console.error('Error procesando pago Stripe', e);
+        stripeError.value = 'Error inesperado procesando el pago.';
+    } finally {
+        stripeLoading.value = false;
+    }
+};
 </script>
 
 <template>
@@ -341,6 +463,20 @@ watch(() => form.monto, (m) => {
                                     <img :src="`data:image/png;base64,${pfQrBase64}`" alt="QR Pago Fácil" class="max-w-xs border rounded shadow-sm" />
                                 </div>
                             </div>
+                        </div>
+
+                        <div v-if="esTarjeta" class="md:col-span-2 border border-input rounded-lg p-4 bg-muted space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold text-foreground">Pago con Tarjeta</h3>
+                                <span v-if="stripeLoading" class="text-sm text-blue-600">Procesando...</span>
+                            </div>
+                            <div v-if="stripeError" class="p-3 bg-destructive/15 border border-destructive/40 rounded text-sm text-destructive">
+                                {{ stripeError }}
+                            </div>
+                            <p class="text-sm text-muted-foreground">
+                                Introduce los datos de tu tarjeta de forma segura.
+                            </p>
+                            <div id="stripe-card-element" class="px-3 py-2 border rounded-md bg-background"></div>
                         </div>
 
                         <div>
