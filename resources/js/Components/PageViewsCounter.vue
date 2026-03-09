@@ -8,17 +8,19 @@ const currentPageName = ref('')
 const loading = ref(true)
 const page = usePage()
 
-// Helper para generar rutas con la base URL correcta
-const route = (name, params = {}) => {
-  const routes = window.routes || {}
-  let url = routes[name] || `/${name}`
+// Obtener la base URL desde la página actual de Inertia
+const getBaseUrl = () => {
+  // Inertia proporciona la URL completa en page.url
+  const currentUrl = page.url
+  const fullUrl = window.location.href
   
-  // Reemplazar parámetros en la URL
-  Object.keys(params).forEach(key => {
-    url = url.replace(`{${key}}`, params[key])
-  })
+  // Extraer la base URL (todo antes de la ruta relativa)
+  if (currentUrl && fullUrl.includes(currentUrl)) {
+    return fullUrl.substring(0, fullUrl.indexOf(currentUrl))
+  }
   
-  return url
+  // Fallback: usar origin
+  return window.location.origin
 }
 
 const fetchPageViews = async () => {
@@ -37,9 +39,10 @@ const fetchPageViews = async () => {
     currentPageName.value = pageName
 
     // Obtener las vistas de esta página específica
-    // Usar route helper de Inertia para construir la URL correctamente
-    const url = route('api.page-views.page', { pageName: encodeURIComponent(pageName) })
-    console.log('📊 Fetching page views:', { pageName, url })
+    // Usar getBaseUrl para construir la URL correctamente en subdirectorios
+    const baseUrl = getBaseUrl()
+    const url = `${baseUrl}/api/page-views/page/${encodeURIComponent(pageName)}`
+    console.log('📊 Fetching page views:', { pageName, url, baseUrl })
     
     const response = await fetch(url)
     
