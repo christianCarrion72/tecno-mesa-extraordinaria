@@ -166,8 +166,8 @@ class ReportController extends Controller
             ->join('orden_trabajo_servicios', 'servicios.id', '=', 'orden_trabajo_servicios.servicio_id')
             ->join('orden_trabajos', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'orden_trabajos.id')
             ->whereBetween('orden_trabajos.created_at', [$fechaInicio, $fechaFin])
-            ->selectRaw('servicios.nombre, servicios.tipo, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
-            ->groupBy('servicios.id', 'servicios.nombre', 'servicios.tipo')
+            ->selectRaw('servicios.id, servicios.nombre, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
+            ->groupBy('servicios.id', 'servicios.nombre')
             ->orderByDesc('cantidad')
             ->limit(10)
             ->get()
@@ -184,11 +184,11 @@ class ReportController extends Controller
             ->join('orden_trabajo_servicios', 'servicios.id', '=', 'orden_trabajo_servicios.servicio_id')
             ->join('orden_trabajos', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'orden_trabajos.id')
             ->whereBetween('orden_trabajos.created_at', [$fechaInicio, $fechaFin])
-            ->selectRaw('servicios.tipo, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
-            ->groupBy('servicios.tipo')
+            ->selectRaw('servicios.nombre, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
+            ->groupBy('servicios.nombre')
             ->get()
             ->map(fn($item) => [
-                'tipo' => ucfirst($item->tipo),
+                'tipo' => ucfirst($item->nombre),
                 'cantidad' => $item->cantidad,
                 'ingresos' => round($item->ingresos, 2),
             ]);
