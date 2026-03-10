@@ -161,44 +161,29 @@ class ReportController extends Controller
      */
     private function datosServicios($fechaInicio, $fechaFin, $periodo)
     {
-        // Servicios más solicitados
-        $serviciosMasUsados = Servicio::query()
+        // Servicios usados en el rango de fechas
+        $serviciosPorServicio = Servicio::query()
             ->join('orden_trabajo_servicios', 'servicios.id', '=', 'orden_trabajo_servicios.servicio_id')
             ->join('orden_trabajos', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'orden_trabajos.id')
             ->whereBetween('orden_trabajos.created_at', [$fechaInicio, $fechaFin])
-            ->selectRaw('servicios.id, servicios.nombre, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
+            ->selectRaw('servicios.id, servicios.nombre, SUM(orden_trabajo_servicios.cantidad) as cantidad, SUM(orden_trabajo_servicios.subtotal) as ingresos, AVG(orden_trabajo_servicios.precio) as precio_promedio')
             ->groupBy('servicios.id', 'servicios.nombre')
             ->orderByDesc('cantidad')
-            ->limit(10)
+            ->limit(20)
             ->get()
             ->map(fn($item) => [
+                'id' => $item->id,
                 'nombre' => $item->nombre,
-                'tipo' => $item->tipo,
                 'cantidad' => $item->cantidad,
                 'ingresos' => round($item->ingresos, 2),
-                'precio_promedio' => round($item->ingresos / $item->cantidad, 2),
+                'precio_promedio' => round($item->precio_promedio, 2),
             ]);
 
-        // Servicios por tipo
-        $serviciosPorTipo = Servicio::query()
-            ->join('orden_trabajo_servicios', 'servicios.id', '=', 'orden_trabajo_servicios.servicio_id')
-            ->join('orden_trabajos', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'orden_trabajos.id')
-            ->whereBetween('orden_trabajos.created_at', [$fechaInicio, $fechaFin])
-            ->selectRaw('servicios.nombre, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
-            ->groupBy('servicios.nombre')
-            ->get()
-            ->map(fn($item) => [
-                'tipo' => ucfirst($item->nombre),
-                'cantidad' => $item->cantidad,
-                'ingresos' => round($item->ingresos, 2),
-            ]);
-
-        // Servicios por período
-        $serviciosPeriodo = $this->generarServiciosPeriodo($fechaInicio, $fechaFin, $periodo);
+        // Servicios por período (para graficar servicios usados y veces utilizadas)
+        $serviciosPeriodo = $serviciosPorServicio->pluck('cantidad', 'nombre')->toArray();
 
         return [
-            'servicios_mas_usados' => $serviciosMasUsados,
-            'servicios_por_tipo' => $serviciosPorTipo,
+            'servicios_por_servicio' => $serviciosPorServicio,
             'servicios_periodo' => $serviciosPeriodo,
         ];
     }
@@ -239,35 +224,33 @@ class ReportController extends Controller
      */
     private function datosMecanicos($fechaInicio, $fechaFin)
     {
-        // Rendimiento de mecánicos
-        $mecanicos = User::where('tipo', 'mecanico')
-            ->with([
-                'ordenesTrabajo' => function ($query) use ($fechaInicio, $fechaFin) {
-                    $query->whereBetween('created_at', [$fechaInicio, $fechaFin]);
-                },
-                'ordenesTrabajo.pagos' => function ($query) {
-                    $query->where('estado', 'terminado');
-                }
-            ])
+        // Rendimiento basado en las órdenes de trabajo asignadas (usuario_id)
+        $mecanicos = \DB::table('orden_trabajos as ot')
+            ->join('users as u', 'ot.usuario_id', '=', 'u.id')
+            ->leftJoin('roles as r', 'u.rol_id', '=', 'r.id')
+            ->whereBetween('ot.created_at', [$fechaInicio, $fechaFin])
+            ->select(
+                'u.id',
+                'u.name as nombre',
+                'r.nombre as rol',
+                \DB::raw('COUNT(*) as total_ordenes'),
+                \DB::raw("SUM(CASE WHEN ot.estado = 'terminado' THEN 1 ELSE 0 END) as ordenes_completadas"),
+                \DB::raw('SUM(ot.total) as ingresos_generados')
+            )
+            ->groupBy('u.id', 'u.name', 'r.nombre')
+            ->orderByDesc('ingresos_generados')
             ->get()
-            ->map(function ($mecanico) {
-                $ordenes = $mecanico->ordenesTrabajo ?? [];
-                $ordenesCompletadas = $ordenes->where('estado', 'completada')->count();
-                $ingresos = $ordenes->sum(fn($o) => $o->pagos()->where('estado', 'terminado')->sum('monto'));
-
-                return [
-                    'id' => $mecanico->id,
-                    'nombre' => $mecanico->nombre,
-                    'total_ordenes' => $ordenes->count(),
-                    'ordenes_completadas' => $ordenesCompletadas,
-                    'ordenes_pendientes' => $ordenes->where('estado', '!=', 'completada')->count(),
-                    'ingresos_generados' => round($ingresos, 2),
-                    'promedio_por_orden' => $ordenes->count() > 0 ? round($ingresos / $ordenes->count(), 2) : 0,
-                    'tasa_completacion' => $ordenes->count() > 0 ? round(($ordenesCompletadas / $ordenes->count()) * 100, 2) : 0,
-                ];
-            })
-            ->sortByDesc('ingresos_generados')
-            ->values();
+            ->map(fn($row) => [
+                'id' => $row->id,
+                'nombre' => $row->nombre,
+                'rol' => $row->rol,
+                'total_ordenes' => (int) $row->total_ordenes,
+                'ordenes_completadas' => (int) $row->ordenes_completadas,
+                'ordenes_pendientes' => (int) $row->total_ordenes - (int) $row->ordenes_completadas,
+                'ingresos_generados' => round($row->ingresos_generados, 2),
+                'promedio_por_orden' => $row->total_ordenes > 0 ? round($row->ingresos_generados / $row->total_ordenes, 2) : 0,
+                'tasa_completacion' => $row->total_ordenes > 0 ? round(($row->ordenes_completadas / $row->total_ordenes) * 100, 2) : 0,
+            ]);
 
         return [
             'rendimiento_mecanicos' => $mecanicos,
@@ -334,8 +317,8 @@ class ReportController extends Controller
                 default => $fecha->format('d-m-Y'),
             };
 
-            $query = \DB::table('orden_servicios')
-                ->join('orden_trabajos', 'orden_servicios.orden_trabajo_id', '=', 'orden_trabajos.id');
+            $query = \DB::table('orden_trabajo_servicios')
+                ->join('orden_trabajos', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'orden_trabajos.id');
 
             match ($periodo) {
                 'diario' => $query->whereDate('orden_trabajos.created_at', $fecha),
@@ -348,7 +331,8 @@ class ReportController extends Controller
                 'anual' => $query->whereYear('orden_trabajos.created_at', $fecha->year),
             };
 
-            $datos[$key] = $query->count();
+            // Cantidad total de servicios en el periodo (suma de cantidades por servicio)
+            $datos[$key] = $query->sum('orden_trabajo_servicios.cantidad');
 
             match ($periodo) {
                 'diario' => $fecha->addDay(),
@@ -459,7 +443,7 @@ class ReportController extends Controller
     private function exportarCSV($datosExport, $tipoReporte, $fechaInicio, $fechaFin)
     {
         $filename = "reporte_{$tipoReporte}_{$fechaInicio->format('Y-m-d')}_a_{$fechaFin->format('Y-m-d')}.csv";
-        
+
         return response()->stream(
             function () use ($datosExport) {
                 if (ob_get_length()) {
@@ -491,6 +475,45 @@ class ReportController extends Controller
                     fputcsv($output, ['Método de Pago', 'Cantidad', 'Total']);
                     foreach ($datosExport['datos']['ingresos_por_metodo'] ?? [] as $item) {
                         fputcsv($output, [$item['name'], $item['cantidad'], number_format($item['total'], 2, ',', '.')]);
+                    }
+
+                    fputcsv($output, []);
+                    fputcsv($output, ['Ingresos por Período']);
+                    foreach ($datosExport['datos']['ingresos_periodo'] ?? [] as $periodo => $monto) {
+                        fputcsv($output, [$periodo, number_format($monto, 2, ',', '.')]);
+                    }
+                }
+
+                if ($datosExport['tipoReporte'] === 'servicios') {
+                    fputcsv($output, ['Servicio', 'Veces Usadas', 'Ingresos', 'Precio Promedio']);
+                    foreach ($datosExport['datos']['servicios_por_servicio'] ?? [] as $item) {
+                        fputcsv($output, [
+                            $item['nombre'],
+                            $item['cantidad'],
+                            number_format($item['ingresos'], 2, ',', '.'),
+                            number_format($item['precio_promedio'], 2, ',', '.'),
+                        ]);
+                    }
+
+                    fputcsv($output, []);
+                    fputcsv($output, ['Servicios por Período']);
+                    foreach ($datosExport['datos']['servicios_periodo'] ?? [] as $servicio => $cantidad) {
+                        fputcsv($output, [$servicio, $cantidad]);
+                    }
+                }
+
+                if ($datosExport['tipoReporte'] === 'mecanicos') {
+                    fputcsv($output, ['Mecánico', 'Rol', 'Total Órdenes', 'Órdenes Completadas', 'Órdenes Pendientes', 'Ingresos Generados', 'Tasa de Completación (%)']);
+                    foreach ($datosExport['datos']['rendimiento_mecanicos'] ?? [] as $item) {
+                        fputcsv($output, [
+                            $item['nombre'],
+                            $item['rol'] ?? '',
+                            $item['total_ordenes'],
+                            $item['ordenes_completadas'],
+                            $item['ordenes_pendientes'],
+                            number_format($item['ingresos_generados'], 2, ',', '.'),
+                            number_format($item['tasa_completacion'], 2, ',', '.'),
+                        ]);
                     }
                 }
 
@@ -581,10 +604,12 @@ class ReportController extends Controller
     }
 
     /**
-     * Generar HTML para PDF
+     * Generar HTML para PDF (incluye imágenes de gráficos usando QuickChart)
      */
     private function generarHTMLPDF($datosExport)
     {
+        $charts = $this->generarUrlsGraficosPDF($datosExport);
+
         $html = '<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -649,6 +674,15 @@ class ReportController extends Controller
             font-weight: bold;
             color: #1a472a;
         }
+        .chart {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .chart img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
         .footer {
             margin-top: 30px;
             text-align: center;
@@ -660,14 +694,14 @@ class ReportController extends Controller
     </style>
 </head>
 <body>';
-        
+
         $html .= '<h1>REPORTE DE ' . strtoupper($datosExport['tipoReporte']) . '</h1>';
-        
+
         $html .= '<div class="info">';
         $html .= '<p><strong>Período:</strong> ' . $datosExport['fechaInicio']->format('d/m/Y') . ' - ' . $datosExport['fechaFin']->format('d/m/Y') . '</p>';
         $html .= '<p><strong>Fecha de Generación:</strong> ' . Carbon::now()->format('d/m/Y H:i:s') . '</p>';
         $html .= '</div>';
-        
+
         $html .= '<h2>INDICADORES CLAVE DE DESEMPEÑO</h2>';
         $html .= '<table>';
         foreach ($datosExport['kpis'] as $key => $value) {
@@ -679,10 +713,19 @@ class ReportController extends Controller
             $html .= '</tr>';
         }
         $html .= '</table>';
-        
+
+        $html .= '<h2>GRÁFICOS</h2>';
+        foreach ($charts as $chart) {
+            $html .= '<div class="chart">';
+            $html .= '<h3>' . $chart['titulo'] . '</h3>';
+            $html .= '<img src="' . $chart['url'] . '" alt="' . $chart['titulo'] . '" />';
+            $html .= '</div>';
+        }
+
         $html .= '<h2>DATOS DETALLADOS</h2>';
-        
+
         if ($datosExport['tipoReporte'] === 'financiero' && isset($datosExport['datos']['ingresos_por_metodo'])) {
+            $html .= '<h3>Ingresos por Método de Pago</h3>';
             $html .= '<table>';
             $html .= '<thead><tr><th>Método de Pago</th><th>Cantidad</th><th>Total</th></tr></thead>';
             $html .= '<tbody>';
@@ -696,13 +739,175 @@ class ReportController extends Controller
             $html .= '</tbody>';
             $html .= '</table>';
         }
-        
+
+        if ($datosExport['tipoReporte'] === 'servicios' && isset($datosExport['datos']['servicios_por_servicio'])) {
+            $html .= '<h3>Servicios usados</h3>';
+            $html .= '<table>';
+            $html .= '<thead><tr><th>Servicio</th><th>Veces usadas</th><th>Ingresos</th><th>Precio promedio</th></tr></thead>';
+            $html .= '<tbody>';
+            foreach ($datosExport['datos']['servicios_por_servicio'] as $item) {
+                $html .= '<tr>';
+                $html .= '<td>' . $item['nombre'] . '</td>';
+                $html .= '<td style="text-align: center;">' . $item['cantidad'] . '</td>';
+                $html .= '<td style="text-align: right;">' . number_format($item['ingresos'], 2, ',', '.') . '</td>';
+                $html .= '<td style="text-align: right;">' . number_format($item['precio_promedio'], 2, ',', '.') . '</td>';
+                $html .= '</tr>';
+            }
+            $html .= '</tbody>';
+            $html .= '</table>';
+        }
+
+        if ($datosExport['tipoReporte'] === 'mecanicos' && isset($datosExport['datos']['rendimiento_mecanicos'])) {
+            $html .= '<h3>Rendimiento de mecánicos</h3>';
+            $html .= '<table>';
+            $html .= '<thead><tr><th>Mecánico</th><th>Rol</th><th>Órdenes</th><th>Completadas</th><th>Pendientes</th><th>Ingresos</th><th>% Completadas</th></tr></thead>';
+            $html .= '<tbody>';
+            foreach ($datosExport['datos']['rendimiento_mecanicos'] as $item) {
+                $html .= '<tr>';
+                $html .= '<td>' . $item['nombre'] . '</td>';
+                $html .= '<td>' . ($item['rol'] ?? '') . '</td>';
+                $html .= '<td style="text-align: center;">' . $item['total_ordenes'] . '</td>';
+                $html .= '<td style="text-align: center;">' . $item['ordenes_completadas'] . '</td>';
+                $html .= '<td style="text-align: center;">' . $item['ordenes_pendientes'] . '</td>';
+                $html .= '<td style="text-align: right;">' . number_format($item['ingresos_generados'], 2, ',', '.') . '</td>';
+                $html .= '<td style="text-align: right;">' . number_format($item['tasa_completacion'], 2, ',', '.') . '%</td>';
+                $html .= '</tr>';
+            }
+            $html .= '</tbody>';
+            $html .= '</table>';
+        }
+
         $html .= '<div class="footer">';
         $html .= '<p>Reporte generado automáticamente por el Sistema de Gestión - Taller Mecánico</p>';
         $html .= '</div>';
-        
+
         $html .= '</body></html>';
-        
+
         return $html;
     }
+
+    /**
+     * Generar URLs para gráficos usando QuickChart
+     */
+    private function generarUrlsGraficosPDF($datosExport)
+    {
+        $charts = [];
+        $base = 'https://quickchart.io/chart?c=';
+
+        if ($datosExport['tipoReporte'] === 'financiero') {
+            $labels = array_keys($datosExport['datos']['ingresos_periodo'] ?? []);
+            $data = array_values($datosExport['datos']['ingresos_periodo'] ?? []);
+
+            $config = [
+                'type' => 'line',
+                'data' => [
+                    'labels' => $labels,
+                    'datasets' => [[
+                        'label' => 'Ingresos',
+                        'data' => $data,
+                        'borderColor' => '#3e95cd',
+                        'fill' => false,
+                    ]],
+                ],
+                'options' => [
+                    'plugins' => ['legend' => ['display' => true]],
+                    'scales' => ['y' => ['beginAtZero' => true]],
+                ],
+            ];
+
+            $charts[] = ['titulo' => 'Ingresos por Período', 'url' => $base . urlencode(json_encode($config))];
+
+            $metodos = $datosExport['datos']['ingresos_por_metodo'] ?? [];
+            if ($metodos instanceof \Illuminate\Support\Collection) {
+                $metodos = $metodos->toArray();
+            }
+
+            $labels = array_map(fn($m) => $m['name'], $metodos);
+            $values = array_map(fn($m) => $m['total'], $metodos);
+            $config = [
+                'type' => 'bar',
+                'data' => [
+                    'labels' => $labels,
+                    'datasets' => [[
+                        'label' => 'Ingresos',
+                        'data' => $values,
+                        'backgroundColor' => array_fill(0, count($values), '#3e95cd'),
+                    ]],
+                ],
+                'options' => ['plugins' => ['legend' => ['display' => false]], 'scales' => ['y' => ['beginAtZero' => true]]],
+            ];
+
+            $charts[] = ['titulo' => 'Ingresos por Método de Pago', 'url' => $base . urlencode(json_encode($config))];
+        }
+
+        if ($datosExport['tipoReporte'] === 'servicios') {
+            $servicios = $datosExport['datos']['servicios_por_servicio'] ?? [];
+            if ($servicios instanceof \Illuminate\Support\Collection) {
+                $servicios = $servicios->toArray();
+            }
+
+            $labels = array_map(fn($s) => $s['nombre'], $servicios);
+            $values = array_map(fn($s) => $s['cantidad'], $servicios);
+
+            $config = [
+                'type' => 'bar',
+                'data' => [
+                    'labels' => $labels,
+                    'datasets' => [[
+                        'label' => 'Veces Usadas',
+                        'data' => $values,
+                        'backgroundColor' => array_fill(0, count($values), '#3e95cd'),
+                    ]],
+                ],
+                'options' => ['plugins' => ['legend' => ['display' => false]], 'scales' => ['y' => ['beginAtZero' => true]]],
+            ];
+
+            $charts[] = ['titulo' => 'Servicios Realizados (veces usadas)', 'url' => $base . urlencode(json_encode($config))];
+
+            $labels = array_map(fn($s) => $s['nombre'], $servicios);
+            $values = array_map(fn($s) => $s['ingresos'], $servicios);
+
+            $config = [
+                'type' => 'pie',
+                'data' => [
+                    'labels' => $labels,
+                    'datasets' => [[
+                        'label' => 'Ingresos',
+                        'data' => $values,
+                        'backgroundColor' => ['#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850'],
+                    ]],
+                ],
+            ];
+
+            $charts[] = ['titulo' => 'Ingresos por Servicio', 'url' => $base . urlencode(json_encode($config))];
+        }
+
+        if ($datosExport['tipoReporte'] === 'mecanicos') {
+            $mecanicos = $datosExport['datos']['rendimiento_mecanicos'] ?? [];
+            if ($mecanicos instanceof \Illuminate\Support\Collection) {
+                $mecanicos = $mecanicos->toArray();
+            }
+
+            $labels = array_map(fn($m) => $m['nombre'], $mecanicos);
+            $values = array_map(fn($m) => $m['ingresos_generados'], $mecanicos);
+
+            $config = [
+                'type' => 'bar',
+                'data' => [
+                    'labels' => $labels,
+                    'datasets' => [[
+                        'label' => 'Ingresos Generados',
+                        'data' => $values,
+                        'backgroundColor' => array_fill(0, count($values), '#3e95cd'),
+                    ]],
+                ],
+                'options' => ['plugins' => ['legend' => ['display' => false]], 'scales' => ['y' => ['beginAtZero' => true]]],
+            ];
+
+            $charts[] = ['titulo' => 'Ingresos Generados por Mecánico', 'url' => $base . urlencode(json_encode($config))];
+        }
+
+        return $charts;
+    }
 }
+

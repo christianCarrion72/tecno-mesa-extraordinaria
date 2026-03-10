@@ -50,10 +50,10 @@ const selectItem = (id: number | string) => {
         <!-- LISTA -->
         <div
             v-if="open"
-            class="absolute mt-1 w-full rounded-md border border-input bg-background text-foreground shadow-md z-50 max-h-48 overflow-auto"
+            class="absolute mt-1 w-full rounded-md border border-input bg-white text-foreground shadow-md z-50 max-h-48 overflow-auto dark:bg-slate-900 dark:text-slate-100"
         >
             <!-- BUSCADOR -->
-            <div class="flex items-center gap-2 p-2 border-b border-input bg-muted">
+            <div class="flex items-center gap-2 p-2 border-b border-input bg-white dark:bg-slate-900">
                 <MagnifyingGlassIcon class="h-4 w-4 opacity-60" />
                 <input
                     type="text"

@@ -20,6 +20,10 @@ class OrdenTrabajo extends Model
         'cliente_id',
         'usuario_id',
         'motor_id',
+        'costo_mano_obra',
+        'costo_repuestos',
+        // Fechas manuales (si existen) para permitir actualizarlas desde el formulario
+        'created_at',
     ];
 
     // Casts

@@ -100,40 +100,32 @@ class ReporteController extends Controller
 
     private function getReporteServicios($filtros)
     {
-        $serviciosMasSolicitados = DB::table('orden_servicios as os')
-            ->join('servicios as s', 'os.servicio_id', '=', 's.id')
-            ->join('ordenes_trabajo as ot', 'os.orden_trabajo_id', '=', 'ot.id')
+        // Obtener servicios usados en el rango de fechas y su ingreso acumulado
+        $serviciosPorServicio = DB::table('orden_trabajo_servicios as ots')
+            ->join('servicios as s', 'ots.servicio_id', '=', 's.id')
+            ->join('ordenes_trabajo as ot', 'ots.orden_trabajo_id', '=', 'ot.id')
             ->whereBetween('ot.fecha_creacion', [$filtros['fecha_inicio'], $filtros['fecha_fin']])
             ->select(
+                's.id',
                 's.nombre',
-                's.tipo',
-                DB::raw('COUNT(*) as cantidad'),
-                DB::raw('SUM(os.subtotal) as ingresos'),
-                DB::raw('AVG(os.precio_unitario) as precio_promedio')
+                DB::raw('SUM(ots.cantidad) as cantidad'),
+                DB::raw('SUM(ots.subtotal) as ingresos'),
+                DB::raw('AVG(ots.precio) as precio_promedio')
             )
-            ->groupBy('s.id', 's.nombre', 's.tipo')
+            ->groupBy('s.id', 's.nombre')
             ->orderByDesc('cantidad')
             ->get();
 
-        $ingresosPorTipoServicio = DB::table('orden_servicios as os')
-            ->join('servicios as s', 'os.servicio_id', '=', 's.id')
-            ->join('ordenes_trabajo as ot', 'os.orden_trabajo_id', '=', 'ot.id')
-            ->whereBetween('ot.fecha_creacion', [$filtros['fecha_inicio'], $filtros['fecha_fin']])
-            ->select(
-                's.tipo',
-                DB::raw('SUM(os.subtotal) as ingresos'),
-                DB::raw('COUNT(*) as cantidad')
-            )
-            ->groupBy('s.tipo')
-            ->get();
+        // Para la gráfica: servicio => cantidad usada
+        $serviciosPeriodo = $serviciosPorServicio->pluck('cantidad', 'nombre')->toArray();
 
         return [
-            'servicios_mas_solicitados' => $serviciosMasSolicitados,
-            'ingresos_por_tipo' => $ingresosPorTipoServicio,
+            'servicios_por_servicio' => $serviciosPorServicio,
+            'servicios_periodo' => $serviciosPeriodo,
             'resumen' => [
-                'total_servicios' => $serviciosMasSolicitados->sum('cantidad'),
-                'ingresos_totales' => $serviciosMasSolicitados->sum('ingresos'),
-                'servicio_mas_popular' => $serviciosMasSolicitados->first()
+                'total_servicios' => $serviciosPorServicio->sum('cantidad'),
+                'ingresos_totales' => $serviciosPorServicio->sum('ingresos'),
+                'servicio_mas_popular' => $serviciosPorServicio->first()
             ]
         ];
     }
