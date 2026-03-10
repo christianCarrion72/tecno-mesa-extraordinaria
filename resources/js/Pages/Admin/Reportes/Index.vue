@@ -58,7 +58,6 @@ const form = useForm({
 const tiposReporte = [
     { id: 'financiero', nombre: 'Financiero', icono: CurrencyDollarIcon, color: 'green' },
     { id: 'servicios', nombre: 'Servicios', icono: WrenchScrewdriverIcon, color: 'blue' },
-    { id: 'citas', nombre: 'Citas', icono: CalendarDaysIcon, color: 'purple' },
     { id: 'mecanicos', nombre: 'Mecánicos', icono: UserGroupIcon, color: 'orange' },
 ]
 

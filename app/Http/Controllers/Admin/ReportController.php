@@ -163,10 +163,10 @@ class ReportController extends Controller
     {
         // Servicios más solicitados
         $serviciosMasUsados = Servicio::query()
-            ->join('orden_servicios', 'servicios.id', '=', 'orden_servicios.servicio_id')
-            ->join('ordenes_trabajo', 'orden_servicios.orden_trabajo_id', '=', 'ordenes_trabajo.id')
+            ->join('orden_trabajo_servicios', 'servicios.id', '=', 'orden_trabajo_servicios.servicio_id')
+            ->join('ordenes_trabajo', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'ordenes_trabajo.id')
             ->whereBetween('ordenes_trabajo.created_at', [$fechaInicio, $fechaFin])
-            ->selectRaw('servicios.nombre, servicios.tipo, COUNT(*) as cantidad, SUM(orden_servicios.precio_unitario * orden_servicios.cantidad) as ingresos')
+            ->selectRaw('servicios.nombre, servicios.tipo, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
             ->groupBy('servicios.id', 'servicios.nombre', 'servicios.tipo')
             ->orderByDesc('cantidad')
             ->limit(10)
@@ -181,10 +181,10 @@ class ReportController extends Controller
 
         // Servicios por tipo
         $serviciosPorTipo = Servicio::query()
-            ->join('orden_servicios', 'servicios.id', '=', 'orden_servicios.servicio_id')
-            ->join('ordenes_trabajo', 'orden_servicios.orden_trabajo_id', '=', 'ordenes_trabajo.id')
+            ->join('orden_trabajo_servicios', 'servicios.id', '=', 'orden_trabajo_servicios.servicio_id')
+            ->join('ordenes_trabajo', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'ordenes_trabajo.id')
             ->whereBetween('ordenes_trabajo.created_at', [$fechaInicio, $fechaFin])
-            ->selectRaw('servicios.tipo, COUNT(*) as cantidad, SUM(orden_servicios.precio_unitario * orden_servicios.cantidad) as ingresos')
+            ->selectRaw('servicios.tipo, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
             ->groupBy('servicios.tipo')
             ->get()
             ->map(fn($item) => [
