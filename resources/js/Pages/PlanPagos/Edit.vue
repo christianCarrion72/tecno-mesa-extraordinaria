@@ -89,7 +89,12 @@ const montoTotalOrden = props.plan?.orden_trabajo?.total ?? props.plan.montotota
                         </div>
 
                         <div class="md:col-span-2 flex gap-4">
-                            <Button :disabled="form.processing">Guardar Cambios</Button>
+                            <Button
+                                :disabled="form.processing"
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
+                            >
+                                Guardar Cambios
+                            </Button>
                             <Button
                                 type="button"
                                 variant="outline"

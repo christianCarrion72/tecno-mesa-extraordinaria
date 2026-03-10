@@ -45,8 +45,11 @@ const mostrarInventario = computed(() =>
                 </div>
             </div>
 
-            <!-- Órdenes en Proceso -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <!-- Órdenes en Proceso (oculto) -->
+            <div
+                v-if="false"
+                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+            >
                 <div class="flex items-center">
                     <div class="p-3 bg-yellow-100 rounded-lg">
                         <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,12 +179,20 @@ const mostrarInventario = computed(() =>
                     <div v-for="orden in stats.ordenes_recientes" :key="orden.id"
                          class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div>
-                            <p class="font-medium text-gray-900">{{ orden.identificador }} — {{ orden.cliente }}</p>
-                            <p class="text-sm text-gray-600">{{ orden.descripcion }}</p>
-                            <p class="text-sm text-gray-600">Mecánico: {{ orden.mecanico }}</p>
+                            <p class="font-medium text-gray-900 dark:text-gray-100">
+                                {{ orden.identificador }} — {{ orden.cliente }}
+                            </p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">
+                                {{ orden.descripcion }}
+                            </p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">
+                                Mecánico: {{ orden.mecanico }}
+                            </p>
                         </div>
                         <div class="text-right">
-                            <p class="text-sm font-medium text-gray-900">${{ orden.subtotal?.toLocaleString() }}</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                {{ orden.subtotal?.toLocaleString() }}
+                            </p>
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
                                 :class="{
                                     'bg-blue-100 text-blue-800': orden.estado === 'presupuestada',

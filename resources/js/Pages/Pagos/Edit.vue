@@ -75,7 +75,13 @@ const submit = () => {
                         </div>
 
                         <div class="md:col-span-2 flex gap-4">
-                            <Button :disabled="form.processing" type="submit">Guardar Cambios</Button>
+                            <Button
+                                :disabled="form.processing"
+                                type="submit"
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
+                            >
+                                Guardar Cambios
+                            </Button>
                             <Button
                                 type="button"
                                 variant="outline"

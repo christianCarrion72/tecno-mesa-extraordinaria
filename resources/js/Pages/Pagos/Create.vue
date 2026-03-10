@@ -11,12 +11,20 @@ import InputError from '@/Components/InputError.vue';
 import Combobox from '@/Components/ui/Combobox.vue';
 
 const props = defineProps<{ plan: any; siguienteCuota: number; metodos: string[] }>();
-const metodosItems = computed(() => props.metodos.map(m => ({ id: m, label: m })));
+
+const metodosFiltrados = computed(() =>
+    props.metodos.filter(m => {
+        const val = String(m).toLowerCase().trim();
+        return val !== 'pago facil' && val !== 'pago fácil';
+    }),
+);
+
+const metodosItems = computed(() => metodosFiltrados.value.map(m => ({ id: m, label: m })));
 
 const form = useForm({
     estado: 'pendiente',
     fechapago: '',
-    metodopago: props.metodos[0] ?? 'efectivo',
+    metodopago: metodosFiltrados.value[0] ?? 'efectivo',
     monto: props.plan.montoporcuota != null ? String(props.plan.montoporcuota) : '0',
     numerocuota: props.siguienteCuota != null ? String(props.siguienteCuota) : '1',
     referencia: '',
@@ -233,8 +241,10 @@ const generarQrStripe = async () => {
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken,
+                ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}),
+                ...(xsrfToken ? { 'X-XSRF-TOKEN': xsrfToken } : {}),
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 amount: Number(form.monto),
                 numerocuota: Number(form.numerocuota),
@@ -393,6 +403,7 @@ const generarQrStripe = async () => {
                                 <Button
                                     type="button"
                                     variant="default"
+                                    :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
                                     :disabled="form.processing"
                                     @click="generarQrStripe"
                                 >
@@ -433,7 +444,13 @@ const generarQrStripe = async () => {
                         </div>
 
                         <div class="md:col-span-2 flex gap-3 flex-wrap">
-                            <Button :disabled="form.processing" type="submit">Guardar Pago</Button>
+                            <Button
+                                :disabled="form.processing"
+                                type="submit"
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
+                            >
+                                Guardar Pago
+                            </Button>
                             <Button
                                 type="button"
                                 variant="outline"

@@ -113,7 +113,13 @@ const submit = () => {
                         </div>
 
                         <div class="md:col-span-2 flex gap-4">
-                            <Button variant="outline" :disabled="form.processing" type="submit">Crear Plan</Button>
+                            <Button
+                                :disabled="form.processing"
+                                type="submit"
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
+                            >
+                                Crear Plan
+                            </Button>
                             <Button
                                 type="button"
                                 variant="outline"
