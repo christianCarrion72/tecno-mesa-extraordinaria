@@ -164,8 +164,8 @@ class ReportController extends Controller
         // Servicios más solicitados
         $serviciosMasUsados = Servicio::query()
             ->join('orden_trabajo_servicios', 'servicios.id', '=', 'orden_trabajo_servicios.servicio_id')
-            ->join('ordenes_trabajo', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'ordenes_trabajo.id')
-            ->whereBetween('ordenes_trabajo.created_at', [$fechaInicio, $fechaFin])
+            ->join('orden_trabajos', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'orden_trabajos.id')
+            ->whereBetween('orden_trabajos.created_at', [$fechaInicio, $fechaFin])
             ->selectRaw('servicios.nombre, servicios.tipo, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
             ->groupBy('servicios.id', 'servicios.nombre', 'servicios.tipo')
             ->orderByDesc('cantidad')
@@ -182,8 +182,8 @@ class ReportController extends Controller
         // Servicios por tipo
         $serviciosPorTipo = Servicio::query()
             ->join('orden_trabajo_servicios', 'servicios.id', '=', 'orden_trabajo_servicios.servicio_id')
-            ->join('ordenes_trabajo', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'ordenes_trabajo.id')
-            ->whereBetween('ordenes_trabajo.created_at', [$fechaInicio, $fechaFin])
+            ->join('orden_trabajos', 'orden_trabajo_servicios.orden_trabajo_id', '=', 'orden_trabajos.id')
+            ->whereBetween('orden_trabajos.created_at', [$fechaInicio, $fechaFin])
             ->selectRaw('servicios.tipo, COUNT(*) as cantidad, SUM(orden_trabajo_servicios.precio_unitario * orden_trabajo_servicios.cantidad) as ingresos')
             ->groupBy('servicios.tipo')
             ->get()
@@ -335,17 +335,17 @@ class ReportController extends Controller
             };
 
             $query = \DB::table('orden_servicios')
-                ->join('ordenes_trabajo', 'orden_servicios.orden_trabajo_id', '=', 'ordenes_trabajo.id');
+                ->join('orden_trabajos', 'orden_servicios.orden_trabajo_id', '=', 'orden_trabajos.id');
 
             match ($periodo) {
-                'diario' => $query->whereDate('ordenes_trabajo.created_at', $fecha),
-                'semanal' => $query->whereBetween('ordenes_trabajo.created_at', [
+                'diario' => $query->whereDate('orden_trabajos.created_at', $fecha),
+                'semanal' => $query->whereBetween('orden_trabajos.created_at', [
                     $fecha->copy()->startOfWeek(),
                     $fecha->copy()->endOfWeek(),
                 ]),
-                'mensual' => $query->whereYear('ordenes_trabajo.created_at', $fecha->year)
-                    ->whereMonth('ordenes_trabajo.created_at', $fecha->month),
-                'anual' => $query->whereYear('ordenes_trabajo.created_at', $fecha->year),
+                'mensual' => $query->whereYear('orden_trabajos.created_at', $fecha->year)
+                    ->whereMonth('orden_trabajos.created_at', $fecha->month),
+                'anual' => $query->whereYear('orden_trabajos.created_at', $fecha->year),
             };
 
             $datos[$key] = $query->count();
