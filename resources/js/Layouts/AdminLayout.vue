@@ -4,6 +4,7 @@ import { router, Link, usePage } from '@inertiajs/vue3';
 import ThemeSwitcher from '@/Components/ThemeSwitcher.vue';
 import GlobalSearch from '@/Components/GlobalSearch.vue';
 import PageViewsCounter from '@/Components/PageViewsCounter.vue';
+import FlashMessages from '@/Components/FlashMessages.vue';
 import { useTheme } from '@/Composables/useTheme';
 
 // Inicializar el tema
@@ -378,5 +379,8 @@ const logout = () => {
 
         <!-- Page Views Counter -->
         <PageViewsCounter />
+
+        <!-- Flash Messages -->
+        <FlashMessages />
     </div>
 </template>

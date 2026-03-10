@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Marca;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Cloudinary\Cloudinary;
 use Cloudinary\Api\Upload\UploadApi;
 
@@ -123,13 +124,31 @@ class MarcaController extends Controller
 
     public function destroy(Marca $marca)
     {
-        
-        if ($marca->motores()->count() > 0) {
-            return redirect()->route('marcas.index')->with('error', 'No se puede eliminar la marca porque tiene motores asociados.');
+        try {
+            // Verificar si tiene motores activos
+            $tieneMotoresActivos = DB::table('motores')
+                ->where('marca_id', $marca->id)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if ($tieneMotoresActivos) {
+                return redirect()->route('marcas.index')->with('error', 'No se puede eliminar esta marca porque tiene motores asociados. Por favor, elimine o reasigne los motores antes de continuar.');
+            }
+
+            // Si no tiene motores activos, hacer soft delete
+            $marca->delete();
+            return redirect()->route('marcas.index')->with('success', 'Marca eliminada correctamente.');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Capturar errores de restricción de base de datos
+            if ($e->getCode() === '23503' || strpos($e->getMessage(), 'foreign key') !== false) {
+                return redirect()->route('marcas.index')->with('error', 'No se puede eliminar esta marca porque tiene registros relacionados en el sistema. Por favor, elimine primero los registros dependientes.');
+            }
+            
+            return redirect()->route('marcas.index')->with('error', 'Ocurrió un error al intentar eliminar la marca. Por favor, intente nuevamente.');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('marcas.index')->with('error', 'Error inesperado. Por favor, contacte al administrador.');
         }
-
-        $marca->delete();
-
-        return redirect()->route('marcas.index')->with('success', 'Marca eliminada correctamente.');
     }
 }

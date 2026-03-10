@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('motor_id')->constrained('motores');
             $table->text('foto')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

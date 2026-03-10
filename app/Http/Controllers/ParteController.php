@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Parte;
 use App\Models\Motor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Cloudinary\Cloudinary;
 use Cloudinary\Api\Upload\UploadApi;
 
@@ -132,8 +133,22 @@ class ParteController extends Controller
 
     public function destroy(Parte $parte)
     {
-        $parte->delete();
-
-        return redirect()->route('partes.index')->with('success', 'Parte eliminada correctamente.');
+        try {
+            // Las partes generalmente no tienen relaciones que impidan su eliminación,
+            // pero podemos verificar si existen restricciones de base de datos
+            $parte->delete();
+            return redirect()->route('partes.index')->with('success', 'Parte eliminada correctamente.');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Capturar errores de restricción de base de datos
+            if ($e->getCode() === '23503' || strpos($e->getMessage(), 'foreign key') !== false) {
+                return redirect()->route('partes.index')->with('error', 'No se puede eliminar esta parte porque tiene registros relacionados en el sistema. Por favor, elimine primero los registros dependientes.');
+            }
+            
+            return redirect()->route('partes.index')->with('error', 'Ocurrió un error al intentar eliminar la parte. Por favor, intente nuevamente.');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('partes.index')->with('error', 'Error inesperado. Por favor, contacte al administrador.');
+        }
     }
 }

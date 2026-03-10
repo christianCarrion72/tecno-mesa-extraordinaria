@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Modelo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Cloudinary\Cloudinary;
 use Cloudinary\Api\Upload\UploadApi;
 
@@ -118,8 +119,31 @@ class ModeloController extends Controller
             return redirect()->route('dashboard')->with('error', 'No tenés permiso para eliminar modelos.');
         }
 
-        $modelo->delete();
+        try {
+            // Verificar si tiene motores activos
+            $tieneMotoresActivos = DB::table('motores')
+                ->where('modelo_id', $modelo->id)
+                ->whereNull('deleted_at')
+                ->exists();
 
-        return redirect()->route('modelos.index')->with('success', 'Modelo eliminado correctamente.');
+            if ($tieneMotoresActivos) {
+                return redirect()->route('modelos.index')->with('error', 'No se puede eliminar este modelo porque tiene motores asociados. Por favor, elimine o reasigne los motores antes de continuar.');
+            }
+
+            // Si no tiene motores activos, hacer soft delete
+            $modelo->delete();
+            return redirect()->route('modelos.index')->with('success', 'Modelo eliminado correctamente.');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Capturar errores de restricción de base de datos
+            if ($e->getCode() === '23503' || strpos($e->getMessage(), 'foreign key') !== false) {
+                return redirect()->route('modelos.index')->with('error', 'No se puede eliminar este modelo porque tiene registros relacionados en el sistema. Por favor, elimine primero los registros dependientes.');
+            }
+            
+            return redirect()->route('modelos.index')->with('error', 'Ocurrió un error al intentar eliminar el modelo. Por favor, intente nuevamente.');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('modelos.index')->with('error', 'Error inesperado. Por favor, contacte al administrador.');
+        }
     }
 }

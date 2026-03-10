@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Cloudinary\Cloudinary;
 use Cloudinary\Api\Upload\UploadApi;
+
 
 class ClienteController extends Controller
 {
@@ -130,8 +132,31 @@ class ClienteController extends Controller
 
     public function destroy(Cliente $cliente)
     {
-        $cliente->delete();
+        try {
+            // Verificar órdenes de trabajo activas (no eliminadas)
+            $tieneOrdenesActivas = DB::table('orden_trabajos')
+                ->where('cliente_id', $cliente->id)
+                ->whereNull('deleted_at')
+                ->exists();
 
-        return redirect()->route('clientes.index')->with('success', 'Cliente eliminado correctamente.');
+            if ($tieneOrdenesActivas) {
+                return back()->with('error', 'No se puede eliminar este cliente porque tiene órdenes de trabajo activas. Por favor, elimine primero todas las órdenes de trabajo asociadas.');
+            }
+
+            // Solo hacer soft delete (no eliminación física) para mantener historial
+            $cliente->delete();
+            return back()->with('success', 'Cliente desactivado correctamente.');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Capturar errores de restricción de base de datos
+            if ($e->getCode() === '23503' || strpos($e->getMessage(), 'foreign key') !== false) {
+                return back()->with('error', 'No se puede eliminar este cliente porque tiene registros históricos asociados. El cliente quedará desactivado pero se mantendrá en el historial del sistema.');
+            }
+            
+            return back()->with('error', 'Ocurrió un error al intentar eliminar el cliente. Por favor, intente nuevamente.');
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error inesperado. Por favor, contacte al administrador.');
+        }
     }
 }

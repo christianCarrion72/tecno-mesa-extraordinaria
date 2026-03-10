@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('modelo_id')->constrained('modelos');
             $table->text('foto')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
