@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombre')->unique();
             $table->text('foto')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

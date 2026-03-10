@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('telefono');
             $table->text('foto')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

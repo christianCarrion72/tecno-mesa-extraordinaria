@@ -6,6 +6,7 @@ use App\Models\Motor;
 use App\Models\Marca;
 use App\Models\Modelo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Cloudinary\Cloudinary;
 use Cloudinary\Api\Upload\UploadApi;
 
@@ -145,12 +146,41 @@ class MotorController extends Controller
 
     public function destroy(Motor $motor)
     {
-        if ($motor->partes()->count() > 0) {
-            return redirect()->route('motores.index')->with('error', 'No se puede eliminar el motor porque tiene partes asociadas.');
+        try {
+            // Verificar si tiene órdenes de trabajo activas
+            $tieneOrdenesActivas = DB::table('orden_trabajos')
+                ->where('motor_id', $motor->id)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if ($tieneOrdenesActivas) {
+                return redirect()->route('motores.index')->with('error', 'No se puede eliminar este motor porque está asignado a órdenes de trabajo activas. Por favor, reasigne o finalice las órdenes de trabajo antes de continuar.');
+            }
+
+            // Verificar si tiene partes activas
+            $tienePartesActivas = DB::table('partes')
+                ->where('motor_id', $motor->id)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if ($tienePartesActivas) {
+                return redirect()->route('motores.index')->with('error', 'No se puede eliminar este motor porque tiene partes asociadas. Por favor, elimine o reasigne las partes antes de continuar.');
+            }
+
+            // Si no tiene restricciones, hacer soft delete
+            $motor->delete();
+            return redirect()->route('motores.index')->with('success', 'Motor eliminado correctamente.');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Capturar errores de restricción de base de datos
+            if ($e->getCode() === '23503' || strpos($e->getMessage(), 'foreign key') !== false) {
+                return redirect()->route('motores.index')->with('error', 'No se puede eliminar este motor porque tiene registros relacionados en el sistema. Por favor, elimine primero los registros dependientes.');
+            }
+            
+            return redirect()->route('motores.index')->with('error', 'Ocurrió un error al intentar eliminar el motor. Por favor, intente nuevamente.');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('motores.index')->with('error', 'Error inesperado. Por favor, contacte al administrador.');
         }
-
-        $motor->delete();
-
-        return redirect()->route('motores.index')->with('success', 'Motor eliminado correctamente.');
     }
 }

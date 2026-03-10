@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Rol;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -116,8 +118,36 @@ class UsuarioController extends Controller
 
     public function destroy(User $usuario)
     {
-        $usuario->delete();
+        try {
+            // Verificar si el usuario es el que está logueado
+            if (Auth::id() === $usuario->id) {
+                return back()->with('error', 'No puede eliminar su propio usuario mientras está activo en el sistema.');
+            }
 
-        return redirect()->route('admin.usuarios.index');
+            // Verificar órdenes de trabajo activas asignadas al usuario
+            $tieneOrdenesActivas = DB::table('orden_trabajos')
+                ->where('usuario_id', $usuario->id)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if ($tieneOrdenesActivas) {
+                return back()->with('error', 'No se puede eliminar este usuario porque tiene órdenes de trabajo asignadas. Por favor, reasigne las órdenes de trabajo a otro usuario antes de eliminar.');
+            }
+
+            // Si tiene órdenes en historial, solo hacer soft delete
+            $usuario->delete();
+            return back()->with('success', 'Usuario desactivado correctamente. El historial se mantiene disponible.');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Capturar errores de restricción de base de datos
+            if ($e->getCode() === '23503' || strpos($e->getMessage(), 'foreign key') !== false) {
+                return back()->with('error', 'No se puede eliminar este usuario porque tiene registros históricos asociados. El usuario quedará desactivado pero se mantendrá en el historial del sistema.');
+            }
+            
+            return back()->with('error', 'Ocurrió un error al intentar eliminar el usuario. Por favor, intente nuevamente.');
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error inesperado. Por favor, contacte al administrador.');
+        }
     }
 }
