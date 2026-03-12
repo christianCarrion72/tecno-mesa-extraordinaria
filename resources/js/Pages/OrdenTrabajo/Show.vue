@@ -9,15 +9,15 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 function formatDate(value: string | Date | null) {
     if (!value) return '';
 
-    // Ensure date strings like "YYYY-MM-DD" are treated as local dates.
     const iso = typeof value === 'string'
         ? value.slice(0, 10)
         : value.toISOString().slice(0, 10);
 
-    const [year, month, day] = iso.split('-').map(Number);
+    const [year, month, day] = iso.split('-');
     if (!year || !month || !day) return '';
 
-    return new Date(year, month - 1, day).toLocaleDateString();
+    // Return in dd/mm/yyyy format without relying on Date parsing (avoids timezone shifts).
+    return `${day}/${month}/${year}`;
 }
 
 import { Button } from '@/Components/ui/button';

@@ -95,7 +95,13 @@ const cancelarOrden = () => {
 }
 
 // Utilidades
-const formatDate = (date) => new Date(date).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+const formatDate = (date) => {
+  if (!date) return ''
+  const iso = typeof date === 'string' ? date.slice(0, 10) : date.toISOString().slice(0, 10)
+  const [year, month, day] = iso.split('-')
+  if (!year || !month || !day) return ''
+  return `${day}/${month}/${year}`
+}
 const formatMoney = (amount) => new Intl.NumberFormat('es-BO', { style: 'currency', currency: 'BOB' }).format(amount)
 
 const pasos = ['presupuestada', 'aprobada', 'en_proceso', 'completada', 'entregada']
@@ -149,7 +155,7 @@ const getEstadoBadgeClass = (estado) => {
                 </span>
                 <span class="flex items-center" :style="{ color: 'var(--color-text-light)' }">
                     <CalendarDaysIcon class="mr-1.5 h-4 w-4" :style="{ color: 'var(--color-text-light)' }" />
-                    {{ formatDate(orden.created_at) }}
+                    {{ formatDate(orden.fechainicio) }}
                 </span>
                 <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
                       :style="{

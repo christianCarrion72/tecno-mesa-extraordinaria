@@ -14,10 +14,12 @@ const props = defineProps<{ orden: any }>();
 
 const estados = ['pendiente', 'en proceso', 'terminado'];
 
+const today = new Date().toISOString().slice(0, 10);
+
 const form = useForm({
     estado: 'pendiente',
-    fechainicio: '',
-    fechafin: '',
+    fechainicio: today,
+    fechafin: today,
     montoporcuota: '',
     numerocuotas: '1',
     observacion: '',
@@ -58,19 +60,19 @@ const submit = () => {
 
                 <CardContent>
                     <form @submit.prevent="submit" class="grid gap-4 md:grid-cols-2">
-                        <div>
+                        <div class="space-y-2">
                             <Label>Estado</Label>
                             <Combobox v-model="form.estado" :items="estados.map(e => ({ id: e, label: e }))" />
                             <InputError :message="form.errors.estado" />
                         </div>
 
-                        <div>
+                        <div class="space-y-2">
                             <Label>Fecha Inicio</Label>
                             <TextInput type="date" v-model="form.fechainicio" />
                             <InputError :message="form.errors.fechainicio" />
                         </div>
 
-                        <div>
+                        <div class="space-y-2">
                             <Label>Fecha Fin</Label>
                             <TextInput type="date" v-model="form.fechafin" />
                             <InputError :message="form.errors.fechafin" />

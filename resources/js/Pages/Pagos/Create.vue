@@ -13,9 +13,11 @@ import Combobox from '@/Components/ui/Combobox.vue';
 const props = defineProps<{ plan: any; siguienteCuota: number; metodos: string[] }>();
 const metodosItems = computed(() => props.metodos.map(m => ({ id: m, label: m })));
 
+const today = new Date().toISOString().slice(0, 10);
+
 const form = useForm({
     estado: 'pendiente',
-    fechapago: '',
+    fechapago: today,
     metodopago: props.metodos[0] ?? 'efectivo',
     monto: props.plan.montoporcuota != null ? String(props.plan.montoporcuota) : '0',
     numerocuota: props.siguienteCuota != null ? String(props.siguienteCuota) : '1',
@@ -267,19 +269,19 @@ const generarQrStripe = async () => {
 
                 <CardContent>
                     <form @submit.prevent="submit" class="grid gap-4 md:grid-cols-2">
-                        <div>
+                        <div class="space-y-2">
                             <Label>Estado</Label>
                             <Combobox v-model="form.estado" :items="['pendiente','en proceso','terminado'].map(e => ({ id: e, label: e }))" />
                             <InputError :message="form.errors.estado" />
                         </div>
 
-                        <div>
+                        <div class="space-y-2">
                             <Label>Fecha de Pago</Label>
                             <TextInput type="date" v-model="form.fechapago" />
                             <InputError :message="form.errors.fechapago" />
                         </div>
 
-                        <div>
+                        <div class="space-y-2">
                             <Label>Método de Pago</Label>
                             <Combobox v-model="form.metodopago" :items="metodosItems" />
                             <InputError :message="form.errors.metodopago" />
@@ -305,39 +307,39 @@ const generarQrStripe = async () => {
                             </div>
 
                             <div class="grid md:grid-cols-2 gap-3">
-                                <div>
+                                <div class="space-y-2">
                                 <Label>Nombre del Cliente</Label>
                                 <TextInput type="text" v-model="pfClientName" placeholder="Nombre completo" />
                                 </div>
-                                <div>
+                                <div class="space-y-2">
                                     <Label>Tipo Documento</Label>
                                     <TextInput type="number" v-model="pfDocumentType" placeholder="1 = CI" />
                                 </div>
-                                <div>
+                                <div class="space-y-2">
                                     <Label>Nro Documento (CI/NIT)</Label>
                                     <TextInput type="text" v-model="pfDocumentId" placeholder="Ej: 1234567" />
                                 </div>
-                                <div>
+                                <div class="space-y-2">
                                     <Label>Teléfono</Label>
                                     <TextInput type="text" v-model="pfPhoneNumber" placeholder="70000000" />
                                 </div>
-                                <div>
+                                <div class="space-y-2">
                                     <Label>Email</Label>
                                     <TextInput type="email" v-model="pfEmail" placeholder="correo@ejemplo.com" />
                                 </div>
-                                <div>
+                                <div class="space-y-2">
                                     <Label>ID Transacción Empresa</Label>
                                     <TextInput type="text" v-model="pfPaymentNumber" :placeholder="`plan-${plan.id}-cuota-${form.numerocuota}`" />
                                 </div>
-                                <div>
+                                <div class="space-y-2">
                                     <Label>Monto</Label>
                                     <TextInput type="number" step="0.01" v-model="pfAmount" />
                                 </div>
-                                <div>
+                                <div class="space-y-2">
                                     <Label>Currency (2 = BOB)</Label>
                                     <TextInput type="number" v-model="pfCurrency" placeholder="2" />
                                 </div>
-                                <div>
+                                <div class="space-y-2">
                                     <Label>ID Cliente Empresa</Label>
                                     <TextInput type="text" v-model="pfClientCode" placeholder="Opcional" />
                                 </div>
@@ -347,27 +349,27 @@ const generarQrStripe = async () => {
                             <div class="border-t border-input pt-3">
                                 <h4 class="font-medium text-sm text-muted-foreground mb-2">Detalle de Orden</h4>
                                 <div class="grid md:grid-cols-3 gap-3">
-                                    <div>
+                                    <div class="space-y-2">
                                         <Label>Serial</Label>
                                         <TextInput type="number" v-model="pfOrderSerial" />
                                     </div>
-                                    <div class="md:col-span-2">
+                                    <div class="md:col-span-2 space-y-2">
                                         <Label>Producto</Label>
                                         <TextInput type="text" v-model="pfOrderProduct" :placeholder="`Pago Plan #${plan.id}`" />
                                     </div>
-                                    <div>
+                                    <div class="space-y-2">
                                         <Label>Cantidad</Label>
                                         <TextInput type="number" v-model="pfOrderQuantity" />
                                     </div>
-                                    <div>
+                                    <div class="space-y-2">
                                         <Label>Precio</Label>
                                         <TextInput type="number" step="0.01" v-model="pfOrderPrice" />
                                     </div>
-                                    <div>
+                                    <div class="space-y-2">
                                         <Label>Descuento</Label>
                                         <TextInput type="number" step="0.01" v-model="pfOrderDiscount" />
                                     </div>
-                                    <div>
+                                    <div class="space-y-2">
                                         <Label>Total</Label>
                                         <TextInput type="number" step="0.01" v-model="pfOrderTotal" />
                                     </div>
@@ -414,26 +416,26 @@ const generarQrStripe = async () => {
                             </div>
                         </div>
 
-                        <div>
+                        <div class="space-y-2">
                             <Label>Monto</Label>
                             <TextInput type="number" step="0.01" v-model="form.monto" />
                             <InputError :message="form.errors.monto" />
                         </div>
 
-                        <div>
+                        <div class="space-y-2">
                             <Label>Número de Cuota</Label>
                             <TextInput type="number" min="1" v-model="form.numerocuota" />
                             <InputError :message="form.errors.numerocuota" />
                         </div>
 
-                        <div class="md:col-span-2">
+                        <div class="md:col-span-2 space-y-2">
                             <Label>Referencia</Label>
                             <TextInput type="text" v-model="form.referencia" />
                             <InputError :message="form.errors.referencia" />
                         </div>
 
                         <div class="md:col-span-2 flex gap-3 flex-wrap">
-                            <Button :disabled="form.processing" type="submit">Guardar Pago</Button>
+                            <Button variant="outline" :disabled="form.processing" type="submit">Guardar Pago</Button>
                             <Button
                                 type="button"
                                 variant="outline"

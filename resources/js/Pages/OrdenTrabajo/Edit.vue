@@ -43,8 +43,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 // 🟩 Formulario
 const form = useForm({
-    fechainicio: props.orden.fechainicio ?? "",
-    fechafin: props.orden.fechafin ?? "",
+    fechainicio: props.orden.fechainicio ? String(props.orden.fechainicio).slice(0, 10) : "",
+    fechafin: props.orden.fechafin ? String(props.orden.fechafin).slice(0, 10) : "",
     descripcion: props.orden.descripcion ?? "",
     estado: props.orden.estado ?? "pendiente",
     cliente_id: props.orden.cliente_id ?? "",
@@ -112,22 +112,22 @@ const submit = () => form.put(route('orden-trabajos.update', props.orden.id));
                                 <InputError :message="form.errors.fechainicio" />
                             </div>
 
-                            <!-- Fecha fin -->
-                            <div class="grid gap-2">
-                                <Label for="fechafin" class="text-sm font-semibold">Fecha de Finalización</Label>
-                                <div class="relative">
-                                    <input
-                                        id="fechafin"
-                                        v-model="form.fechafin"
-                                        type="date"
-                                        class="w-full px-4 py-2 pl-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                                    />
-                                    <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                                <InputError :message="form.errors.fechafin" />
+                            <!-- Fecha fin (oculto) -->
+                        <div class="grid gap-2" style="display:none;">
+                            <Label for="fechafin" class="text-sm font-semibold">Fecha de Finalización</Label>
+                            <div class="relative">
+                                <input
+                                    id="fechafin"
+                                    v-model="form.fechafin"
+                                    type="date"
+                                    class="w-full px-4 py-2 pl-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                />
+                                <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
                             </div>
+                            <InputError :message="form.errors.fechafin" />
+                        </div>
                         </div>
 
                         <!-- Descripción -->
