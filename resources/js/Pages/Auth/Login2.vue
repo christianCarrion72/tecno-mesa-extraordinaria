@@ -131,15 +131,7 @@ const submit = () => {
                 </PrimaryButton>
             </div>
 
-            <div
-                class="text-center text-sm text-muted-foreground"
-                v-if="canRegister"
-            >
-                Don't have an account?
-                <TextLink :href="route('register')" :tabindex="5">
-                    Sign up
-                </TextLink>
-            </div>
+            
         </form>
     </GuestLayout>
 </template>

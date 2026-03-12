@@ -60,23 +60,39 @@ defineProps<{ factura: any }>();
                         <div class="space-y-2">
                             <div v-for="servicio in factura.pago?.plan_pago?.orden_trabajo?.servicios"
                                  :key="servicio.id"
-                                 class="border rounded-lg p-3 bg-gray-50 dark:bg-gray-700">
+                                 class="border rounded-lg p-3"
+                                 :style="{ 
+                                     backgroundColor: 'var(--color-base)',
+                                     borderColor: 'var(--color-border)',
+                                     color: 'var(--color-text)'
+                                 }"
+                            >
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <p class="font-medium">{{ servicio.nombre }}</p>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">{{ servicio.descripcion }}</p>
+                                        <p class="text-sm" :style="{ color: 'var(--color-text-light)' }">
+                                            {{ servicio.descripcion }}
+                                        </p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm">Cant: {{ servicio.pivot.cantidad }}</p>
-                                        <p class="text-sm">Precio: ${{ servicio.pivot.precio }}</p>
-                                        <p class="font-semibold">Subtotal: ${{ servicio.pivot.subtotal }}</p>
+                                        <p class="text-sm" :style="{ color: 'var(--color-text)' }">
+                                            Cant: {{ servicio.pivot.cantidad }}
+                                        </p>
+                                        <p class="text-sm" :style="{ color: 'var(--color-text)' }">
+                                            Precio: {{ servicio.pivot.precio }}
+                                        </p>
+                                        <p class="font-semibold" :style="{ color: 'var(--color-text)' }">
+                                            Subtotal: {{ servicio.pivot.subtotal }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div v-else>
-                        <p class="text-gray-500">No hay servicios registrados para esta orden de trabajo.</p>
+                        <p class="text-gray-500 dark:text-gray-300">
+                            No hay servicios registrados para esta orden de trabajo.
+                        </p>
                     </div>
                 </CardContent>
             </Card>

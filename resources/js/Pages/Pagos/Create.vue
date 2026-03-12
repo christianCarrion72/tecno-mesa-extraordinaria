@@ -235,8 +235,10 @@ const generarQrStripe = async () => {
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken,
+                ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}),
+                ...(xsrfToken ? { 'X-XSRF-TOKEN': xsrfToken } : {}),
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 amount: Number(form.monto),
                 numerocuota: Number(form.numerocuota),
@@ -395,6 +397,7 @@ const generarQrStripe = async () => {
                                 <Button
                                     type="button"
                                     variant="default"
+                                    :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
                                     :disabled="form.processing"
                                     @click="generarQrStripe"
                                 >
@@ -436,6 +439,13 @@ const generarQrStripe = async () => {
 
                         <div class="md:col-span-2 flex gap-3 flex-wrap">
                             <Button variant="outline" :disabled="form.processing" type="submit">Guardar Pago</Button>
+                            <Button
+                                :disabled="form.processing"
+                                type="submit"
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
+                            >
+                                Guardar Pago
+                            </Button>
                             <Button
                                 type="button"
                                 variant="outline"

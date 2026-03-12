@@ -41,10 +41,6 @@ const showingNavigationDropdown = ref(false);
                             class="text-gray-300 hover:text-white transition duration-150">
                         Iniciar Sesión
                         </Link>
-                        <Link v-if="!$page.props.auth.user" :href="route('register')"
-                            class="bg-taller-blue-dark hover:bg-taller-blue-light text-white px-4 py-2 rounded-lg transition duration-300">
-                        Registrarse
-                        </Link>
                     </div>
                 </div>
             </div>

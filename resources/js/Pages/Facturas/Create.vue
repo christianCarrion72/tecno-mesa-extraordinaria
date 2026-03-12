@@ -57,7 +57,12 @@ const submit = () => {
 
                         <div>
                             <Label>Monto Total</Label>
-                            <TextInput type="number" step="0.01" v-model="form.montototal" readonly />
+                            <TextInput
+                                type="number"
+                                step="0.01"
+                                v-model="form.montototal"
+                                readonly
+                            />
                             <InputError :message="form.errors.montototal" />
                         </div>
 
@@ -74,7 +79,13 @@ const submit = () => {
                         </div>
 
                         <div class="md:col-span-2 flex gap-4">
-                            <Button :disabled="form.processing" type="submit">Emitir</Button>
+                            <Button
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
+                                :disabled="form.processing"
+                                type="submit"
+                            >
+                                Emitir
+                            </Button>
                             <Button
                                 type="button"
                                 variant="outline"
