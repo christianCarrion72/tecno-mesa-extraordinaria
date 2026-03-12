@@ -76,9 +76,15 @@ class ReportController extends Controller
             ->where('estado', '!=', 'terminado')
             ->sum('monto');
 
-        // Órdenes completadas
-        $ordenesCompletadas = OrdenTrabajo::whereBetween('created_at', [$fechaInicio, $fechaFin])
-            ->where('estado', 'completada')
+        // Órdenes completadas (basado en fecha de finalización, o en creación si falta fechafin)
+        $ordenesCompletadas = OrdenTrabajo::where('estado', 'terminado')
+            ->where(function ($query) use ($fechaInicio, $fechaFin) {
+                $query->whereBetween('fechafin', [$fechaInicio, $fechaFin])
+                    ->orWhere(function ($query2) use ($fechaInicio, $fechaFin) {
+                        $query2->whereNull('fechafin')
+                            ->whereBetween('created_at', [$fechaInicio, $fechaFin]);
+                    });
+            })
             ->count();
 
         // Órdenes pendientes

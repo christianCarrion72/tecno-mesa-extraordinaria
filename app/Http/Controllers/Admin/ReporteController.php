@@ -272,6 +272,9 @@ class ReporteController extends Controller
             'ordenes_pendientes' => DB::table('ordenes_trabajo')
                 ->whereIn('estado', ['presupuestada', 'en_proceso'])
                 ->count(),
+            'ordenes_completadas' => DB::table('ordenes_trabajo')
+                ->where('estado', 'terminado')
+                ->count(),
             'pagos_pendientes' => DB::table('pagos')
                 ->whereIn('estado', ['pendiente', 'pagado_parcial'])
                 ->count(),
