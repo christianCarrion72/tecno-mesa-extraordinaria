@@ -106,6 +106,18 @@ class OrdenTrabajoController extends Controller
 
     public function store(Request $request)
     {
+        // El formulario de creación no expone ni permite modificar el estado ni la fecha de fin.
+        // Se fijan valores seguros aquí para evitar validaciones fallidas por datos faltantes.
+        $request->merge([
+            'estado' => 'pendiente',
+            'fechafin' => null,
+        ]);
+
+        // Si no se proporciona fecha de inicio, la usamos como hoy.
+        if (!$request->filled('fechainicio')) {
+            $request->merge(['fechainicio' => now()->toDateString()]);
+        }
+
         $data = $request->validate([
             'fechainicio' => 'required|date',
             'fechafin' => 'nullable|date',
@@ -165,16 +177,21 @@ class OrdenTrabajoController extends Controller
             'fechainicio' => 'required|date',
             'fechafin' => 'nullable|date',
             'descripcion' => 'required|string',
-            'total' => 'required|numeric',
+            'total' => 'sometimes|numeric|min:0',
             'estado' => 'required',
             'cliente_id' => 'required|exists:clientes,id',
             'usuario_id' => 'required|exists:users,id',
             'motor_id' => 'required|exists:motores,id',
         ]);
 
+        // Si el formulario no envía total (por ejemplo porque no se muestra), mantenemos el actual.
+        if (!$request->has('total')) {
+            $data['total'] = $ordenTrabajo->total;
+        }
+
         $ordenTrabajo->update($data);
 
-        return back()->with('success', 'Orden actualizada.');
+        return redirect()->route('orden-trabajos.index')->with('success', 'Orden actualizada.');
     }
 
     public function show(OrdenTrabajo $ordenTrabajo)

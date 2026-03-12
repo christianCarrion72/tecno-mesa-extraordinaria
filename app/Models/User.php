@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use App\Models\OrdenTrabajo;
 
 class User extends Authenticatable
 {
@@ -83,10 +84,10 @@ class User extends Authenticatable
     //     return $this->hasMany(Diagnostico::class, 'mecanico_id');
     // }
 
-    // public function ordenesTrabajo()
-    // {
-    //     return $this->hasMany(OrdenTrabajo::class, 'mecanico_id');
-    // }
+    public function ordenesTrabajo()
+    {
+        return $this->hasMany(OrdenTrabajo::class, 'usuario_id');
+    }
 
     // public function pagosRecibidos()
     // {

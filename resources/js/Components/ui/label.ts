@@ -9,7 +9,7 @@ export const Label = defineComponent({
         {
           ...attrs,
           class: [
-            'text-sm font-medium text-foreground',
+            'block text-sm font-medium text-foreground',
             (attrs as any).class ?? '',
           ]
             .filter(Boolean)

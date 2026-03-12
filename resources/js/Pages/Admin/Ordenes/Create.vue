@@ -73,6 +73,12 @@ const totalGeneral = computed(() => {
   return subtotalRepuestos.value + parseFloat(form.costo_mano_obra || 0)
 })
 
+const fechaInicioFormateada = computed(() => {
+  const date = new Date(form.fecha_creacion)
+  if (Number.isNaN(date.getTime())) return ''
+  return date.toLocaleDateString('es-ES')
+})
+
 const submit = () => {
   console.log('=== DEBUG: Datos del formulario ===')
   console.log('Diagnóstico ID:', form.diagnostico_id)
@@ -329,51 +335,26 @@ const submit = () => {
                             <p v-if="form.errors.mecanico_id" class="mt-1 text-xs" :style="{ color: 'var(--color-error)' }">{{ form.errors.mecanico_id }}</p>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-medium uppercase tracking-wide mb-1" :style="{ color: 'var(--color-text-light)' }">Estado Inicial</label>
-                            <div class="relative">
-                                <TagIcon class="absolute left-3 top-2.5 h-5 w-5" :style="{ color: 'var(--color-text-light)' }" />
-                                <select v-model="form.estado" class="block w-full rounded-lg pl-10 focus:ring-2 sm:text-sm"
-                                    :style="{ 
-                                      backgroundColor: 'var(--color-base)', 
-                                      color: 'var(--color-text)', 
-                                      border: '1px solid var(--color-border)',
-                                      '--tw-ring-color': 'var(--color-primary)'
-                                    }">
-                                    <option v-for="(label, key) in estados" :key="key" :value="key">{{ label }}</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--color-text-light)' }">
                                   Fecha Inicio <span :style="{ color: 'var(--color-error)' }">*</span>
                                 </label>
-                                <input type="date" v-model="form.fecha_creacion"
-                                    class="block w-full rounded-lg text-xs focus:ring-2"
-                                    :style="{ 
-                                      backgroundColor: 'var(--color-base)', 
-                                      color: 'var(--color-text)', 
-                                      borderColor: form.errors.fecha_creacion ? 'var(--color-error)' : 'var(--color-border)',
-                                      '--tw-ring-color': form.errors.fecha_creacion ? 'var(--color-error)' : 'var(--color-primary)'
-                                    }" />
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        :value="fechaInicioFormateada"
+                                        readonly
+                                        class="block w-full rounded-lg text-xs focus:ring-2"
+                                        :style="{ 
+                                          backgroundColor: 'var(--color-base)', 
+                                          color: 'var(--color-text)', 
+                                          borderColor: form.errors.fecha_creacion ? 'var(--color-error)' : 'var(--color-border)',
+                                          '--tw-ring-color': form.errors.fecha_creacion ? 'var(--color-error)' : 'var(--color-primary)'
+                                        }" />
+                                    <input type="hidden" v-model="form.fecha_creacion" />
+                                </div>
                                 <p v-if="form.errors.fecha_creacion" class="mt-1 text-xs" :style="{ color: 'var(--color-error)' }">{{ form.errors.fecha_creacion }}</p>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium mb-1" :style="{ color: 'var(--color-text-light)' }">
-                                  Fecha Fin (Est.) <span :style="{ color: 'var(--color-error)' }">*</span>
-                                </label>
-                                <input type="date" v-model="form.fecha_fin_estimada"
-                                    :min="form.fecha_creacion"
-                                    class="block w-full rounded-lg text-xs focus:ring-2"
-                                    :style="{ 
-                                      backgroundColor: 'var(--color-base)', 
-                                      color: 'var(--color-text)', 
-                                      borderColor: form.errors.fecha_fin_estimada ? 'var(--color-error)' : 'var(--color-border)',
-                                      '--tw-ring-color': form.errors.fecha_fin_estimada ? 'var(--color-error)' : 'var(--color-primary)'
-                                    }" />
-                                <p v-if="form.errors.fecha_fin_estimada" class="mt-1 text-xs" :style="{ color: 'var(--color-error)' }">{{ form.errors.fecha_fin_estimada }}</p>
                             </div>
                         </div>
                     </div>

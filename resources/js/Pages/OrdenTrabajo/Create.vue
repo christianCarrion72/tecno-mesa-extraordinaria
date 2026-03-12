@@ -46,8 +46,12 @@ const motorRef = ref(null);
 // ------------------
 // Formulario con useForm
 // ------------------
+const today = new Date();
+const pad = (n: number) => String(n).padStart(2, '0');
+const localDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
 const form = useForm({
-    fechainicio: '',
+    fechainicio: localDate,
     fechafin: '',
     descripcion: '',
     total: '0',
@@ -56,6 +60,7 @@ const form = useForm({
     usuario_id: null,
     motor_id: null,
 });
+
 
 // ------------------
 // Computed para filtrar opciones
@@ -157,7 +162,7 @@ const submit = () => {
                 <CardContent>
                     <form @submit.prevent="submit" class="space-y-6">
 
-                        <!-- Grid de 2 columnas para las fechas -->
+                        <!-- Grid de 2 columnas para fechas -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Fecha de inicio -->
                             <div class="grid gap-2">
@@ -176,8 +181,8 @@ const submit = () => {
                                 <InputError :message="form.errors.fechainicio" />
                             </div>
 
-                            <!-- Fecha fin -->
-                            <div class="grid gap-2">
+                            <!-- Fecha fin: opcional y no usada al crear (mantener oculta) -->
+                            <div class="grid gap-2" style="display: none;">
                                 <Label for="fechafin" class="text-sm font-semibold">Fecha de Finalización</Label>
                                 <div class="relative">
                                     <input

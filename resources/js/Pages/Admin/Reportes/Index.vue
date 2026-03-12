@@ -58,7 +58,6 @@ const form = useForm({
 const tiposReporte = [
     { id: 'financiero', nombre: 'Financiero', icono: CurrencyDollarIcon, color: 'green' },
     { id: 'servicios', nombre: 'Servicios', icono: WrenchScrewdriverIcon, color: 'blue' },
-    { id: 'citas', nombre: 'Citas', icono: CalendarDaysIcon, color: 'purple' },
     { id: 'mecanicos', nombre: 'Mecánicos', icono: UserGroupIcon, color: 'orange' },
 ]
 
@@ -237,19 +236,19 @@ const chartIngresosVsPendiente = computed(() => {
     }
 })
 
-const chartServiciosPorTipo = computed(() => {
-    const tipos = props.datos.servicios_por_tipo?.map(s => s.tipo) || []
-    const ingresos = props.datos.servicios_por_tipo?.map(s => s.ingresos) || []
+const chartIngresosPorServicio = computed(() => {
+    const servicios = props.datos.servicios_por_servicio?.map(s => s.nombre) || []
+    const ingresos = props.datos.servicios_por_servicio?.map(s => s.ingresos) || []
     const colores = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
     
     return {
-        labels: tipos,
+        labels: servicios,
         datasets: [
             {
                 label: 'Ingresos (S/.)',
                 data: ingresos,
-                backgroundColor: colores.slice(0, tipos.length),
-                borderColor: colores.slice(0, tipos.length),
+                backgroundColor: colores.slice(0, servicios.length),
+                borderColor: colores.slice(0, servicios.length),
                 borderWidth: 1,
             }
         ]
@@ -769,10 +768,39 @@ const chartOptionsPie = {
                               backgroundColor: 'var(--color-base)',
                               borderColor: 'var(--color-border)'
                             }">
-                            <h3 class="text-lg font-semibold mb-4" :style="{ color: 'var(--color-text)' }">Ingresos por Tipo de Servicio</h3>
+                            <h3 class="text-lg font-semibold mb-4" :style="{ color: 'var(--color-text)' }">Ingresos por Servicio</h3>
                             <div style="height: 300px;">
-                                <Pie :data="chartServiciosPorTipo" :options="chartOptionsPie" />
+                                <Pie :data="chartIngresosPorServicio" :options="chartOptionsPie" />
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Servicios -->
+                    <div class="rounded-xl shadow-sm border p-6"
+                        :style="{ 
+                          backgroundColor: 'var(--color-base)',
+                          borderColor: 'var(--color-border)'
+                        }">
+                        <h3 class="text-lg font-semibold mb-4" :style="{ color: 'var(--color-text)' }">Servicios usados en el rango</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y" :style="{ borderColor: 'var(--color-border)' }">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" :style="{ color: 'var(--color-text-light)' }">Servicio</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium uppercase" :style="{ color: 'var(--color-text-light)' }">Veces usadas</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium uppercase" :style="{ color: 'var(--color-text-light)' }">Ingresos</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium uppercase" :style="{ color: 'var(--color-text-light)' }">Precio promedio</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y" :style="{ borderColor: 'var(--color-border)' }">
+                                    <tr v-for="servicio in datos.servicios_por_servicio" :key="servicio.id" class="hover" :style="{ backgroundColor: 'var(--color-base)' }">
+                                        <td class="px-4 py-3" :style="{ color: 'var(--color-text)' }">{{ servicio.nombre }}</td>
+                                        <td class="px-4 py-3 text-right" :style="{ color: 'var(--color-text)' }">{{ formatNumber(servicio.cantidad) }}</td>
+                                        <td class="px-4 py-3 text-right" :style="{ color: 'var(--color-text)' }">{{ formatMoney(servicio.ingresos) }}</td>
+                                        <td class="px-4 py-3 text-right" :style="{ color: 'var(--color-text)' }">{{ formatMoney(servicio.precio_promedio) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 

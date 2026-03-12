@@ -243,10 +243,12 @@ class OrdenController extends Controller
     {
         $request->validate([
             'mecanico_id' => 'required|exists:usuarios,id',
+            'fecha_creacion' => 'nullable|date',
             'fecha_inicio' => 'nullable|date',
-            'fecha_fin_estimada' => 'required|date',
+            'fecha_fin_estimada' => 'nullable|date',
             'fecha_fin_real' => 'nullable|date',
-            'costo_mano_obra' => 'required|numeric|min:0',
+            'costo_mano_obra' => 'nullable|numeric|min:0',
+            'costo_repuestos' => 'nullable|numeric|min:0',
             'estado' => 'required|in:presupuestada,aprobada,en_proceso,completada,entregada,cancelada',
             'observaciones' => 'nullable|string|max:1000',
         ]);
@@ -260,7 +262,26 @@ class OrdenController extends Controller
             $request->merge(['fecha_fin_real' => now()]);
         }
 
-        $orden->update($request->all());
+        // Mapear campos del formulario a los nombres reales en la tabla
+        $data = [
+            'usuario_id' => $request->mecanico_id,
+            'fechainicio' => $request->fecha_inicio,
+            'fechafin' => $request->fecha_fin_estimada,
+            'descripcion' => $request->observaciones,
+            'estado' => $request->estado,
+            'costo_mano_obra' => $request->costo_mano_obra,
+            'costo_repuestos' => $request->costo_repuestos,
+        ];
+
+        // Si llega fecha de creación, actualizar created_at
+        if ($request->filled('fecha_creacion')) {
+            $data['created_at'] = $request->fecha_creacion;
+        }
+
+        // Calcular total automáticamente (mano de obra + repuestos)
+        $data['total'] = ($request->costo_mano_obra ?? 0) + ($request->costo_repuestos ?? 0);
+
+        $orden->update($data);
 
         return redirect()->route('admin.ordenes.show', $orden->id)
             ->with('success', 'Orden de trabajo actualizada exitosamente.');

@@ -208,27 +208,6 @@
                     </p>
                   </div>
 
-                  <!-- Subtotal -->
-                  <div>
-                    <label for="subtotal" class="block text-sm font-medium" :style="{ color: 'var(--color-text)' }">
-                      Total Orden
-                    </label>
-                    <div class="mt-1 relative">
-                      <BanknotesIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" :style="{ color: 'var(--color-text-light)' }" />
-                      <input
-                        type="number"
-                        id="subtotal"
-                        :value="calcularTotal"
-                        step="0.01"
-                        readonly
-                        class="pl-10 block w-full rounded-md shadow-sm sm:text-sm font-bold bg-gray-100"
-                        :style="{ backgroundColor: 'var(--color-background-muted)', color: 'var(--color-text)', borderColor: 'var(--color-border)' }"
-                      />
-                    </div>
-                    <p class="mt-1 text-xs" :style="{ color: 'var(--color-text-light)' }">
-                      Mano de obra + Repuestos
-                    </p>
-                  </div>
                 </div>
 
                 <!-- Observaciones -->
@@ -385,14 +364,6 @@
                         <p class="text-sm mt-1" :style="{ color: 'var(--color-text)' }">${{ Number(servicio.precio_unitario).toLocaleString('es-ES') }}</p>
                       </div>
                     </div>
-                    <div class="mt-3 pt-3 border-t" :style="{ borderColor: 'var(--color-border)' }">
-                      <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium" :style="{ color: 'var(--color-text-light)' }">Subtotal:</span>
-                        <span class="text-sm font-bold" :style="{ color: 'var(--color-text)' }">
-                          ${{ Number(servicio.subtotal).toLocaleString('es-ES') }}
-                        </span>
-                      </div>
-                    </div>
                   </div>
 
                   <!-- Estado vacío -->
@@ -406,27 +377,6 @@
                   </div>
                 </div>
 
-                <!-- Resumen de Costos -->
-                <div class="mt-6 p-4 rounded-lg" :style="{ backgroundColor: 'var(--color-primary)', color: '#ffffff' }">
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="text-lg font-semibold">Resumen de Costos</span>
-                    <DocumentChartBarIcon class="h-5 w-5" />
-                  </div>
-                  <div class="space-y-1">
-                    <div class="flex justify-between">
-                      <span class="text-sm opacity-90">Mano de Obra:</span>
-                      <span class="text-sm">${{ Number(form.costo_mano_obra || 0).toLocaleString('es-ES') }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-sm opacity-90">Repuestos:</span>
-                      <span class="text-sm">${{ Number(form.costo_repuestos || 0).toLocaleString('es-ES') }}</span>
-                    </div>
-                    <div class="flex justify-between pt-2 border-t border-blue-400">
-                      <span class="text-lg font-bold">Total:</span>
-                      <span class="text-lg font-bold">${{ calcularTotal.toLocaleString('es-ES') }}</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
