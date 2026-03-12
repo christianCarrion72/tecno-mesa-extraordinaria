@@ -24,7 +24,8 @@ class DatabaseSeeder extends Seeder
             ParteSeeder::class,
             ClienteSeeder::class,
             ServicioSeeder::class,
-            OrdenTrabajoSeeder::class
+            OrdenTrabajoSeeder::class,
+            PagoSeeder::class,
             //VehiculoSeeder::class,
         ]);
     }
