@@ -12,7 +12,7 @@ import {
 import TextInput from '@/Components/TextInput.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Paginacion, type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
 import {
     MagnifyingGlassIcon,
@@ -36,6 +36,9 @@ interface Props {
 const props = defineProps<Props>();
 const marcas = computed(() => props.marcas.data);
 const metadatos = computed(() => props.marcas);
+const page = usePage();
+const permisos = computed(() => page.props.auth?.permisos || []);
+const tienePermiso = (permiso: string) => permisos.value.includes(permiso);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -103,12 +106,16 @@ watch(
                         
                     </div>
                     <div>
-                        <Link :href="route('marcas.create')" class="group px-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center gap-2 text-sm"
-                    :style="{
-                        backgroundColor: 'var(--color-primary)',
-                        color: 'var(--color-base)',
-                        ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
-                    }">
+                        <Link
+                            v-if="tienePermiso('marca.crear')"
+                            :href="route('marcas.create')"
+                            class="group px-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center gap-2 text-sm"
+                            :style="{
+                                backgroundColor: 'var(--color-primary)',
+                                color: 'var(--color-base)',
+                                ':hover': { backgroundColor: 'var(--color-primary)', opacity: '0.9' }
+                            }"
+                        >
                             <Button>
                                 <PlusIcon class="mr-2 h-4 w-4" />
                                 Nueva Marca
@@ -172,6 +179,7 @@ watch(
                                     <td class="p-4 text-right align-middle">
                                         <div class="flex justify-end gap-2">
                                             <Link
+                                                v-if="tienePermiso('marca.editar')"
                                                 :href="route('marcas.edit', marca.id)"
                                             >
                                                 <Button
@@ -182,6 +190,7 @@ watch(
                                                 </Button>
                                             </Link>
                                             <Button
+                                                v-if="tienePermiso('marca.eliminar')"
                                                 variant="destructive"
                                                 size="sm"
                                                 @click="deleteMarca(marca)"
