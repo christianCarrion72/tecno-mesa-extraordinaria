@@ -45,6 +45,10 @@ class MarcaController extends Controller
 
     public function store(Request $request)
     {
+        if (!request()->user()->tienePermiso('marca.crear')) {
+            return redirect()->route('dashboard')->with('error', 'NO TIENE PERMISO PARA CREAR.');
+        }
+
         $request->validate([
             'nombre' => 'required|string|max:255',
             'foto' => 'nullable|image|max:2048',
@@ -81,7 +85,7 @@ class MarcaController extends Controller
     public function edit(Marca $marca)
     {
         if (!request()->user()->tienePermiso('marca.editar')) {
-            return redirect()->route('dashboard')->with('error', 'No tenés permiso para editar marcas.');
+            return redirect()->route('mecanico.dashboard')->with('error', 'No tiene permiso para editar marcas.');
         }
     
         return inertia('Marcas/Edit', compact('marca'));
@@ -89,6 +93,10 @@ class MarcaController extends Controller
 
     public function update(Request $request, Marca $marca)
     {
+        if (!request()->user()->tienePermiso('marca.editar')) {
+            return redirect()->route('mecanico.dashboard')->with('error', 'NO TIENE PERMISO PARA EDITAR.');
+        }
+
         $request->validate([
             'nombre' => 'required|string|max:255',
             'foto' => 'nullable|image|max:2048',
@@ -124,6 +132,10 @@ class MarcaController extends Controller
 
     public function destroy(Marca $marca)
     {
+        if (!request()->user()->tienePermiso('marca.eliminar')) {
+            return redirect()->route('dashboard')->with('error', 'NO TIENE PERMISO PARA ELIMINAR.');
+        }
+
         try {
             // Verificar si tiene motores activos
             $tieneMotoresActivos = DB::table('motores')

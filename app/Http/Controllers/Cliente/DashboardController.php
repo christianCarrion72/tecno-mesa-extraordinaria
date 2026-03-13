@@ -19,12 +19,17 @@ class DashboardController extends Controller
 
         $roleName = $user->rol->nombre ?? null;
 
+        $flashData = array_filter([
+            'error'   => session('error'),
+            'success' => session('success'),
+        ]);
+
         if (in_array($roleName, ['Propietario', 'Secretaria'])) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.dashboard')->with($flashData);
         }
 
         if ($roleName === 'Mecanico') {
-            return redirect()->route('mecanico.dashboard');
+            return redirect()->route('mecanico.dashboard')->with($flashData);
         }
 
         $data = [];

@@ -43,7 +43,7 @@ const pfToken = ref<string>('');
 const pfLoginError = ref<string>('');
 const obtenerTokenPagoFacil = async (): Promise<string | null> => {
     try {
-        const res = await fetch('/pagofacil/login');
+        const res = await fetch(route('pagofacil.login'));
         const data = await res.json();
         console.log('PagoFacil login response:', data);
         const token = data?.values?.accessToken ?? '';
@@ -60,6 +60,7 @@ const obtenerTokenPagoFacil = async (): Promise<string | null> => {
 const serviciosPF = ref<any[]>([]);
 const selectedPaymentMethodId = ref<string>('');
 const loadingPF = ref(false);
+const generatingPF = ref(false);
 const pfItems = computed(() => serviciosPF.value.map(s => ({ id: String(s.paymentMethodId), label: s.paymentMethodName })));
 const pfQrBase64 = ref<string>('');
 const pfClientName = ref<string>('');
@@ -72,7 +73,7 @@ const pfAmount = ref<string>(String(Number(form.monto) || 0));
 const pfCurrency = ref<string>('2');
 const pfClientCode = ref<string>('');
 const pfOrderSerial = ref<string>('1');
-const pfOrderProduct = ref<string>('');
+const pfOrderProduct = ref<string>('Servicio automotriz y refacciones de vehículos');
 const pfOrderQuantity = ref<string>('1');
 const pfOrderPrice = ref<string>(String(Number(form.monto) || 0));
 const pfOrderDiscount = ref<string>('0');
@@ -84,7 +85,7 @@ const cargarPFServicios = async () => {
         if (!pfToken.value) {
             await obtenerTokenPagoFacil();
         }
-        const res = await fetch('/pagofacil/list-enabled-services', {
+        const res = await fetch(route('pagofacil.list'), {
             headers: pfToken.value ? { Authorization: `Bearer ${pfToken.value}` } : {},
         });
         const data = await res.json();
@@ -109,11 +110,15 @@ const prefillPFCliente = () => {
 };
 
 const generarQrPF = async () => {
+    if (generatingPF.value) {
+        return;
+    }
+    generatingPF.value = true;
     try {
         if (!pfToken.value) {
             await obtenerTokenPagoFacil();
         }
-        const cbRes = await fetch('/pagofacil/callback-url');
+        const cbRes = await fetch(route('pagofacil.callback-url'));
         const cbJson = await cbRes.json();
         const callbackUrl = cbJson?.callbackUrl || '';
         console.log('[PF] Callback URL usada:', callbackUrl);
@@ -142,7 +147,7 @@ const generarQrPF = async () => {
                 },
             ],
         };
-        const res = await fetch('/pagofacil/generate-qr', {
+        const res = await fetch(route('pagofacil.generate'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -162,7 +167,7 @@ const generarQrPF = async () => {
         } else {
             const pagoId = data?.values?.pagoId;
             if (pagoId) {
-                router.visit(`/pagos/${pagoId}`);
+                router.visit(route('plan-pagos.pagos.show', pagoId));
                 return;
             }
             pfQrBase64.value = data?.values?.qrBase64 || '';
@@ -170,6 +175,8 @@ const generarQrPF = async () => {
     } catch (e) {
         console.error('Error generando QR PagoFacil:', e);
         pfLoginError.value = 'Error generando QR PagoFacil';
+    } finally {
+        generatingPF.value = false;
     }
 };
 
@@ -226,8 +233,36 @@ const esTarjeta = computed(() => {
 });
 
 const stripeQrUrl = ref<string>('');
+const stripeLoading = ref(false);
+
+const copiarStripeUrl = async () => {
+    if (!stripeQrUrl.value) {
+        return;
+    }
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(stripeQrUrl.value);
+            alert('Link de pago copiado al portapapeles.');
+        } else {
+            const dummy = document.createElement('input');
+            dummy.value = stripeQrUrl.value;
+            document.body.appendChild(dummy);
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            alert('Link de pago copiado al portapapeles.');
+        }
+    } catch (e) {
+        console.error('No se pudo copiar el link', e);
+        alert('No se pudo copiar el link de pago.');
+    }
+};
 
 const generarQrStripe = async () => {
+    if (stripeLoading.value) {
+        return;
+    }
+    stripeLoading.value = true;
     stripeQrUrl.value = '';
     try {
         const res = await fetch(route('plan-pagos.pagos.stripe.intent', props.plan.id), {
@@ -254,6 +289,8 @@ const generarQrStripe = async () => {
     } catch (e) {
         console.error('Error generando QR Stripe', e);
         alert('Error generando QR para tarjeta.');
+    } finally {
+        stripeLoading.value = false;
     }
 };
 </script>
@@ -398,22 +435,38 @@ const generarQrStripe = async () => {
                                     type="button"
                                     variant="default"
                                     :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
-                                    :disabled="form.processing"
+                                    :disabled="form.processing || stripeLoading"
                                     @click="generarQrStripe"
                                 >
-                                    Generar QR de pago
+                                    {{ stripeLoading ? 'Generando QR...' : 'Generar QR de pago' }}
                                 </Button>
                             </div>
                             <div v-if="stripeQrUrl" class="mt-4">
-                                <Label>Escanea este QR o abre el enlace:</Label>
+                                <Label>Escanea este QR o comparte el enlace:</Label>
                                 <div class="mt-2 flex flex-col md:flex-row gap-4 items-center">
                                     <img
                                         :src="`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(stripeQrUrl)}`"
                                         alt="QR pago con tarjeta"
                                         class="border rounded shadow-sm"
                                     />
-                                    <div class="text-xs break-all text-muted-foreground max-w-xs">
-                                        {{ stripeQrUrl }}
+                                    <div class="w-full max-w-xs flex flex-col gap-2">
+                                        <Label>Link de pago</Label>
+                                        <div class="flex gap-2 items-center">
+                                            <input
+                                                type="text"
+                                                :value="stripeQrUrl"
+                                                readonly
+                                                class="flex-1 text-xs rounded-md border border-input bg-background px-2 py-1 text-foreground"
+                                            />
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
+                                                @click="copiarStripeUrl"
+                                            >
+                                                Copiar
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -438,7 +491,6 @@ const generarQrStripe = async () => {
                         </div>
 
                         <div class="md:col-span-2 flex gap-3 flex-wrap">
-                            <Button variant="outline" :disabled="form.processing" type="submit">Guardar Pago</Button>
                             <Button
                                 :disabled="form.processing"
                                 type="submit"
@@ -455,31 +507,14 @@ const generarQrStripe = async () => {
                                 Cancelar
                             </Button>
                             <Button
-                                v-if="esPagoFacil"
-                                type="button"
-                                variant="outline"
-                                :disabled="form.processing || loadingPF"
-                                @click="obtenerTokenPagoFacil"
-                            >
-                                {{ pfToken ? 'Renovar Token' : 'Obtener Token' }}
-                            </Button>
-                            <Button
                                 v-if="esPagoFacil && selectedPaymentMethodId"
                                 type="button"
                                 variant="default"
-                                :disabled="form.processing || !selectedPaymentMethodId || !pfClientName"
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
+                                :disabled="form.processing || generatingPF || !selectedPaymentMethodId || !pfClientName"
                                 @click="generarQrPF"
                             >
-                                Generar QR
-                            </Button>
-                            <Button
-                                v-if="esTarjeta"
-                                type="button"
-                                variant="outline"
-                                :disabled="form.processing"
-                                @click="generarQrStripe"
-                            >
-                                Generar QR Tarjeta
+                                {{ generatingPF ? 'Generando QR...' : 'Generar QR' }}
                             </Button>
                         </div>
                     </form>

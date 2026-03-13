@@ -682,6 +682,44 @@ class PagoController extends Controller
         $json = $resp->json();
         Log::info('PagoFacil query-transaction response', ['response' => $json]);
 
+        if (!is_array($json)) {
+            return response()->json([
+                'error' => 1,
+                'status' => $resp->status(),
+                'message' => 'Respuesta inválida de PagoFacil',
+            ], $resp->status());
+        }
+
+        if (($json['error'] ?? 1) === 0 && $pago) {
+            $values = (array) ($json['values'] ?? []);
+            $estadoPago = $values['paymentStatus'] ?? null;
+
+            // Según docs de PagoFácil, paymentStatus es un Id numérico de estado de transacción.
+            // Tomamos 2 (y variantes textuales) como pagado/completado.
+            $statusString = is_string($estadoPago) ? strtolower($estadoPago) : (string) $estadoPago;
+
+            $pagado = in_array($statusString, ['2', 'pagado', 'completed', 'completado'], true)
+                || $estadoPago === 2;
+
+            if ($pagado) {
+                $updates = [
+                    'estado' => 'terminado',
+                ];
+
+                if (isset($values['paymentStatus']) && is_numeric($values['paymentStatus'])) {
+                    $updates['pf_status'] = (int) $values['paymentStatus'];
+                }
+
+                if (!empty($values['paymentDate'])) {
+                    $updates['fechapago'] = substr((string) $values['paymentDate'], 0, 10);
+                }
+
+                $pago->update($updates);
+
+                optional($pago->planPago)->refresh()->actualizarEstadoSegunPagos();
+            }
+        }
+
         return response()->json($json, $resp->status());
     }
 }

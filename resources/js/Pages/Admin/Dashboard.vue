@@ -12,6 +12,7 @@ const props = defineProps({
 
 const page = usePage();
 const permisos = computed(() => page.props.auth?.permisos || []);
+const rolNombre = computed(() => page.props.auth?.user?.rol?.nombre || '');
 
 const puede = (permiso) => permisos.value.includes(permiso);
 
@@ -64,7 +65,7 @@ const mostrarInventario = computed(() =>
             </div>
 
             <!-- Ingresos del Mes -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <div v-if="rolNombre !== 'Mecanico'" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <div class="flex items-center">
                     <div class="p-3 bg-purple-100 rounded-lg">
                         <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
