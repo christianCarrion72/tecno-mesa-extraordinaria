@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/Com
 import { Button } from '@/Components/ui/button';
 import TextInput from '@/Components/TextInput.vue';
 
-import { MagnifyingGlassIcon, PencilSquareIcon, PlusIcon, TrashIcon, EyeIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PencilSquareIcon, PlusIcon, TrashIcon, EyeIcon, EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { computed, ref, watch } from 'vue';
 import debounce from 'lodash/debounce';
 
@@ -29,12 +29,14 @@ interface OrdenTrabajo {
 interface Props {
     ordenes: Paginacion<OrdenTrabajo>;
     terminosBusqueda?: string;
+    estados: string[];
 }
 
 const props = defineProps<Props>();
 
 const ordenes = computed(() => props.ordenes.data);
 const paginator = computed(() => props.ordenes);
+const estados = computed(() => props.estados || []);
 
 // -------------------------------
 // Breadcrumbs
@@ -64,6 +66,54 @@ const deleteOrden = (orden: OrdenTrabajo) => {
     if (confirm(`¿Eliminar la orden #${orden.id}?`)) {
         router.delete(route('orden-trabajos.destroy', orden.id));
     }
+};
+
+// -------------------------------
+// Cambio de estado
+// -------------------------------
+const estadoMenuAbiertoId = ref<number | null>(null);
+const mostrarConfirmacion = ref(false);
+const ordenSeleccionada = ref<OrdenTrabajo | null>(null);
+const estadoSeleccionado = ref<string | null>(null);
+
+const toggleMenuEstado = (ordenId: number) => {
+    estadoMenuAbiertoId.value = estadoMenuAbiertoId.value === ordenId ? null : ordenId;
+};
+
+const seleccionarEstado = (orden: OrdenTrabajo, nuevoEstado: string) => {
+    if (nuevoEstado === orden.estado) {
+        estadoMenuAbiertoId.value = null;
+        return;
+    }
+
+    ordenSeleccionada.value = orden;
+    estadoSeleccionado.value = nuevoEstado;
+    estadoMenuAbiertoId.value = null;
+    mostrarConfirmacion.value = true;
+};
+
+const cancelarCambioEstado = () => {
+    mostrarConfirmacion.value = false;
+    ordenSeleccionada.value = null;
+    estadoSeleccionado.value = null;
+};
+
+const cambiarEstado = () => {
+    if (!ordenSeleccionada.value || !estadoSeleccionado.value) {
+        cancelarCambioEstado();
+        return;
+    }
+
+    router.put(
+        route('orden-trabajos.actualizar-estado', ordenSeleccionada.value.id),
+        { estado: estadoSeleccionado.value },
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                cancelarCambioEstado();
+            },
+        },
+    );
 };
 </script>
 
@@ -146,22 +196,18 @@ const deleteOrden = (orden: OrdenTrabajo) => {
 
                                     <td class="p-4 text-right">
                                         <div class="flex justify-end gap-2">
-
-                                            <!-- Ver -->
                                             <Link :href="route('orden-trabajos.show', ot.id)">
                                                 <Button variant="outline" size="sm">
                                                     <EyeIcon class="h-4 w-4" />
                                                 </Button>
                                             </Link>
 
-                                            <!-- Editar -->
                                             <Link :href="route('orden-trabajos.edit', ot.id)">
                                                 <Button variant="outline" size="sm">
                                                     <PencilSquareIcon class="h-4 w-4" />
                                                 </Button>
                                             </Link>
 
-                                            <!-- Eliminar -->
                                             <Button 
                                                 variant="destructive" 
                                                 size="sm"
@@ -170,6 +216,33 @@ const deleteOrden = (orden: OrdenTrabajo) => {
                                                 <TrashIcon class="h-4 w-4" />
                                             </Button>
 
+                                            <div class="relative inline-block text-left">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    @click="toggleMenuEstado(ot.id)"
+                                                >
+                                                    <EllipsisVerticalIcon class="h-4 w-4" />
+                                                </Button>
+                                                <div
+                                                    v-if="estadoMenuAbiertoId === ot.id"
+                                                    class="absolute right-0 mt-2 w-40 rounded-md border shadow-lg z-10"
+                                                    :style="{
+                                                        backgroundColor: 'var(--color-base)',
+                                                        borderColor: 'var(--color-border)',
+                                                        color: 'var(--color-text)'
+                                                    }"
+                                                >
+                                                    <button
+                                                        v-for="estado in estados"
+                                                        :key="estado"
+                                                        class="block w-full px-3 py-2 text-sm text-left hover:bg-muted"
+                                                        @click="seleccionarEstado(ot, estado)"
+                                                    >
+                                                        {{ estado.charAt(0).toUpperCase() + estado.slice(1) }}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -182,6 +255,50 @@ const deleteOrden = (orden: OrdenTrabajo) => {
 
             <!-- PAGINACIÓN -->
             <PaginationLinks :paginator="paginator" />
+
+            <div
+                v-if="mostrarConfirmacion"
+                class="fixed inset-0 z-50 flex items-center justify-center"
+                :style="{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }"
+            >
+                <div
+                    class="w-full max-w-sm rounded-lg border p-6"
+                    :style="{
+                        backgroundColor: 'var(--color-base)',
+                        borderColor: 'var(--color-border)',
+                        color: 'var(--color-text)'
+                    }"
+                >
+                    <h3 class="text-lg font-semibold mb-2">
+                        Confirmar cambio de estado
+                    </h3>
+                    <p
+                        class="text-sm mb-4"
+                        :style="{ color: 'var(--color-text-light)' }"
+                    >
+                        ¿Seguro que quiere cambiar el estado de la orden?
+                    </p>
+                    <div class="flex justify-end gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            @click="cancelarCambioEstado"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            size="sm"
+                            :style="{
+                                backgroundColor: 'var(--color-primary)',
+                                color: 'var(--color-base)'
+                            }"
+                            @click="cambiarEstado"
+                        >
+                            Confirmar
+                        </Button>
+                    </div>
+                </div>
+            </div>
 
         </div>
 

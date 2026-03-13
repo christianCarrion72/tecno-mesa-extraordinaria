@@ -183,6 +183,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'show'])->middleware('permiso:orden_trabajo.listar')->name('orden-trabajos.show');
     Route::get('/orden-trabajos/{ordenTrabajo}/edit', [OrdenTrabajoController::class, 'edit'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.edit');
     Route::put('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'update'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.update');
+    Route::put('/orden-trabajos/{ordenTrabajo}/estado', [OrdenTrabajoController::class, 'actualizarEstado'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.actualizar-estado');
     Route::delete('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'destroy'])->middleware('permiso:orden_trabajo.eliminar')->name('orden-trabajos.destroy');
 
     Route::post('/orden-trabajos/{ordenTrabajo}/servicios', [OrdenTrabajoServicioController::class, 'store'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.servicios.store');
@@ -216,11 +217,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/plan-pagos/{planPago}/pagos/stripe/intent', [PagoController::class, 'stripeCreatePaymentIntent'])->middleware('permiso:pago.crear')->name('plan-pagos.pagos.stripe.intent');
     Route::post('/plan-pagos/{planPago}/pagos/stripe/confirm', [PagoController::class, 'stripeConfirmPago'])->middleware('permiso:pago.crear')->name('plan-pagos.pagos.stripe.confirm');
 
-    Route::get('/pagofacil/login', [PagoController::class, 'pagofacilLogin'])->middleware('permiso:pago.listar')->name('pagofacil.login');
-    Route::get('/pagofacil/list-enabled-services', [PagoController::class, 'pagofacilListEnabledServices'])->middleware('permiso:pago.listar')->name('pagofacil.list');
-    Route::post('/pagofacil/generate-qr', [PagoController::class, 'pagofacilGenerateQr'])->middleware('permiso:pago.crear')->name('pagofacil.generate');
-    Route::get('/pagofacil/callback-url', [PagoController::class, 'pagofacilCallbackUrl'])->middleware('permiso:pago.listar')->name('pagofacil.callback-url');
-    Route::post('/pagofacil/query-transaction', [PagoController::class, 'pagofacilQueryTransaction'])->middleware('permiso:pago.listar')->name('pagofacil.query');
+    Route::get('/pagofacil/login', [PagoController::class, 'pagofacilLogin'])->name('pagofacil.login');
+    Route::get('/pagofacil/list-enabled-services', [PagoController::class, 'pagofacilListEnabledServices'])->name('pagofacil.list');
+    Route::post('/pagofacil/generate-qr', [PagoController::class, 'pagofacilGenerateQr'])
+        ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)
+        ->name('pagofacil.generate');
+    Route::get('/pagofacil/callback-url', [PagoController::class, 'pagofacilCallbackUrl'])->name('pagofacil.callback-url');
+    Route::post('/pagofacil/query-transaction', [PagoController::class, 'pagofacilQueryTransaction'])->name('pagofacil.query');
 
     Route::get('/facturas/{factura}', [FacturaController::class, 'show'])->middleware('permiso:factura.listar')->name('facturas.show');
     Route::get('/pagos/{pago}/facturas/create', [FacturaController::class, 'create'])->middleware('permiso:factura.crear')->name('facturas.create');
