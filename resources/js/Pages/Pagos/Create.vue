@@ -228,6 +228,29 @@ const esTarjeta = computed(() => {
 const stripeQrUrl = ref<string>('');
 const stripeLoading = ref(false);
 
+const copiarStripeUrl = async () => {
+    if (!stripeQrUrl.value) {
+        return;
+    }
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(stripeQrUrl.value);
+            alert('Link de pago copiado al portapapeles.');
+        } else {
+            const dummy = document.createElement('input');
+            dummy.value = stripeQrUrl.value;
+            document.body.appendChild(dummy);
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            alert('Link de pago copiado al portapapeles.');
+        }
+    } catch (e) {
+        console.error('No se pudo copiar el link', e);
+        alert('No se pudo copiar el link de pago.');
+    }
+};
+
 const generarQrStripe = async () => {
     if (stripeLoading.value) {
         return;
@@ -412,15 +435,31 @@ const generarQrStripe = async () => {
                                 </Button>
                             </div>
                             <div v-if="stripeQrUrl" class="mt-4">
-                                <Label>Escanea este QR o abre el enlace:</Label>
+                                <Label>Escanea este QR o comparte el enlace:</Label>
                                 <div class="mt-2 flex flex-col md:flex-row gap-4 items-center">
                                     <img
                                         :src="`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(stripeQrUrl)}`"
                                         alt="QR pago con tarjeta"
                                         class="border rounded shadow-sm"
                                     />
-                                    <div class="text-xs break-all text-muted-foreground max-w-xs">
-                                        {{ stripeQrUrl }}
+                                    <div class="w-full max-w-xs flex flex-col gap-2">
+                                        <Label>Link de pago</Label>
+                                        <div class="flex gap-2 items-center">
+                                            <input
+                                                type="text"
+                                                :value="stripeQrUrl"
+                                                readonly
+                                                class="flex-1 text-xs rounded-md border border-input bg-background px-2 py-1 text-foreground"
+                                            />
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
+                                                @click="copiarStripeUrl"
+                                            >
+                                                Copiar
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
