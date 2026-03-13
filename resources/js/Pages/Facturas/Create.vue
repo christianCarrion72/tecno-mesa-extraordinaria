@@ -10,10 +10,14 @@ import InputError from '@/Components/InputError.vue';
 
 const props = defineProps<{ pago: any }>();
 
+const today = new Date();
+const pad = (n: number) => String(n).padStart(2, '0');
+const localDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
 const form = useForm({
     descripcion: '',
     estado: 'emitida',
-    fechaemision: '',
+    fechaemision: localDate,
     montototal: props.pago.monto ?? 0,
     nroautorizacion: '',
     numerofactura: '',
