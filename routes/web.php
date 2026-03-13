@@ -135,12 +135,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ============================================================================
     // GESTIÓN DE MARCAS, MODELOS, MOTORES, PARTES Y SERVICIOS
     // ============================================================================
-    Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
-    Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
-    Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
-    Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
-    Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
-    Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+    Route::get('/clientes', [ClienteController::class, 'index'])->middleware('permiso:cliente.listar')->name('clientes.index');
+    Route::get('/clientes/create', [ClienteController::class, 'create'])->middleware('permiso:cliente.crear')->name('clientes.create');
+    Route::post('/clientes', [ClienteController::class, 'store'])->middleware('permiso:cliente.crear')->name('clientes.store');
+    Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->middleware('permiso:cliente.editar')->name('clientes.edit');
+    Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->middleware('permiso:cliente.editar')->name('clientes.update');
+    Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->middleware('permiso:cliente.eliminar')->name('clientes.destroy');
 
     Route::get('/marcas', [MarcaController::class, 'index'])->name('marcas.index');
     Route::get('/marcas/create', [MarcaController::class, 'create'])->name('marcas.create');
@@ -149,73 +149,72 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/marcas/{marca}', [MarcaController::class, 'update'])->name('marcas.update');
     Route::delete('/marcas/{marca}', [MarcaController::class, 'destroy'])->name('marcas.destroy');
 
-    Route::get('/modelos', [ModeloController::class, 'index'])->name('modelos.index');
-    Route::get('/modelos/create', [ModeloController::class, 'create'])->name('modelos.create');
-    Route::post('/modelos', [ModeloController::class, 'store'])->name('modelos.store');
-    Route::get('/modelos/{modelo}/edit', [ModeloController::class, 'edit'])->name('modelos.edit');
-    Route::put('/modelos/{modelo}', [ModeloController::class, 'update'])->name('modelos.update');
-    Route::delete('/modelos/{modelo}', [ModeloController::class, 'destroy'])->name('modelos.destroy');
+    Route::get('/modelos', [ModeloController::class, 'index'])->middleware('permiso:modelo.listar')->name('modelos.index');
+    Route::get('/modelos/create', [ModeloController::class, 'create'])->middleware('permiso:modelo.crear')->name('modelos.create');
+    Route::post('/modelos', [ModeloController::class, 'store'])->middleware('permiso:modelo.crear')->name('modelos.store');
+    Route::get('/modelos/{modelo}/edit', [ModeloController::class, 'edit'])->middleware('permiso:modelo.editar')->name('modelos.edit');
+    Route::put('/modelos/{modelo}', [ModeloController::class, 'update'])->middleware('permiso:modelo.editar')->name('modelos.update');
+    Route::delete('/modelos/{modelo}', [ModeloController::class, 'destroy'])->middleware('permiso:modelo.eliminar')->name('modelos.destroy');
 
-    Route::get('/motores', [MotorController::class, 'index'])->name('motores.index');
-    Route::get('/motores/create', [MotorController::class, 'create'])->name('motores.create');
-    Route::post('/motores', [MotorController::class, 'store'])->name('motores.store');
-    Route::get('/motores/{motor}/edit', [MotorController::class, 'edit'])->name('motores.edit');
-    Route::put('/motores/{motor}', [MotorController::class, 'update'])->name('motores.update');
-    Route::delete('/motores/{motor}', [MotorController::class, 'destroy'])->name('motores.destroy');
+    Route::get('/motores', [MotorController::class, 'index'])->middleware('permiso:motor.listar')->name('motores.index');
+    Route::get('/motores/create', [MotorController::class, 'create'])->middleware('permiso:motor.crear')->name('motores.create');
+    Route::post('/motores', [MotorController::class, 'store'])->middleware('permiso:motor.crear')->name('motores.store');
+    Route::get('/motores/{motor}/edit', [MotorController::class, 'edit'])->middleware('permiso:motor.editar')->name('motores.edit');
+    Route::put('/motores/{motor}', [MotorController::class, 'update'])->middleware('permiso:motor.editar')->name('motores.update');
+    Route::delete('/motores/{motor}', [MotorController::class, 'destroy'])->middleware('permiso:motor.eliminar')->name('motores.destroy');
 
-    Route::get('/partes', [ParteController::class, 'index'])->name('partes.index');
-    Route::get('/partes/create', [ParteController::class, 'create'])->name('partes.create');
-    Route::post('/partes', [ParteController::class, 'store'])->name('partes.store');
-    Route::get('/partes/{parte}/edit', [ParteController::class, 'edit'])->name('partes.edit');
-    Route::put('/partes/{parte}', [ParteController::class, 'update'])->name('partes.update');
-    Route::delete('/partes/{parte}', [ParteController::class, 'destroy'])->name('partes.destroy');
+    Route::get('/partes', [ParteController::class, 'index'])->middleware('permiso:parte.listar')->name('partes.index');
+    Route::get('/partes/create', [ParteController::class, 'create'])->middleware('permiso:parte.crear')->name('partes.create');
+    Route::post('/partes', [ParteController::class, 'store'])->middleware('permiso:parte.crear')->name('partes.store');
+    Route::get('/partes/{parte}/edit', [ParteController::class, 'edit'])->middleware('permiso:parte.editar')->name('partes.edit');
+    Route::put('/partes/{parte}', [ParteController::class, 'update'])->middleware('permiso:parte.editar')->name('partes.update');
+    Route::delete('/partes/{parte}', [ParteController::class, 'destroy'])->middleware('permiso:parte.eliminar')->name('partes.destroy');
 
-    Route::get('/servicios', [\App\Http\Controllers\ServicioController::class, 'index'])->name('servicios.index');
-    Route::get('/servicios/create', [\App\Http\Controllers\ServicioController::class, 'create'])->name('servicios.create');
-    Route::post('/servicios', [\App\Http\Controllers\ServicioController::class, 'store'])->name('servicios.store');
-    Route::get('/servicios/{servicio}/edit', [\App\Http\Controllers\ServicioController::class, 'edit'])->name('servicios.edit');
-    Route::put('/servicios/{servicio}', [\App\Http\Controllers\ServicioController::class, 'update'])->name('servicios.update');
-    Route::delete('/servicios/{servicio}', [\App\Http\Controllers\ServicioController::class, 'destroy'])->name('servicios.destroy');
+    Route::get('/servicios', [\App\Http\Controllers\ServicioController::class, 'index'])->middleware('permiso:servicio.listar')->name('servicios.index');
+    Route::get('/servicios/create', [\App\Http\Controllers\ServicioController::class, 'create'])->middleware('permiso:servicio.crear')->name('servicios.create');
+    Route::post('/servicios', [\App\Http\Controllers\ServicioController::class, 'store'])->middleware('permiso:servicio.crear')->name('servicios.store');
+    Route::get('/servicios/{servicio}/edit', [\App\Http\Controllers\ServicioController::class, 'edit'])->middleware('permiso:servicio.editar')->name('servicios.edit');
+    Route::put('/servicios/{servicio}', [\App\Http\Controllers\ServicioController::class, 'update'])->middleware('permiso:servicio.editar')->name('servicios.update');
+    Route::delete('/servicios/{servicio}', [\App\Http\Controllers\ServicioController::class, 'destroy'])->middleware('permiso:servicio.eliminar')->name('servicios.destroy');
 
-    Route::get('/orden-trabajos', [OrdenTrabajoController::class, 'index'])->name('orden-trabajos.index');
-    Route::get('/orden-trabajos/create', [OrdenTrabajoController::class, 'create'])->name('orden-trabajos.create');
-    Route::post('/orden-trabajos', [OrdenTrabajoController::class, 'store'])->name('orden-trabajos.store');
-    Route::get('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'show'])->name('orden-trabajos.show');
-    Route::get('/orden-trabajos/{ordenTrabajo}/edit', [OrdenTrabajoController::class, 'edit'])->name('orden-trabajos.edit');
-    Route::put('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'update'])->name('orden-trabajos.update');
-    Route::put('/orden-trabajos/{ordenTrabajo}/estado', [OrdenTrabajoController::class, 'actualizarEstado'])->name('orden-trabajos.actualizar-estado');
-    Route::delete('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'destroy'])->name('orden-trabajos.destroy');
+    Route::get('/orden-trabajos', [OrdenTrabajoController::class, 'index'])->middleware('permiso:orden_trabajo.listar')->name('orden-trabajos.index');
+    Route::get('/orden-trabajos/create', [OrdenTrabajoController::class, 'create'])->middleware('permiso:orden_trabajo.crear')->name('orden-trabajos.create');
+    Route::post('/orden-trabajos', [OrdenTrabajoController::class, 'store'])->middleware('permiso:orden_trabajo.crear')->name('orden-trabajos.store');
+    Route::get('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'show'])->middleware('permiso:orden_trabajo.listar')->name('orden-trabajos.show');
+    Route::get('/orden-trabajos/{ordenTrabajo}/edit', [OrdenTrabajoController::class, 'edit'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.edit');
+    Route::put('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'update'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.update');
+    Route::delete('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'destroy'])->middleware('permiso:orden_trabajo.eliminar')->name('orden-trabajos.destroy');
 
-    Route::post('/orden-trabajos/{ordenTrabajo}/servicios', [OrdenTrabajoServicioController::class, 'store'])->name('orden-trabajos.servicios.store');
-    Route::put('/orden-trabajos/servicios/{detalle}', [OrdenTrabajoServicioController::class, 'update'])->name('orden-trabajos.servicios.update');
-    Route::delete('/orden-trabajos/servicios/{detalle}', [OrdenTrabajoServicioController::class, 'destroy'])->name('orden-trabajos.servicios.destroy');
+    Route::post('/orden-trabajos/{ordenTrabajo}/servicios', [OrdenTrabajoServicioController::class, 'store'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.servicios.store');
+    Route::put('/orden-trabajos/servicios/{detalle}', [OrdenTrabajoServicioController::class, 'update'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.servicios.update');
+    Route::delete('/orden-trabajos/servicios/{detalle}', [OrdenTrabajoServicioController::class, 'destroy'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.servicios.destroy');
 
-    Route::get('/incidencias', [IncidenciaController::class, 'index'])->name('incidencias.index');
-    Route::get('/orden-trabajos/{ordenTrabajo}/incidencias/create', [IncidenciaController::class, 'create'])->name('incidencias.create');
-    Route::post('/orden-trabajos/{ordenTrabajo}/incidencias', [IncidenciaController::class, 'store'])->name('incidencias.store');
-    Route::get('/incidencias/{incidencia}/edit', [IncidenciaController::class, 'edit'])->name('incidencias.edit');
-    Route::put('/incidencias/{incidencia}', [IncidenciaController::class, 'update'])->name('incidencias.update');
-    Route::delete('/incidencias/{incidencia}', [IncidenciaController::class, 'destroy'])->name('incidencias.destroy');
+    Route::get('/incidencias', [IncidenciaController::class, 'index'])->middleware('permiso:incidencia.listar')->name('incidencias.index');
+    Route::get('/orden-trabajos/{ordenTrabajo}/incidencias/create', [IncidenciaController::class, 'create'])->middleware('permiso:incidencia.crear')->name('incidencias.create');
+    Route::post('/orden-trabajos/{ordenTrabajo}/incidencias', [IncidenciaController::class, 'store'])->middleware('permiso:incidencia.crear')->name('incidencias.store');
+    Route::get('/incidencias/{incidencia}/edit', [IncidenciaController::class, 'edit'])->middleware('permiso:incidencia.editar')->name('incidencias.edit');
+    Route::put('/incidencias/{incidencia}', [IncidenciaController::class, 'update'])->middleware('permiso:incidencia.editar')->name('incidencias.update');
+    Route::delete('/incidencias/{incidencia}', [IncidenciaController::class, 'destroy'])->middleware('permiso:incidencia.eliminar')->name('incidencias.destroy');
 
-    Route::get('/plan-pagos', [PlanPagoController::class, 'index'])->name('plan-pagos.index');
-    Route::get('/plan-pagos/{planPago}', [PlanPagoController::class, 'show'])->name('plan-pagos.show');
-    Route::get('/orden-trabajos/{ordenTrabajo}/plan-pagos/create', [PlanPagoController::class, 'create'])->name('plan-pagos.create');
-    Route::post('/orden-trabajos/{ordenTrabajo}/plan-pagos', [PlanPagoController::class, 'store'])->name('plan-pagos.store');
-    Route::get('/plan-pagos/{planPago}/edit', [PlanPagoController::class, 'edit'])->name('plan-pagos.edit');
-    Route::put('/plan-pagos/{planPago}', [PlanPagoController::class, 'update'])->name('plan-pagos.update');
-    Route::delete('/plan-pagos/{planPago}', [PlanPagoController::class, 'destroy'])->name('plan-pagos.destroy');
+    Route::get('/plan-pagos', [PlanPagoController::class, 'index'])->middleware('permiso:plan_pago.listar')->name('plan-pagos.index');
+    Route::get('/plan-pagos/{planPago}', [PlanPagoController::class, 'show'])->middleware('permiso:plan_pago.listar')->name('plan-pagos.show');
+    Route::get('/orden-trabajos/{ordenTrabajo}/plan-pagos/create', [PlanPagoController::class, 'create'])->middleware('permiso:plan_pago.crear')->name('plan-pagos.create');
+    Route::post('/orden-trabajos/{ordenTrabajo}/plan-pagos', [PlanPagoController::class, 'store'])->middleware('permiso:plan_pago.crear')->name('plan-pagos.store');
+    Route::get('/plan-pagos/{planPago}/edit', [PlanPagoController::class, 'edit'])->middleware('permiso:plan_pago.editar')->name('plan-pagos.edit');
+    Route::put('/plan-pagos/{planPago}', [PlanPagoController::class, 'update'])->middleware('permiso:plan_pago.editar')->name('plan-pagos.update');
+    Route::delete('/plan-pagos/{planPago}', [PlanPagoController::class, 'destroy'])->middleware('permiso:plan_pago.eliminar')->name('plan-pagos.destroy');
 
-    Route::get('/plan-pagos/{planPago}/pagos', [PagoController::class, 'index'])->name('plan-pagos.pagos.index');
-    Route::get('/plan-pagos/{planPago}/pagos/create', [PagoController::class, 'create'])->name('plan-pagos.pagos.create');
-    Route::post('/plan-pagos/{planPago}/pagos', [PagoController::class, 'store'])->name('plan-pagos.pagos.store');
-    Route::get('/pagos/{pago}', [PagoController::class, 'show'])->name('plan-pagos.pagos.show');
-    Route::get('/pagos/{pago}/edit', [PagoController::class, 'edit'])->name('plan-pagos.pagos.edit');
-    Route::put('/pagos/{pago}', [PagoController::class, 'update'])->name('plan-pagos.pagos.update');
-    Route::delete('/pagos/{pago}', [PagoController::class, 'destroy'])->name('plan-pagos.pagos.destroy');
+    Route::get('/plan-pagos/{planPago}/pagos', [PagoController::class, 'index'])->middleware('permiso:pago.listar')->name('plan-pagos.pagos.index');
+    Route::get('/plan-pagos/{planPago}/pagos/create', [PagoController::class, 'create'])->middleware('permiso:pago.crear')->name('plan-pagos.pagos.create');
+    Route::post('/plan-pagos/{planPago}/pagos', [PagoController::class, 'store'])->middleware('permiso:pago.crear')->name('plan-pagos.pagos.store');
+    Route::get('/pagos/{pago}', [PagoController::class, 'show'])->middleware('permiso:pago.listar')->name('plan-pagos.pagos.show');
+    Route::get('/pagos/{pago}/edit', [PagoController::class, 'edit'])->middleware('permiso:pago.editar')->name('plan-pagos.pagos.edit');
+    Route::put('/pagos/{pago}', [PagoController::class, 'update'])->middleware('permiso:pago.editar')->name('plan-pagos.pagos.update');
+    Route::delete('/pagos/{pago}', [PagoController::class, 'destroy'])->middleware('permiso:pago.eliminar')->name('plan-pagos.pagos.destroy');
 
-    Route::get('/stripe/config', [PagoController::class, 'stripeConfig'])->name('stripe.config');
-    Route::post('/plan-pagos/{planPago}/pagos/stripe/intent', [PagoController::class, 'stripeCreatePaymentIntent'])->name('plan-pagos.pagos.stripe.intent');
-    Route::post('/plan-pagos/{planPago}/pagos/stripe/confirm', [PagoController::class, 'stripeConfirmPago'])->name('plan-pagos.pagos.stripe.confirm');
+    Route::get('/stripe/config', [PagoController::class, 'stripeConfig'])->middleware('permiso:pago.listar')->name('stripe.config');
+    Route::post('/plan-pagos/{planPago}/pagos/stripe/intent', [PagoController::class, 'stripeCreatePaymentIntent'])->middleware('permiso:pago.crear')->name('plan-pagos.pagos.stripe.intent');
+    Route::post('/plan-pagos/{planPago}/pagos/stripe/confirm', [PagoController::class, 'stripeConfirmPago'])->middleware('permiso:pago.crear')->name('plan-pagos.pagos.stripe.confirm');
 
     Route::get('/pagofacil/login', [PagoController::class, 'pagofacilLogin'])->name('pagofacil.login');
     Route::get('/pagofacil/list-enabled-services', [PagoController::class, 'pagofacilListEnabledServices'])->name('pagofacil.list');
@@ -225,10 +224,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/pagofacil/callback-url', [PagoController::class, 'pagofacilCallbackUrl'])->name('pagofacil.callback-url');
     Route::post('/pagofacil/query-transaction', [PagoController::class, 'pagofacilQueryTransaction'])->name('pagofacil.query');
 
-    Route::get('/facturas/{factura}', [FacturaController::class, 'show'])->name('facturas.show');
-    Route::get('/pagos/{pago}/facturas/create', [FacturaController::class, 'create'])->name('facturas.create');
-    Route::post('/pagos/{pago}/facturas', [FacturaController::class, 'store'])->name('facturas.store');
-    Route::delete('/facturas/{factura}', [FacturaController::class, 'destroy'])->name('facturas.destroy');
+    Route::get('/facturas/{factura}', [FacturaController::class, 'show'])->middleware('permiso:factura.listar')->name('facturas.show');
+    Route::get('/pagos/{pago}/facturas/create', [FacturaController::class, 'create'])->middleware('permiso:factura.crear')->name('facturas.create');
+    Route::post('/pagos/{pago}/facturas', [FacturaController::class, 'store'])->middleware('permiso:factura.crear')->name('facturas.store');
+    Route::delete('/facturas/{factura}', [FacturaController::class, 'destroy'])->middleware('permiso:factura.eliminar')->name('facturas.destroy');
 
     // ========================================================================
     // RUTAS ESPECÍFICAS PARA MECÁNICOS
