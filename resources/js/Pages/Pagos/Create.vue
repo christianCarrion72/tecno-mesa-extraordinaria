@@ -43,7 +43,7 @@ const pfToken = ref<string>('');
 const pfLoginError = ref<string>('');
 const obtenerTokenPagoFacil = async (): Promise<string | null> => {
     try {
-        const res = await fetch('/pagofacil/login');
+        const res = await fetch(route('pagofacil.login'));
         const data = await res.json();
         console.log('PagoFacil login response:', data);
         const token = data?.values?.accessToken ?? '';
@@ -84,7 +84,7 @@ const cargarPFServicios = async () => {
         if (!pfToken.value) {
             await obtenerTokenPagoFacil();
         }
-        const res = await fetch('/pagofacil/list-enabled-services', {
+        const res = await fetch(route('pagofacil.list'), {
             headers: pfToken.value ? { Authorization: `Bearer ${pfToken.value}` } : {},
         });
         const data = await res.json();
@@ -113,7 +113,7 @@ const generarQrPF = async () => {
         if (!pfToken.value) {
             await obtenerTokenPagoFacil();
         }
-        const cbRes = await fetch('/pagofacil/callback-url');
+        const cbRes = await fetch(route('pagofacil.callback-url'));
         const cbJson = await cbRes.json();
         const callbackUrl = cbJson?.callbackUrl || '';
         console.log('[PF] Callback URL usada:', callbackUrl);
@@ -142,7 +142,7 @@ const generarQrPF = async () => {
                 },
             ],
         };
-        const res = await fetch('/pagofacil/generate-qr', {
+        const res = await fetch(route('pagofacil.generate'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -162,7 +162,7 @@ const generarQrPF = async () => {
         } else {
             const pagoId = data?.values?.pagoId;
             if (pagoId) {
-                router.visit(`/pagos/${pagoId}`);
+                router.visit(route('plan-pagos.pagos.show', pagoId));
                 return;
             }
             pfQrBase64.value = data?.values?.qrBase64 || '';
