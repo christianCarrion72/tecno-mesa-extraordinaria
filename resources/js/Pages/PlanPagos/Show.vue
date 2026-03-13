@@ -24,7 +24,7 @@ defineProps<{ plan: any }>();
                     <div class="flex gap-2">
                         <template v-if="(plan.pagos?.length || 0) < plan.numerocuotas && plan.estado !== 'terminado'">
                             <Link :href="route('plan-pagos.pagos.create', plan.id)">
-                                <Button :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }">
+                                <Button :style="{ backgroundColor: 'var(--color-primary)', color: 'white' }">
                                     Generar Pago
                                 </Button>
                             </Link>

@@ -354,10 +354,10 @@ const logout = () => {
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     Mi Perfil
                                 </Link>
-                                <Link :href="route('dashboard')"
+                                <!--Link :href="route('dashboard')"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     Vista Cliente
-                                </Link>
+                                </Link-->
                                 <form @submit.prevent="logout">
                                     <button type="submit"
                                         class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
