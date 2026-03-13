@@ -72,7 +72,7 @@ const pfAmount = ref<string>(String(Number(form.monto) || 0));
 const pfCurrency = ref<string>('2');
 const pfClientCode = ref<string>('');
 const pfOrderSerial = ref<string>('1');
-const pfOrderProduct = ref<string>('');
+const pfOrderProduct = ref<string>('Servicio automotriz y refacciones de vehículos');
 const pfOrderQuantity = ref<string>('1');
 const pfOrderPrice = ref<string>(String(Number(form.monto) || 0));
 const pfOrderDiscount = ref<string>('0');
@@ -226,8 +226,13 @@ const esTarjeta = computed(() => {
 });
 
 const stripeQrUrl = ref<string>('');
+const stripeLoading = ref(false);
 
 const generarQrStripe = async () => {
+    if (stripeLoading.value) {
+        return;
+    }
+    stripeLoading.value = true;
     stripeQrUrl.value = '';
     try {
         const res = await fetch(route('plan-pagos.pagos.stripe.intent', props.plan.id), {
@@ -254,6 +259,8 @@ const generarQrStripe = async () => {
     } catch (e) {
         console.error('Error generando QR Stripe', e);
         alert('Error generando QR para tarjeta.');
+    } finally {
+        stripeLoading.value = false;
     }
 };
 </script>
@@ -398,10 +405,10 @@ const generarQrStripe = async () => {
                                     type="button"
                                     variant="default"
                                     :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
-                                    :disabled="form.processing"
+                                    :disabled="form.processing || stripeLoading"
                                     @click="generarQrStripe"
                                 >
-                                    Generar QR de pago
+                                    {{ stripeLoading ? 'Generando QR...' : 'Generar QR de pago' }}
                                 </Button>
                             </div>
                             <div v-if="stripeQrUrl" class="mt-4">
@@ -438,7 +445,6 @@ const generarQrStripe = async () => {
                         </div>
 
                         <div class="md:col-span-2 flex gap-3 flex-wrap">
-                            <Button variant="outline" :disabled="form.processing" type="submit">Guardar Pago</Button>
                             <Button
                                 :disabled="form.processing"
                                 type="submit"
@@ -455,31 +461,14 @@ const generarQrStripe = async () => {
                                 Cancelar
                             </Button>
                             <Button
-                                v-if="esPagoFacil"
-                                type="button"
-                                variant="outline"
-                                :disabled="form.processing || loadingPF"
-                                @click="obtenerTokenPagoFacil"
-                            >
-                                {{ pfToken ? 'Renovar Token' : 'Obtener Token' }}
-                            </Button>
-                            <Button
                                 v-if="esPagoFacil && selectedPaymentMethodId"
                                 type="button"
                                 variant="default"
+                                :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
                                 :disabled="form.processing || !selectedPaymentMethodId || !pfClientName"
                                 @click="generarQrPF"
                             >
                                 Generar QR
-                            </Button>
-                            <Button
-                                v-if="esTarjeta"
-                                type="button"
-                                variant="outline"
-                                :disabled="form.processing"
-                                @click="generarQrStripe"
-                            >
-                                Generar QR Tarjeta
                             </Button>
                         </div>
                     </form>
