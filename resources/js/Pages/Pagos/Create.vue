@@ -60,6 +60,7 @@ const obtenerTokenPagoFacil = async (): Promise<string | null> => {
 const serviciosPF = ref<any[]>([]);
 const selectedPaymentMethodId = ref<string>('');
 const loadingPF = ref(false);
+const generatingPF = ref(false);
 const pfItems = computed(() => serviciosPF.value.map(s => ({ id: String(s.paymentMethodId), label: s.paymentMethodName })));
 const pfQrBase64 = ref<string>('');
 const pfClientName = ref<string>('');
@@ -109,6 +110,10 @@ const prefillPFCliente = () => {
 };
 
 const generarQrPF = async () => {
+    if (generatingPF.value) {
+        return;
+    }
+    generatingPF.value = true;
     try {
         if (!pfToken.value) {
             await obtenerTokenPagoFacil();
@@ -170,6 +175,8 @@ const generarQrPF = async () => {
     } catch (e) {
         console.error('Error generando QR PagoFacil:', e);
         pfLoginError.value = 'Error generando QR PagoFacil';
+    } finally {
+        generatingPF.value = false;
     }
 };
 
@@ -504,10 +511,10 @@ const generarQrStripe = async () => {
                                 type="button"
                                 variant="default"
                                 :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }"
-                                :disabled="form.processing || !selectedPaymentMethodId || !pfClientName"
+                                :disabled="form.processing || generatingPF || !selectedPaymentMethodId || !pfClientName"
                                 @click="generarQrPF"
                             >
-                                Generar QR
+                                {{ generatingPF ? 'Generando QR...' : 'Generar QR' }}
                             </Button>
                         </div>
                     </form>
