@@ -80,7 +80,7 @@ defineProps<{ plan: any }>();
                                             <div class="flex gap-2">
                                                 <template v-if="!pg.factura">
                                                     <Link :href="route('facturas.create', pg.id)">
-                                                        <Button size="sm" :style="{ backgroundColor: 'var(--color-primary)', color: 'var(--color-base)' }">Generar Factura</Button>
+                                                        <Button size="sm" :style="{ backgroundColor: 'var(--color-primary)', color: 'white' }">Generar Factura</Button>
                                                     </Link>
                                                 </template>
                                                 <template v-else>

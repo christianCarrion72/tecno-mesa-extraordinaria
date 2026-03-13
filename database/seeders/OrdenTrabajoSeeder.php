@@ -58,8 +58,8 @@ class OrdenTrabajoSeeder extends Seeder
 
             foreach ($chosen as $s) {
                 $cantidad = rand(1, 3);
-                // small random variation on price
-                $precio = round($s->costo * (1 + (rand(-10, 10) / 100)), 2);
+                // Precio coherente: usar el costo real del servicio en BD.
+                $precio = (float) $s->costo;
                 $subtotal = round($cantidad * $precio, 2);
 
                 OrdenTrabajoServicio::create([
