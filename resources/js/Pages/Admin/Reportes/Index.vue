@@ -562,7 +562,7 @@ const chartOptionsPie = {
                     </div>
                 </div>
 
-                <div class="rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow"
+                <!--div class="rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow"
                     :style="{ 
                       backgroundColor: 'var(--color-base)',
                       borderColor: 'var(--color-border)'
@@ -579,7 +579,7 @@ const chartOptionsPie = {
                             <ChartPieIcon class="h-6 w-6" :style="{ color: 'var(--color-accent)' }" />
                         </div>
                     </div>
-                </div>
+                </div-->
             </div>
 
 

@@ -14,8 +14,14 @@ const showingNavigationDropdown = ref(false);
 
 const page = usePage();
 const permisos = computed(() => page.props.auth?.permisos || []);
-const tienePermiso = (permiso) => permisos.value.includes(permiso);
 const rolNombre = computed(() => page.props.auth.user.rol?.nombre || '');
+const tienePermiso = (permiso) => {
+    if (rolNombre.value === 'Propietario') {
+        return true;
+    }
+
+    return permisos.value.includes(permiso);
+};
 
 const logout = () => {
     router.post(route('logout'));
