@@ -183,6 +183,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'show'])->middleware('permiso:orden_trabajo.listar')->name('orden-trabajos.show');
     Route::get('/orden-trabajos/{ordenTrabajo}/edit', [OrdenTrabajoController::class, 'edit'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.edit');
     Route::put('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'update'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.update');
+    Route::put('/orden-trabajos/{ordenTrabajo}/estado', [OrdenTrabajoController::class, 'actualizarEstado'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.actualizar-estado');
     Route::delete('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'destroy'])->middleware('permiso:orden_trabajo.eliminar')->name('orden-trabajos.destroy');
 
     Route::post('/orden-trabajos/{ordenTrabajo}/servicios', [OrdenTrabajoServicioController::class, 'store'])->middleware('permiso:orden_trabajo.editar')->name('orden-trabajos.servicios.store');
