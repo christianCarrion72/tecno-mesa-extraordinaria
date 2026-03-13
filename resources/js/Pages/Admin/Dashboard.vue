@@ -74,7 +74,7 @@ const mostrarInventario = computed(() =>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Ingresos del Mes</p>
-                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">${{ stats.ingresos_mes?.toLocaleString() }}</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">${{ stats.ingresos_mes?.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
                     </div>
                 </div>
             </div>
