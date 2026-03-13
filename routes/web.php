@@ -220,7 +220,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/pagofacil/login', [PagoController::class, 'pagofacilLogin'])->name('pagofacil.login');
     Route::get('/pagofacil/list-enabled-services', [PagoController::class, 'pagofacilListEnabledServices'])->name('pagofacil.list');
-    Route::post('/pagofacil/generate-qr', [PagoController::class, 'pagofacilGenerateQr'])->name('pagofacil.generate');
+    Route::post('/pagofacil/generate-qr', [PagoController::class, 'pagofacilGenerateQr'])
+        ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)
+        ->name('pagofacil.generate');
     Route::get('/pagofacil/callback-url', [PagoController::class, 'pagofacilCallbackUrl'])->name('pagofacil.callback-url');
     Route::post('/pagofacil/query-transaction', [PagoController::class, 'pagofacilQueryTransaction'])->name('pagofacil.query');
 
