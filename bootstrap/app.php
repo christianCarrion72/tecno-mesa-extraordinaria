@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckPermission;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Registrar middleware personalizado
         $middleware->alias([
             'tipo' => \App\Http\Middleware\CheckUserType::class,
+            'permiso' => CheckPermission::class,
         ]);
 
         // Excluir rutas de CSRF
