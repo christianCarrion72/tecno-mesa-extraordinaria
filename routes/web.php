@@ -184,6 +184,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'show'])->name('orden-trabajos.show');
     Route::get('/orden-trabajos/{ordenTrabajo}/edit', [OrdenTrabajoController::class, 'edit'])->name('orden-trabajos.edit');
     Route::put('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'update'])->name('orden-trabajos.update');
+    Route::put('/orden-trabajos/{ordenTrabajo}/estado', [OrdenTrabajoController::class, 'actualizarEstado'])->name('orden-trabajos.actualizar-estado');
     Route::delete('/orden-trabajos/{ordenTrabajo}', [OrdenTrabajoController::class, 'destroy'])->name('orden-trabajos.destroy');
 
     Route::post('/orden-trabajos/{ordenTrabajo}/servicios', [OrdenTrabajoServicioController::class, 'store'])->name('orden-trabajos.servicios.store');

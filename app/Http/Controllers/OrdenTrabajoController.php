@@ -66,6 +66,7 @@ class OrdenTrabajoController extends Controller
         return inertia('OrdenTrabajo/Index', [
             'ordenes' => $ordenes,
             'terminosBusqueda' => $busqueda,
+            'estados' => ['pendiente', 'aprobado', 'proceso', 'terminado'],
         ]);
     }
 
@@ -192,6 +193,30 @@ class OrdenTrabajoController extends Controller
         $ordenTrabajo->update($data);
 
         return redirect()->route('orden-trabajos.index')->with('success', 'Orden actualizada.');
+    }
+
+    public function actualizarEstado(Request $request, OrdenTrabajo $ordenTrabajo)
+    {
+        if (!request()->user()->tienePermiso('orden_trabajo.editar')) {
+            return redirect()->route('dashboard')->with('error', 'No tenés permiso para cambiar el estado de órdenes de trabajo.');
+        }
+
+        $data = $request->validate([
+            'estado' => 'required|in:pendiente,aprobado,proceso,terminado',
+        ]);
+
+        $ordenTrabajo->update([
+            'estado' => $data['estado'],
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Estado de la orden actualizado.',
+                'orden' => $ordenTrabajo->fresh(['cliente', 'usuario', 'motor']),
+            ]);
+        }
+
+        return back()->with('success', 'Estado de la orden actualizado.');
     }
 
     public function show(OrdenTrabajo $ordenTrabajo)
