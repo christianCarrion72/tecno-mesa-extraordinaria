@@ -10,7 +10,7 @@ const variantClasses: Record<Variant, string> = {
   default:
     'bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-600',
   outline:
-    'border border-gray-500 bg-transparent text-gray-100 hover:bg-gray-800 focus-visible:ring-gray-500',
+    'border border-gray-400 bg-transparent text-gray-600 hover:bg-gray-100 focus-visible:ring-gray-500 dark:border-gray-500 dark:text-gray-100 dark:hover:bg-gray-800',
   destructive:
     'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600 dark:bg-red-500 dark:hover:bg-red-600',
 };
@@ -57,4 +57,3 @@ export const Button = defineComponent({
       );
   },
 });
-
